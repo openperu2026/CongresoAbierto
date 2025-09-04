@@ -1,11 +1,5 @@
-from sqlalchemy import (Column, Integer, String, Enum, Boolean, DateTime, 
-                        ForeignKey, UniqueConstraint, PrimaryKeyConstraint,
-                        Index)
-from estecon.backend import (VoteOption, AttendanceStatus, BillStepType, RoleTypeBill, 
-                     LegPeriod, Legislature, LegislativeYear, Proponents,
-                     RoleOrganization, TypeOrganization)
+from sqlalchemy import Column, Integer
 from sqlalchemy.orm import declarative_base
-
 Base = declarative_base()
 
 class Vote(Base):
@@ -20,14 +14,7 @@ class Vote(Base):
     '''
     __tablename__ = 'votes'
 
-    vote_event_id = Column(String, ForeignKey('vote_events.id'), primary_key=True)
-    voter_id = Column(Integer, ForeignKey('congresistas.id'), nullable=False)
-    option = Column(Enum(VoteOption, name = "option"), nullable=False)
-    bancada_id = Column(Integer, ForeignKey('bancadas.bancada_id'), nullable=False)
-
-    __table_args__ = (UniqueConstraint('vote_event_id', 'voter_id', name='uq_vote_event_voter'),
-                      Index('ix_vote_vote_event_id', 'vote_event_id'),
-                      Index('ix_vote_voter_id', 'voter_id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class VoteEvent(Base):
     '''
@@ -41,14 +28,7 @@ class VoteEvent(Base):
     '''
     __tablename__ = 'vote_events'
 
-    id = Column(String, primary_key=True)
-    org_id = Column(Integer, ForeignKey('organizations.org_id'), nullable=False)
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), nullable=False)
-    bill_id = Column(String, ForeignKey('bills.id'), nullable=False)
-    date = Column(DateTime, nullable=False)
-
-    __table_args__ = (UniqueConstraint('org_id', 'leg_period', 'bill_id', 'id', name='uq_vote_event'),
-                      Index('ix_vote_event_bill_id', 'bill_id'),)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class VoteCounts(Base):
     '''
@@ -63,16 +43,7 @@ class VoteCounts(Base):
     '''
     __tablename__ = 'vote_counts'
 
-    org_id = Column(Integer, ForeignKey('organizations.org_id'), nullable=False)
-    vote_event_id = Column(String, ForeignKey('vote_events.id'), nullable=False)
-    option = Column(Enum(VoteOption, name = "option"), nullable=False)
-    bancada_id =  Column(Integer, ForeignKey('bancadas.bancada_id'), nullable=False)
-    count = Column(Integer, nullable=False)
-
-    __table_args__ = (
-        PrimaryKeyConstraint('vote_event_id', 'option', 'bancada_id', name='pk_vote_counts'),
-        Index('ix_votecounts_vote_event_id', 'vote_event_id'),
-        Index('ix_votecounts_bancada_id', 'bancada_id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class Attendance(Base):
     '''
@@ -86,14 +57,7 @@ class Attendance(Base):
     '''
     __tablename__ = 'attendance'
 
-    org_id = Column(Integer, ForeignKey('organizations.org_id'), nullable=False)
-    event_id = Column(String, ForeignKey('vote_events.id'), primary_key=True)
-    attendee_id = Column(Integer, ForeignKey('congresistas.id'), nullable=False)
-    status = Column(Enum(AttendanceStatus, name='attendance_status'), nullable=False)
-
-    __table_args__ = (UniqueConstraint('org_id', 'event_id', 'attendee_id', name='uq_attendance'),
-                      Index('ix_attendance_by_event', 'event_id'),
-                      Index('ix_attendance_attendee_id', 'attendee_id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class Bill(Base):
     '''
@@ -116,23 +80,8 @@ class Bill(Base):
     '''
     __tablename__ = 'bills'
 
-    id = Column(String, primary_key=True)
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), nullable=False)
-    legislature = Column(Enum(Legislature, name ="legislature"), nullable=False)
-    presentation_date = Column(DateTime, nullable=False)
-    title = Column(String, nullable=False)
-    summary = Column(String, nullable=False)
-    observations = Column(String, nullable=False)
-    complete_text = Column(String, nullable=False)
-    status = Column(String, nullable=False)
-    proponent = Column(Enum(Proponents, name = "proponent"), nullable=False)
-    author_id = Column(Integer, ForeignKey('congresistas.id'), nullable=True)
-    bancada_id = Column(Integer, ForeignKey('bancadas.bancada_id'), nullable=True)
-    bill_approved = Column(Boolean, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (UniqueConstraint('id', name='bill_unique'),
-                      Index('ix_bill_author_id', 'author_id'),
-                      Index('ix_bill_bancada_id', 'bancada_id'))
 
 class BillCongresistas(Base):
     '''
@@ -145,13 +94,8 @@ class BillCongresistas(Base):
         role_type (str): The type of role that the person has in the bill (e.g. author, coauthor, adherente, etc) 
     '''
     __tablename__ = "bills_congresistas"
-    
-    bill_id = Column(String, ForeignKey('bills.id'), nullable = False)
-    person_id = Column(Integer, ForeignKey('congresistas.id'), nullable = False)
-    role_type = Column(Enum(RoleTypeBill, name="role_type"), nullable = False)
 
-    __table_args__ = (PrimaryKeyConstraint('bill_id', 'person_id'),
-                      Index('ix_billcongresistas_person_id', 'person_id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class BillStep(Base):
     '''
@@ -167,14 +111,8 @@ class BillStep(Base):
     '''
     __tablename__ = "bill_steps"
 
-    id = Column(Integer, primary_key=True)
-    bill_id = Column(String, ForeignKey('bills.id'), nullable=True)
-    step_type = Column(Enum(BillStepType, name='type_step'), nullable=False)
-    step_date = Column(DateTime, nullable=False)
-    step_detail = Column(String, nullable=False)
-    step_url = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (Index('ix_billstep_bill_id', 'bill_id'),)
 
 class BillCommittees(Base):
     '''
@@ -186,12 +124,8 @@ class BillCommittees(Base):
     '''
     __tablename__ = "bill_committees"
 
-    bill_id = Column(String, ForeignKey('bills.id'), nullable=False)
-    committee_id = Column(Integer, ForeignKey('committees.id'), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (PrimaryKeyConstraint('bill_id', 'committee_id'),
-                      UniqueConstraint('bill_id', 'committee_id', name='bill_committee_uniq'),
-                      Index('ix_billcommittees_committee_id', "committee_id"))
     
 class Committee(Base):
     '''
@@ -206,13 +140,8 @@ class Committee(Base):
     '''
     __tablename__ = 'committees'
 
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), primary_key=True, nullable=False)
-    leg_year = Column(Enum(LegislativeYear, name = "leg_period"), primary_key=True, nullable=False)
-    org_id = Column(Integer, ForeignKey('organizations.org_id'), nullable=False)
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (UniqueConstraint('leg_period', 'leg_year', 'org_id', 'id', name='committee_uniq'),)
 
 class Congresista(Base):
     '''
@@ -230,17 +159,8 @@ class Congresista(Base):
     '''
     __tablename__ = 'congresistas'
 
-    id = Column(Integer, nullable=False)
-    nombre = Column(String, nullable=False)
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), nullable=False)
-    party_id = Column(Integer, ForeignKey('partidos.party_id'), nullable=False)
-    votes_in_election = Column(Integer, nullable=False)
-    dist_electoral = Column(String, nullable=True)
-    condicion = Column(String, nullable=False)
-    website = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (UniqueConstraint('id', 'leg_period', name='congresista_uniq'),
-                      PrimaryKeyConstraint('id', 'leg_period'))
 
 class Party(Base):
     '''
@@ -253,9 +173,8 @@ class Party(Base):
     '''
     __tablename__ = "partidos"
 
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), nullable=False)
-    party_id = Column(Integer, primary_key = True)
-    party_name= Column(String, nullable = False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
 
 class Bancada(Base):
     '''
@@ -268,9 +187,7 @@ class Bancada(Base):
     '''
     __tablename__ = "bancadas"
 
-    leg_year = Column(Enum(LegislativeYear, name = "leg_period"), nullable=False)
-    bancada_id = Column(Integer, primary_key = True)
-    bancada_name= Column(String, nullable = False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
 class Organization(Base):
     '''
@@ -286,13 +203,8 @@ class Organization(Base):
     '''
     __tablename__ = "organizations"
 
-    leg_period = Column(Enum(LegPeriod, name = "leg_period"), nullable=False)
-    leg_year = Column(Enum(LegislativeYear, name = "leg_year"), primary_key=True, nullable=False)
-    org_id = Column(Integer, primary_key=True)
-    org_name = Column(String, nullable=False)
-    org_type = Column(Enum(TypeOrganization, name = "type_organization"), nullable = False)
-    
-    __table_args__ = (UniqueConstraint('leg_period', 'org_id', name='org_uniq'),)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
 
 class Membership(Base):
     '''
@@ -309,14 +221,8 @@ class Membership(Base):
 
     __tablename__ = "memberships"
 
-    id = Column(Integer, primary_key = True)
-    role = Column(Enum(RoleOrganization, name = "role"), nullable = False)
-    person_id = Column(Integer, ForeignKey('congresistas.id'), nullable = False)
-    org_id = Column(Integer, ForeignKey('organizations.org_id'), nullable = False)
-    start_date = Column(DateTime, nullable = False)
-    end_date = Column(DateTime, nullable = True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    __table_args__ = (UniqueConstraint("id", name = "membership"),)
 
 class BancadaMembership(Base):
     '''
@@ -330,7 +236,73 @@ class BancadaMembership(Base):
     '''
     __tablename__ = "bancada_memberships"
 
-    id = Column(Integer, primary_key = True)
-    leg_year = Column(Enum(LegislativeYear, name = 'leg_year'), nullable = False)
-    person_id = Column(Integer, ForeignKey('congresistas.id'), nullable = False)
-    bancada_id = Column(Integer, ForeignKey('bancadas.bancada_id'), nullable = False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+class RawBills(Base):
+    '''
+    Raw data extracted by scrape_project_bills.py that contains bill's information
+    from the web https://wb2server.congreso.gob.pe/spley-portal-service/expediente.
+     
+    Attributes:
+        bill_id (int): Unique bill identifiesr.
+        timestamp (datetime): Timestamp from the request.
+        general (str): Raw content on 'general' key
+        comisiones (str): Raw content on 'comisiones' key
+        seguimientos (str): Raw content on 'seguimientos' key
+        acumulados (str): Raw content on 'acumulados' key
+        documentosAnexos (str): Raw content on 'documentosAnexos' key
+        fases (str): Raw content on 'fases' key
+        firmantes (str): Raw content on 'firmantes' key
+        secciones (str): Raw content on 'secciones' key
+        archivos (str): Raw content on 'archivos' key
+    '''
+    __tablename__ = "raw_bills"
+
+class RawBillDocuments(Base):
+    '''
+    Raw documents url and text content extracted by scrape_project_bills.py
+     
+    Attributes:
+        bill_id (str): Unique identifier for the membership relationship.
+        seguimientoPleyId (str): Event to which the document is related to.
+        url (str): complete document's url.
+        text (str): extracted text from the pdf
+    '''
+    __tablename__ = "raw_bill_documents"
+
+class RawCongresistas(Base):
+    '''
+    Raw data extracted by scrape_congresistas.py
+    
+    Attributes:
+        TODO
+    '''
+    __tablename__ = "raw_congresistas"
+
+class RawCommittees(Base):
+    '''
+    Raw data extracted by scrape_committees.py
+    
+    Attributes:
+        TODO
+    '''
+    __tablename__ = "raw_committees"
+
+class RawMemberships(Base):
+    '''
+    Raw data extracted by scrape_membership.py
+    
+    Attributes:
+        TODO
+    '''
+    __tablename__ = "raw_memberships"
+
+
+class RawBancadas(Base):
+    '''
+    Raw data extracted by scrape_bancadas.py
+    
+    Attributes:
+        TODO
+    '''
+    __tablename__ = "raw_bancadas"
