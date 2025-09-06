@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
+from ..config import settings
 
 # Import all models from the models.py file
 from .models import (
@@ -11,7 +12,7 @@ def create_database():
     Create SQLite database with all tables from the models.
     """
     
-    database_url = "sqlite:///OpenPeru.db"
+    database_url = settings.DB_URL
     engine = create_engine(database_url)
     
     try:

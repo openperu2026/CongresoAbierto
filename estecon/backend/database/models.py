@@ -114,7 +114,26 @@ class RawBill(Base):
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
     
-       
+class RawBillDocuments(Base):
+    '''
+    Raw documents url and text content extracted by scrape_project_bills.py
+     
+    Attributes:
+        bill_id (str): Unique identifier for the membership relationship.
+        seguimientoPleyId (str): Event to which the document is related to.
+        url (str): complete document's url.
+        text (str): extracted text from the pdf
+    '''
+    __tablename__ = "raw_bill_documents"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    bill_id = Column(String, nullable=False)
+    step_date = Column(DateTime, nullable=False)
+    seguimiento_id = Column(String, nullable=False)
+    archivo_id = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    text = Column(String, nullable=False)
 
 class Bill(Base):
     '''

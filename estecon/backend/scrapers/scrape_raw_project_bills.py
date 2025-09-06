@@ -5,8 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from estecon.backend.database.models import RawBill
+from ..config import settings
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/" 
-DB_PATH = "sqlite:///./OpenPeru.db" 
+DB_PATH = settings.DB_URL
 
 
 class RawBillScraper:

@@ -14,7 +14,7 @@ class Directories:
         PROCESSED_DATA (Path): The directory containing processed data.
         LOGS (Path): The directory containing logs.
     """
-    ROOT_DIR = Path(__file__).resolve().parent
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent
     DATA = ROOT_DIR / "data"
     RAW_DATA = DATA / "raw"
     PROCESSED_DATA = DATA / "processed"
@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     The settings are used to configure the application, such as setting up the database connection.
     """
     # This should change depending on where the DB will be stored
-    DB_URL: str = os.getenv("DB_URL", f"sqlite:///{directories.RAW_DATA.as_posix()}/openperu.db")
+    DB_URL: str = os.getenv("DB_URL", f"sqlite:///{directories.RAW_DATA.as_posix()}/OpenPeru.db")
     # Uncomment this 
     # AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID")
     # AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY")
