@@ -1,4 +1,3 @@
-import httpx
 import json
 import base64
 from datetime import datetime
@@ -6,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from loguru import logger
-from datetime import datetime
 from .scrape_utils import render_pdf
 from typing import List
 from estecon.backend.database.models import RawBillDocuments, RawBill
