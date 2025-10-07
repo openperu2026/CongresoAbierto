@@ -68,7 +68,9 @@ def xpath2(xpath_query, parse):
 
 def get_url_text(url:str, *args):
     if args:
-        with httpx.Client(verify=False) as client:
+        with httpx.Client(verify=False, 
+                          timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0),
+                          follow_redirects=True) as client:
             response = client.post(url, data = args[0])
             if response.status_code == 200:
                 return response.text
