@@ -273,6 +273,28 @@ class Committee(Base):
 
     __table_args__ = (UniqueConstraint('leg_period', 'leg_year', 'org_id', 'id', name='committee_uniq'),)
 
+class RawCongresista(Base):
+    '''
+    Represents a raw scraped information of congresistas
+
+    Attributes:
+        id (str): Unique identifier for raw congresista.
+        timestamp: Time stamp of the scrape process
+        leg_period (str): Legislative period related to the congresista
+        url (str): Congresista's website url
+        profile_content (str): Html text from the website's profile tab
+        memberships_content (str): API response to memberships of the congresista in json format
+
+    '''
+    __tablename__ = 'raw_congresistas'
+
+    id = Column(Integer, primary_key = True, nullable = False, autoincrement=True)
+    timestamp = Column(DateTime, nullable = False)
+    leg_period = Column(String, nullable = False)
+    url = Column(String, nullable = False)
+    profile_content = Column(String, nullable = False)
+    memberships_content = Column(String, nullable = False)
+
 class Congresista(Base):
     '''
     Represents a member of the peruvian parliament
