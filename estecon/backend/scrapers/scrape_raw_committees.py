@@ -111,7 +111,7 @@ class RawCommitteeScraper:
         try:
             session.bulk_save_objects(self.committee_list)
             session.commit()
-            logger.success(f'Added {len(self.committee_list)} documents to Raw Bill Documents table')
+            logger.success(f'Added {len(self.committee_list)} committees to Raw Committees table')
             return True
         except SQLAlchemyError as e:
             logger.error(f"Failed to add committees: {e}")
