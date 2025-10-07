@@ -79,14 +79,13 @@ class RawBillScraper:
             return True
         
         except SQLAlchemyError as e:
-            print(f"Failed to add bill {self.raw_bill.id} to Raw Bills table: {e}")
+            print(f"Failed to add bill {self.raw_bill.id} tox Raw Bills table: {e}")
             session.rollback() 
             return False
         
         finally:
             # Close Session
             session.close() 
-        
         
 if __name__ == "__main__":
     scraper = RawBillScraper()

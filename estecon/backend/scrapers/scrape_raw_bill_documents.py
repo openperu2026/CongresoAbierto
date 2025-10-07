@@ -51,7 +51,7 @@ class RawBillDocumentScraper:
 
         urls = []
         logger.info(f"Extracting files from {len(steps)} steps of bill {bill_id}")
-        for step in steps:
+        for ix, step in enumerate(steps):
             files = step.get("archivos")
             step_date = step.get("fecha")
 
@@ -61,7 +61,7 @@ class RawBillDocumentScraper:
                 b64_id = base64.b64encode(str(file_id).encode()).decode()
                 url = (f"{BASE_URL}/archivo/{b64_id}/pdf")
 
-                logger.info(f"Extracting {url}")
+                logger.info(f"Extracting document {ix}/{len(steps)} at url: {url}")
                 extracted_text = render_pdf(url)
                 logger.success(f"Successfully extracted text from {url}")
 
