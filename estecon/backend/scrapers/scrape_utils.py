@@ -79,7 +79,7 @@ def get_url_text(url:str, *args):
             response = httpx.get(url, verify=False, follow_redirects = True)
             if response.status_code == 200:
                     return response.text
-    except (httpx.RequestError, httpx.TimeoutException) as e:
+    except (httpx.RequestError, httpx.TimeoutException):
         logger.warning(f"HTML parse error for the url: {url}")
         return None    
 

@@ -1,7 +1,6 @@
 import os
-import httpx
 from loguru import logger
-from lxml.html import fromstring, HtmlElement
+from lxml.html import HtmlElement
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
@@ -14,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from estecon.backend.database.models import RawCommittee
-from typing import Dict, Optional, List, Literal
+from typing import Dict, Optional, Literal
 from .scrape_utils import parse_url
 from ..config import settings
 

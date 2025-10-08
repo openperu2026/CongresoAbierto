@@ -1,8 +1,8 @@
-import re, httpx
+import re
 from lxml.html import HtmlElement, fromstring
 from loguru import logger
 from ..config import settings
-from typing import List, Dict, Tuple, Optional
+from typing import List, Optional
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
