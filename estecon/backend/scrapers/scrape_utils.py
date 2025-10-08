@@ -1,6 +1,6 @@
 import httpx
 import asyncio
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 from lxml.html import HtmlElement, fromstring
 from loguru import logger
 from pathlib import Path
@@ -67,19 +67,23 @@ def xpath2(xpath_query, parse):
     return result[0].text if result else None
 
 def get_url_text(url:str, *args):
-    if args:
-        with httpx.Client(verify=False, 
-                          timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0),
-                          follow_redirects=True) as client:
-            response = client.post(url, data = args[0])
+    try:
+        if args:
+            with httpx.Client(verify=False, 
+                            timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0),
+                            follow_redirects=True) as client:
+                response = client.post(url, data = args[0])
+                if response.status_code == 200:
+                    return response.text
+        else:
+            response = httpx.get(url, verify=False, follow_redirects = True)
             if response.status_code == 200:
-                return response.text
-    else:
-        response = httpx.get(url,verify=False)
-        if response.status_code == 200:
-                return response.text
+                    return response.text
+    except (httpx.RequestError, httpx.TimeoutException) as e:
+        logger.warning(f"HTML parse error for the url: {url}")
+        return None    
 
-def parse_url(url:str, *args) -> HtmlElement:
+def parse_url(url:str, *args) -> Optional[HtmlElement]:
     """
     Returns the html of the url parse ready to use
     """
@@ -87,7 +91,8 @@ def parse_url(url:str, *args) -> HtmlElement:
         return fromstring(get_url_text(url, args[0]))
     else:
         return fromstring(get_url_text(url))
-    
+
+        
 async def get_url_text_async(client: httpx.AsyncClient, url: str, data: dict = None):
     """
     Async GET or POST using a shared client
