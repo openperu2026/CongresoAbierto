@@ -116,7 +116,6 @@ class RawCongresistasScraper:
             links = self.get_urls_from_table(value)
             for cong_link in links:
                 self.raw_congresistas.append(self.create_raw_congresista(period, cong_link))
-                break
 
         return self.raw_congresistas
 
