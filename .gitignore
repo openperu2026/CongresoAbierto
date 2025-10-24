@@ -179,6 +179,7 @@ cython_debug/
 
 # Data
 data/bill_jsons/*.json
+data/*
 data/ocr_cache/*.txt
 *.db
 *.csv
