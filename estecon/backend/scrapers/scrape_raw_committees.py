@@ -12,13 +12,13 @@ from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from estecon.backend.database.models import RawCommittee
+from estecon.backend.database.raw_models import RawCommittee
 from typing import Dict, Optional, Literal
 from .scrape_utils import parse_url
 from ..config import settings
 
 BASE_URL = "https://www.congreso.gob.pe/CuadrodeComisiones" 
-DB_PATH = settings.DB_URL
+RAW_DB_PATH = settings.RAW_DB_URL
 
 
 class RawCommitteeScraper:
@@ -27,7 +27,7 @@ class RawCommitteeScraper:
     '''
     def __init__(self):
         # Engine and session maker for DB
-        self.engine = create_engine(DB_PATH)
+        self.engine = create_engine(RAW_DB_PATH)
         self.url = BASE_URL
         self.Session = sessionmaker(bind=self.engine)
 

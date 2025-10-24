@@ -40,7 +40,8 @@ class Settings(BaseSettings):
     The settings are used to configure the application, such as setting up the database connection.
     """
     # This should change depending on where the DB will be stored
-    DB_URL: str = os.getenv("DB_URL", f"sqlite:///{directories.RAW_DATA.as_posix()}/OpenPeru.db")
+    DB_URL: str = os.getenv("DB_URL", f"sqlite:///{directories.PROCESSED_DATA.as_posix()}/OpenPeru.db")
+    RAW_DB_URL: str = os.getenv("RAW_DB_URL", f"sqlite:///{directories.RAW_DATA.as_posix()}/OpenPeruRaw.db")
     # Uncomment this 
     # AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID")
     # AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY")

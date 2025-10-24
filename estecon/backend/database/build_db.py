@@ -3,33 +3,42 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..config import settings
 
 # Import all models from the models.py file
-from .models import (
-    Base
-)
+from .models import Base
+from .raw_models import Base as RawBase
 
-def create_database():
+import os
+
+def create_database(base, db_url: str):
     """
-    Create SQLite database with all tables from the models.
+    Create a SQLite database (Raw or Clean) with all tables from the models,
+    only if the database file does not already exist.
     """
+    # Extract path from the URL (assuming format sqlite:///path/to/dbfile.db)
+    if not db_url.startswith("sqlite:///"):
+        raise ValueError("This function only supports SQLite databases.")
     
-    database_url = settings.DB_URL
-    engine = create_engine(database_url)
+    db_path = db_url.replace("sqlite:///", "")
+    
+    if os.path.exists(db_path):
+        print(f"Database already exists: {db_path}")
+        return False  # nothing to do
+    
+    engine = create_engine(db_url)
     
     try:
-        # Create all tables
-        Base.metadata.create_all(engine)
+        base.metadata.create_all(engine)
         
-        # Verify tables were created
         with engine.connect() as conn:
             result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table';"))
             tables = [row[0] for row in result.fetchall()]
         
-        print(f"Database created successfully with {len(tables)} tables")
+        print(f"Database created successfully at {db_path} with {len(tables)} tables.")
         return True
-        
+
     except SQLAlchemyError as e:
         print(f"Error creating database: {e}")
         return False
 
 if __name__ == "__main__":
-    create_database()
+    create_database(RawBase, settings.RAW_DB_URL)
+    create_database(Base, settings.DB_URL)

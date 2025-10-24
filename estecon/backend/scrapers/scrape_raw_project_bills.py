@@ -4,10 +4,10 @@ from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from estecon.backend.database.models import RawBill
+from estecon.backend.database.raw_models import RawBill
 from ..config import settings
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/" 
-DB_PATH = settings.DB_URL
+RAW_DB_PATH = settings.RAW_DB_URL
 
 
 class RawBillScraper:
@@ -17,7 +17,7 @@ class RawBillScraper:
     def __init__(self):
         
         # Engine and session maker for DB
-        self.engine = create_engine(DB_PATH)
+        self.engine = create_engine(RAW_DB_PATH)
         self.Session = sessionmaker(bind=self.engine)
         
         # Mapping raw section name to RawBill attribute name

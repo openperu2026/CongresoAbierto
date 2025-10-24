@@ -7,12 +7,12 @@ from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from ..database.models import RawCongresista
+from ..database.raw_models import RawCongresista
 from estecon.backend.scrapers.scrape_utils import parse_url, get_url_text
 
 BASE_URL = "https://www.congreso.gob.pe/pleno/congresistas/"
 API_MEMBERSHIP = "https://wb2server.congreso.gob.pe/vll/cargos/api/"
-DB_PATH = settings.DB_URL
+RAW_DB_PATH = settings.RAW_DB_URL
 
 class RawCongresistasScraper:
     '''
@@ -21,7 +21,7 @@ class RawCongresistasScraper:
 
     def __init__(self):
         # Engine and session maker for DB
-        self.engine = create_engine(DB_PATH)
+        self.engine = create_engine(RAW_DB_PATH)
         self.url = BASE_URL
         self.Session = sessionmaker(bind=self.engine)
     
@@ -51,7 +51,6 @@ class RawCongresistasScraper:
 
     def create_raw_congresista(self, period: str, cong_link: str) -> Optional[RawCongresista]:
         
-
         profile_content = self.get_profile_content(cong_link)
         website = self.get_cong_website(profile_content)
 
@@ -69,8 +68,12 @@ class RawCongresistasScraper:
             cargos = parse_url(website + "Cargoscongresista/")
         elif period == "Parlamentario 2011 - 2016":
             cargos = parse_url(website + "sobre_congresista/cargos/")
-        elif period == "Parlamentario 2001 - 2006":
+        elif period == "Parlamentario 2006 - 2011":
             cargos = parse_url(website + "CargosCongresista/")
+            # also sobrecongresista/cargos/
+            # sobreCongresista/Cargos/
+            # Cargos/
+            # cargos/
         
         try:
             iframe = cargos.xpath('//*[@id="objContents"]/div[2]/p/iframe')
@@ -113,6 +116,7 @@ class RawCongresistasScraper:
             links = self.get_urls_from_table(value)
             for cong_link in links:
                 self.raw_congresistas.append(self.create_raw_congresista(period, cong_link))
+                break
 
         return self.raw_congresistas
 
@@ -132,7 +136,7 @@ class RawCongresistasScraper:
             logger.success(f"Added {len(self.raw_congresistas)} congresistas to Raw Congresistas table")
             return True
         except SQLAlchemyError as e:
-            logger.error(f"Failed to add committees: {e.response["Error"]["Message"]}")
+            logger.error(f"Failed to add committees: {str(e)}")
             session.rollback()
             return False
         finally:
@@ -143,4 +147,5 @@ if __name__ == "__main__":
     scraper = RawCongresistasScraper()
     scraper.get_dict_periodos()
     scraper.extract_all()
-    # scraper.add_congresistas_to_db()
+    scraper.add_congresistas_to_db()
+    
