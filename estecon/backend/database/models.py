@@ -293,7 +293,7 @@ class RawCongresista(Base):
     leg_period = Column(String, nullable = False)
     url = Column(String, nullable = False)
     profile_content = Column(String, nullable = False)
-    memberships_content = Column(String, nullable = False)
+    memberships_content = Column(String, nullable = True)
 
 class Congresista(Base):
     '''
