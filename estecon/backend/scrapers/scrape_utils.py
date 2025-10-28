@@ -12,6 +12,12 @@ from PIL import Image
 import numpy as np
 import cv2
 
+def normalize_text(txt: str | None) -> str:
+    if not txt:
+        return ""
+    # collapse whitespace and lowercase
+    return re.sub(r"\s+", " ", txt).strip().lower()
+
 def clean_string(text: str):
     """
     Cleans duplicated white spaces and new lines"""
@@ -76,11 +82,11 @@ def get_url_text(url:str, *args):
                 if response.status_code == 200:
                     return response.text
         else:
-            response = httpx.get(url, verify=False, follow_redirects = True)
+            response = httpx.get(url, verify=False, follow_redirects = True, timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0))
             if response.status_code == 200:
                     return response.text
-    except (httpx.RequestError, httpx.TimeoutException):
-        logger.warning(f"HTML parse error for the url: {url}")
+    except (httpx.RequestError, httpx.TimeoutException) as e :
+        logger.warning(f"HTML parse error for the url: {url}: {e}")
         return None    
 
 def parse_url(url:str, *args) -> Optional[HtmlElement]:
@@ -91,7 +97,6 @@ def parse_url(url:str, *args) -> Optional[HtmlElement]:
         return fromstring(get_url_text(url, args[0]))
     else:
         return fromstring(get_url_text(url))
-
         
 async def get_url_text_async(client: httpx.AsyncClient, url: str, data: dict = None):
     """

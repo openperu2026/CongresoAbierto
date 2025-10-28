@@ -1,5 +1,6 @@
 import re
 from lxml.html import HtmlElement, fromstring
+from urllib.parse import urljoin
 from loguru import logger
 from ..config import settings
 from typing import List, Optional
@@ -8,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from ..database.raw_models import RawCongresista
-from estecon.backend.scrapers.scrape_utils import parse_url, get_url_text
+from estecon.backend.scrapers.scrape_utils import parse_url, get_url_text, normalize_text
 
 BASE_URL = "https://www.congreso.gob.pe/pleno/congresistas/"
 API_MEMBERSHIP = "https://wb2server.congreso.gob.pe/vll/cargos/api/"
@@ -24,6 +25,9 @@ class RawCongresistasScraper:
         self.engine = create_engine(RAW_DB_PATH)
         self.url = BASE_URL
         self.Session = sessionmaker(bind=self.engine)
+        
+        self.periods = {}
+        self.raw_congresistas: List[RawCongresista] = []        
     
     def get_dict_periodos(self):
         parse = parse_url(self.url)
@@ -48,6 +52,62 @@ class RawCongresistasScraper:
         parse = fromstring(profile_content)
         website = parse.xpath('//*[@class="web"]/span[2]/a/@href')
         return website[0] if website else None
+    
+    def _is_cargos_label(self, txt: str) -> bool:
+        """
+        Helper function to assert if the labels inside the webpage is related to cargos.
+        We care about labels like: 'Cargos', 'Cargos del congresista', 'Cargos de la congresista', etc.
+        """
+        if "cargo" not in txt:
+            return False
+        # soft preference for congresista/parlamentario but we don't force it
+        return True
+    
+    def _score_link_text(self, txt: str) -> int:
+        """
+        Higher score means that is more like what we want from the cargos url.
+        """
+        score = 0
+        if "cargo" in txt:
+            score += 2
+        if "congres" in txt or "parlament" in txt:
+            score += 2
+        if "cargos del" in txt or "cargos de la" in txt:
+            score += 1
+        return score
+    
+    def get_best_cargos_link(self, doc: HtmlElement, base_url: str) -> Optional[str]:
+        """
+        Method
+        """
+        # collect all <a> and <button> (just in case)
+        candidates = doc.xpath("//a | //button")
+
+        best_href = None
+        best_score = -1
+
+        for node in candidates:
+            raw_text = node.text_content()
+            txt = normalize_text(raw_text)
+
+            if not self._is_cargos_label(txt):
+                continue
+
+            # try common URL carriers
+            href = node.get("href") or node.get("data-href") or node.get("onclick")
+            if not href:
+                continue
+
+            s = self._score_link_text(txt)
+            if s > best_score:
+                best_score = s
+                best_href = href
+
+        if best_href:
+            return urljoin(base_url, best_href)
+
+        # fallback: None found
+        return None
 
     def create_raw_congresista(self, period: str, cong_link: str) -> Optional[RawCongresista]:
         
@@ -62,20 +122,12 @@ class RawCongresistasScraper:
                 profile_content = profile_content,
                 memberships_content = None
             )
-        elif period == "Parlamentario 2021 - 2026":
-            cargos = parse_url(website + "sobrecongresista/cargos/")
-        elif period == "Parlamentario 2016 - 2021":
-            cargos = parse_url(website + "Cargoscongresista/")
-        elif period == "Parlamentario 2011 - 2016":
-            cargos = parse_url(website + "sobre_congresista/cargos/")
-        elif period == "Parlamentario 2006 - 2011":
-            cargos = parse_url(website + "CargosCongresista/")
-            # also sobrecongresista/cargos/
-            # sobreCongresista/Cargos/
-            # Cargos/
-            # cargos/
+        else:
+            html_cong = parse_url(website)
+            cargos_url = self.get_best_cargos_link(html_cong, website)
         
         try:
+            cargos = parse_url(cargos_url)
             iframe = cargos.xpath('//*[@id="objContents"]/div[2]/p/iframe')
             if not iframe:
                 raise IndexError("No iframe found in cargos page")
@@ -107,15 +159,21 @@ class RawCongresistasScraper:
         logger.info(f"Congresista successfully extracted from {website}")
         return raw_congresista
 
-    def extract_all(self) -> List[RawCongresista]:
+    def extract_cong_from_period(self, period_key: str, period_value: str) -> List[RawCongresista]:        
+        congresistas = []
+
+        links = self.get_urls_from_table(period_value)
+        for cong_link in links:
+            congresistas.append(self.create_raw_congresista(period_key, cong_link))
+
+        return congresistas
+
+    def extract_and_load_all(self) -> List[RawCongresista]:
         assert self.periods, "You need to extract all the available periods before extracting the tables"
-        
-        self.raw_congresistas = []
 
         for period, value in self.periods.items():
-            links = self.get_urls_from_table(value)
-            for cong_link in links:
-                self.raw_congresistas.append(self.create_raw_congresista(period, cong_link))
+            self.raw_congresistas = self.extract_cong_from_period(period, value)
+            self.add_congresistas_to_db()
 
         return self.raw_congresistas
 
@@ -145,6 +203,4 @@ class RawCongresistasScraper:
 if __name__ == "__main__":
     scraper = RawCongresistasScraper()
     scraper.get_dict_periodos()
-    scraper.extract_all()
-    scraper.add_congresistas_to_db()
-    
+    scraper.extract_and_load_all()
