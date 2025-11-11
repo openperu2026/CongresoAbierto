@@ -12,6 +12,20 @@ from PIL import Image
 import numpy as np
 import cv2
 
+DEFAULT_TIMEOUT = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0)
+
+BROWSER_LIKE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/121.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+}
+
 def normalize_text(txt: str | None) -> str:
     if not txt:
         return ""
@@ -72,21 +86,30 @@ def xpath2(xpath_query, parse):
     result = parse.xpath(xpath_query)
     return result[0].text if result else None
 
-def get_url_text(url:str, *args):
+def get_url_text(url: str, data: str | None = None, timeout: httpx.Timeout = DEFAULT_TIMEOUT, verify: bool = True):
+    method = "POST" if data is not None else "GET"
     try:
-        if args:
-            with httpx.Client(verify=False, 
-                            timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0),
-                            follow_redirects=True) as client:
-                response = client.post(url, data = args[0])
-                if response.status_code == 200:
-                    return response.text
+        with httpx.Client(headers=BROWSER_LIKE_HEADERS,
+                          timeout=timeout,
+                          follow_redirects=True,
+                          verify=verify,
+                          http2=True) as client:
+            if method == "POST":
+                response = client.post(url, data=data)
+            else:
+                response = client.get(url)
+        
+        if response.is_success:
+            return response.text
+
+        if response.status_code == 403:
+            logger.warning(f"403 Forbidden fetching {url}.: Likely WAF/permissions issue. Check headers, cookies, IP, and rate limits.")
         else:
-            response = httpx.get(url, verify=False, follow_redirects = True, timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0))
-            if response.status_code == 200:
-                    return response.text
+            logger.warning(f"Non-200 response fetching {url}: {response.status_code}")
+        return None
+    
     except (httpx.RequestError, httpx.TimeoutException) as e :
-        logger.warning(f"HTML parse error for the url: {url}: {e}")
+        logger.warning(f"Request error for {url}: {e}")
         return None    
 
 def parse_url(url:str, *args) -> Optional[HtmlElement]:
