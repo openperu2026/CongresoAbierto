@@ -6,11 +6,15 @@ from loguru import logger
 from pathlib import Path
 import re
 import pytesseract
+import functools
 import fitz
 from io import BytesIO
 from PIL import Image
 import numpy as np
 import cv2
+
+RETRY_BACKOFF = 5
+MAX_RETRIES = 10
 
 def normalize_text(txt: str | None) -> str:
     if not txt:
@@ -112,7 +116,7 @@ async def get_url_text_async(client: httpx.AsyncClient, url: str, data: dict = N
             return response.text
     except httpx.HTTPError as e:
         logger.info(f"Error fetching {url}: {e}")
-        return None
+        raise e
 
 
 async def fetch_multiple_urls_async(urls: List[Union[str, Tuple[str, dict]]]) -> List[HtmlElement]:
@@ -133,3 +137,33 @@ async def fetch_multiple_urls_async(urls: List[Union[str, Tuple[str, dict]]]) ->
 
         html_responses = await asyncio.gather(*tasks)
         return [fromstring(html) for html in html_responses if html]
+    
+def with_retry(max_retries: int = MAX_RETRIES, backoff: int = RETRY_BACKOFF):
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            label = kwargs.pop("label", func.__name__)
+            for _ in range(max_retries):
+                try:
+                    return await func(*args, **kwargs)
+                except ValueError:
+                    raise
+                except httpx.HTTPStatusError as e:
+                    if e.response.status_code == 429:
+                        retry_after = int(
+                            e.response.headers.get("Retry-After", backoff)
+                        )
+                        logger.warning(f"[429] {label}: retrying in {retry_after}s...")
+                        await asyncio.sleep(retry_after)
+                    else:
+                        logger.error(f"[{label}] HTTP error: {e}")
+                        break
+                except Exception as e:
+                    logger.error(f"[{label}] Other error: {e}")
+                    break
+            logger.error(f"[{label}] Failed after {max_retries} retries.")
+            return None
+
+        return wrapper
+
+    return decorator
