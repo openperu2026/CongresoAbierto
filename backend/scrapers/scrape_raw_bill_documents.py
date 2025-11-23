@@ -1,12 +1,14 @@
 import json
 import base64
 from datetime import datetime
+
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+
 from loguru import logger
+
 from .scrape_utils import render_pdf
-from typing import List
 from estecon.backend.database.raw_models import RawBillDocuments, RawBill
 from ..config import settings
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/" 
@@ -22,7 +24,7 @@ class RawBillDocumentScraper:
         self.engine = create_engine(RAW_DB_PATH)
         self.Session = sessionmaker(bind=self.engine)
 
-    def filter_steps(self, extracted_steps: List[dict], bill_id: str):
+    def filter_steps(self, extracted_steps: list[dict], bill_id: str):
         """
         Filter steps that are already loaded in the DB
         """
@@ -35,7 +37,7 @@ class RawBillDocumentScraper:
         return filtered_steps
 
 
-    def get_bill_urls(self, bill_id: str, update: bool = False) -> List[RawBillDocuments]:
+    def get_bill_urls(self, bill_id: str, update: bool = False) -> list[RawBillDocuments]:
         """
         Extract the urls from a RawBill's files and extract the text from each of them
         """

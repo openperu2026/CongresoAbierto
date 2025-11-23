@@ -1,0 +1,1 @@
+BASE_URL = "https://wb2server.congreso.gob.pe/smociones-portal-service/mocion/" 
