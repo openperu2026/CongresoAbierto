@@ -1,4 +1,3 @@
-import httpx
 import json
 from datetime import datetime
 from loguru import logger
@@ -119,7 +118,7 @@ if __name__ == "__main__":
     while True:
         try:
             scraper.scrape_bill(str(year), str(bill))
-        except TypeError as e:
+        except TypeError:
             break
 
         bill += 1
