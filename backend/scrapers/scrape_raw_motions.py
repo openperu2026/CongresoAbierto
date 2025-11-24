@@ -1,4 +1,3 @@
-import httpx
 import json
 from datetime import datetime
 from loguru import logger
@@ -118,7 +117,7 @@ if __name__ == "__main__":
     while True:
         try:
             scraper.scrape_motion(str(year), str(motion))
-        except TypeError as e:
+        except TypeError:
             break
 
         motion += 1
