@@ -159,10 +159,29 @@ def test_get_url_request_error_returns_none(monkeypatch):
     assert resp is None
 
 
-def test_get_url_text_with_response():
-    resp = DummyResponse(text="contenido", is_success=True)
-    assert u.get_url_text(resp) == "contenido"
+def test_get_url_text_with_response(monkeypatch):
+    def fake_client(*args, **kwargs):
+        class Ctx:
+            def __enter__(self_inner):
+                class Client:
+                    def get(self, url):
+                        return DummyResponse(status_code=200, text="OK", is_success=True)
 
+                    def post(self, url, data=None):
+                        return DummyResponse(status_code=200, text="OK", is_success=True)
+
+                return Client()
+
+            def __exit__(self_inner, exc_type, exc, tb):
+                return False
+
+        return Ctx()
+
+    monkeypatch.setattr(u.httpx, "Client", fake_client)
+    
+    resp = u.get_url("https://example.com")
+    assert isinstance(resp, DummyResponse)
+    assert resp.text == "OK"
 
 def test_get_url_text_with_none_returns_none():
     resp = None

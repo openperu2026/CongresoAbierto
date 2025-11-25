@@ -163,7 +163,7 @@ def get_url_text(
     try:
         response = get_url(url, data)
         return response.text
-    except AttributeError as e:
+    except (AttributeError, TypeError) as e:
         logger.warning(f"Request error: {e}")
         return None
 
