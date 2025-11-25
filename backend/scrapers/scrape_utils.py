@@ -10,6 +10,36 @@ from io import BytesIO
 from PIL import Image
 import numpy as np
 import cv2
+import os
+import shutil
+
+def _configure_tesseract() -> None:
+    """
+    Configure pytesseract in an environment-agnostic way.
+
+    Priority:
+    1. TESSERACT_CMD env var (if set)
+    2. `tesseract` found in PATH
+    3. Raise a clear error if not found
+    """
+    cmd_from_env = os.getenv("TESSERACT_CMD")
+    if cmd_from_env:
+        pytesseract.pytesseract.tesseract_cmd = cmd_from_env
+        return
+
+    cmd_from_path = shutil.which("tesseract")
+    if cmd_from_path:
+        pytesseract.pytesseract.tesseract_cmd = cmd_from_path
+        return
+
+    raise RuntimeError(
+        "Tesseract binary not found. Install it and either make it available on PATH "
+        "or set the TESSERACT_CMD environment variable to its full path."
+    )
+
+
+# Run once on import
+_configure_tesseract()
 
 DEFAULT_TIMEOUT = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0)
 
