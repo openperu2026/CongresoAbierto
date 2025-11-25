@@ -20,12 +20,15 @@ def create_database(base, db_url: str):
 
     db_path = db_url.replace("sqlite:///", "")
 
-    if os.path.exists(db_path):
-        print(f"Database already exists: {db_path}")
-        return False  # nothing to do
-
     engine = create_engine(db_url)
 
+    # If DB exists, just ensure all tables are present
+    if os.path.exists(db_path):
+        print(f"Database already exists: {db_path}, ensuring all tables are present...")
+        base.metadata.create_all(engine)
+        return False
+
+    # If DB does not exist, create it and all tables
     try:
         base.metadata.create_all(engine)
 
