@@ -1,5 +1,5 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
 
@@ -58,8 +58,9 @@ class Settings(BaseSettings):
     # AWS_S3_BUCKET_NAME: str = os.getenv("AWS_S3_BUCKET_NAME")
 
     # This is only in case we need some API_KEYS. Allow us to handle safely.
-    class Config:
-        env_file = directories.ROOT_DIR / ".env"
+    model_config = SettingsConfigDict(
+        env_file = str(directories.ROOT_DIR / ".env"),
+    )
 
 
 settings = Settings()
