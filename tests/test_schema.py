@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, timedelta
-from estecon.backend.scrapers.schema import (
+from backend.scrapers.schema import (
     Vote,
     VoteEvent,
     Attendance,
@@ -15,7 +15,7 @@ from estecon.backend.scrapers.schema import (
     Organization,
     Membership,
 )
-from estecon.backend import (
+from backend import (
     RoleTypeBill,
     Proponents,
     Legislature,

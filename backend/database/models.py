@@ -10,7 +10,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     Index,
 )
-from estecon.backend import (
+from backend import (
     VoteOption,
     AttendanceStatus,
     BillStepType,
