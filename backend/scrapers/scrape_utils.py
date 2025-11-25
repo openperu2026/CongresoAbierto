@@ -159,8 +159,9 @@ def get_url(
 
 
 def get_url_text(
-    response: httpx.Response | None) -> str | None:
+    url: str, data: str | None = None) -> str | None:
     try:
+        response = get_url(url, data)
         return response.text
     except AttributeError as e:
         logger.warning(f"Request error: {e}")
