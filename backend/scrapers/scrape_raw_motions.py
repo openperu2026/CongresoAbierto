@@ -117,10 +117,10 @@ if __name__ == "__main__":
     while True:
         try:
             scraper.scrape_motion(str(year), str(motion))
+            motion += 1
         except TypeError:
             break
 
-        motion += 1
 
         if len(scraper.raw_motions) % 10 == 0:
             time.sleep(5)

@@ -70,6 +70,10 @@ class RawBillDocumentScraper:
         if not update:
             steps = self.filter_steps(steps, bill_id)
 
+        if len(steps) == 0:
+            logger.info(f"No steps found for bill {bill_id}")
+            return None
+        
         logger.info(f"Extracting files from {len(steps)} steps of bill {bill_id}")
 
         for ix, step in enumerate(steps):
@@ -122,6 +126,7 @@ class RawBillDocumentScraper:
             return True
         except SQLAlchemyError as e:
             logger.error(
+                
                 f"Failed to add documents from bill {self.urls[0].bill_id}: {e}"
             )
             session.rollback()
@@ -138,17 +143,23 @@ if __name__ == "__main__":
     logger.info("Starting Scraper")
     scraper = RawBillDocumentScraper()
 
-    # TODO: DEBUG PARA BILL 
-    bill = 86
+    bill = 209
     year = 2021
 
     while True:
         try:
             scraper.get_bill_urls(bill_id=f"{year}_{bill}")
+            bill += 1
         except TypeError as e:
             print(e)
             break
+        except:
+            time.sleep(10)
+            continue
 
-        bill += 1
-        scraper.load_raw_documents()
+        try:
+            scraper.load_raw_documents()
+        except AssertionError as e:
+            logger.warning(f"No steps neither documents found for bill {year}_{bill-1}")
+
         time.sleep(5)
