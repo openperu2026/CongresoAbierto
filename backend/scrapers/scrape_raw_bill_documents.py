@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
         try:
             scraper.load_raw_documents()
-        except AssertionError as e:
+        except AssertionError:
             logger.warning(f"No steps neither documents found for bill {year}_{bill-1}")
 
         time.sleep(5)
