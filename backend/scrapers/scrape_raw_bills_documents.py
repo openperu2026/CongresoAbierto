@@ -27,7 +27,7 @@ class RawBillDocumentScraper:
         self.engine = create_engine(RAW_DB_PATH)
         self.Session = sessionmaker(bind=self.engine)
 
-        self.urls = []
+        self.documents = []
 
     def filter_steps(self, extracted_steps: list[dict], bill_id: str):
         """
@@ -49,7 +49,7 @@ class RawBillDocumentScraper:
 
         return filtered_steps
 
-    def get_bill_urls(
+    def get_bill_documents(
         self, bill_id: str, update: bool = False, prioritize: bool = True
     ) -> list[RawBillDocument]:
         """
@@ -97,7 +97,7 @@ class RawBillDocumentScraper:
                 extracted_text = render_pdf(url)
                 logger.success(f"Successfully extracted text from {url}")
 
-                self.urls.append(
+                self.documents.append(
                     RawBillDocument(
                         timestamp=datetime.now(),
                         bill_id=bill_id,
@@ -118,21 +118,21 @@ class RawBillDocumentScraper:
         Returns True on success, False on failure.
         """
 
-        assert self.urls, "Documents must be scraped before it can be saved"
+        assert self.documents, "Documents must be scraped before it can be saved"
 
         session = self.Session()
 
         try:
-            session.bulk_save_objects(self.urls)
+            session.bulk_save_objects(self.documents)
             session.commit()
             logger.success(
-                f"Added {len(self.urls)} documents to Raw Bill Documents table"
+                f"Added {len(self.documents)} documents to Raw Bill Documents table"
             )
             return True
         except SQLAlchemyError as e:
             logger.error(
                 
-                f"Failed to add documents from bill {self.urls[0].bill_id}: {e}"
+                f"Failed to add documents from bill {self.documents[0].bill_id}: {e}"
             )
             session.rollback()
             return False
@@ -142,7 +142,7 @@ class RawBillDocumentScraper:
 
     def load_raw_documents(self):
         self.add_documents_to_db()
-        self.urls = []
+        self.documents = []
 
 if __name__ == "__main__":
     logger.info("Starting Scraper")
@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     while True:
         try:
-            scraper.get_bill_urls(bill_id=f"{year}_{bill}")
+            scraper.get_bill_documents(bill_id=f"{year}_{bill}")
             scraper.load_raw_documents()
             bill += 1
         except TypeError as e:

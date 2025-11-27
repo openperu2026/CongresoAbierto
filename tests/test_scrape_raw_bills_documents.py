@@ -71,9 +71,9 @@ def test_filter_steps_filters_existing(monkeypatch):
     assert remaining[0]["seguimientoPleyId"] == 2
 
 
-# ---------- get_bill_urls ----------
+# ---------- get_bill_documents ----------
 
-def test_get_bill_urls_raises_if_bill_not_found():
+def test_get_bill_documents_raises_if_bill_not_found():
     engine, SessionLocal = _setup_inmemory_db()
 
     scraper = RawBillDocumentScraper()
@@ -81,10 +81,10 @@ def test_get_bill_urls_raises_if_bill_not_found():
     scraper.Session = SessionLocal
 
     with pytest.raises(AssertionError):
-        scraper.get_bill_urls(bill_id="2021_999")
+        scraper.get_bill_documents(bill_id="2021_999")
 
 
-def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
+def test_get_bill_documents_populates_documents_and_calls_render_pdf(monkeypatch):
     engine, SessionLocal = _setup_inmemory_db()
 
     scraper = RawBillDocumentScraper()
@@ -98,6 +98,7 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
         {
             "seguimientoPleyId": 10,
             "fecha": step_date_str,
+            "desEstado" : "Publicada en el Diario Oficial El Peruano",
             "archivos": [
                 {
                     "proyectoArchivoId": 111,
@@ -131,8 +132,7 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
         "backend.scrapers.scrape_raw_bills_documents.render_pdf", fake_render_pdf
     )
 
-    scraper.get_bill_urls(bill_id=bill_id)
-
+    scraper.get_bill_documents(bill_id=bill_id)
     # Should have called render_pdf once
     assert len(calls) == 1
     # b64 of "111"
@@ -141,8 +141,8 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
     assert calls[0] == expected_url
 
     # Scraper should have one RawBillDocument object
-    assert len(scraper.urls) == 1
-    doc = scraper.urls[0]
+    assert len(scraper.documents) == 1
+    doc = scraper.documents[0]
     assert doc.bill_id == bill_id
     assert doc.archivo_id == 111
     assert doc.seguimiento_id == 10
@@ -152,7 +152,7 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
     assert isinstance(doc.step_date, datetime)
 
 
-def test_get_bill_urls_respects_update_flag(monkeypatch):
+def test_get_bill_documents_respects_update_flag(monkeypatch):
     """When update=False, filter_steps is used; when update=True, it should not be used."""
     engine, SessionLocal = _setup_inmemory_db()
 
@@ -164,6 +164,7 @@ def test_get_bill_urls_respects_update_flag(monkeypatch):
     steps = [
         {
             "seguimientoPleyId": 1,
+            "desEstado" : "Publicada en el Diario Oficial El Peruano",
             "fecha": "2021-01-01T00:00:00.000000+0000",
             "archivos": [
                 {"proyectoArchivoId": 999, "seguimientoPleyId": 1},
@@ -196,15 +197,15 @@ def test_get_bill_urls_respects_update_flag(monkeypatch):
 
     monkeypatch.setattr(scraper, "filter_steps", fake_filter_steps)
 
-    scraper.get_bill_urls(bill_id=bill_id, update=False)
-    assert len(scraper.urls) == 0
+    scraper.get_bill_documents(bill_id=bill_id, update=False)
+    assert len(scraper.documents) == 0
 
     # Case 2: update=True should bypass filter_steps
-    scraper.urls = []  # reset
+    scraper.documents = []  # reset
 
-    scraper.get_bill_urls(bill_id=bill_id, update=True)
-    assert len(scraper.urls) == 1
-    assert scraper.urls[0].bill_id == bill_id
+    scraper.get_bill_documents(bill_id=bill_id, update=True)
+    assert len(scraper.documents) == 1
+    assert scraper.documents[0].bill_id == bill_id
 
 
 # ---------- add_documents_to_db ----------
@@ -226,7 +227,7 @@ def test_add_documents_to_db_persists(monkeypatch):
         url="http://example.com/doc.pdf",
         text="SOME TEXT",
     )
-    scraper.urls = [doc]
+    scraper.documents = [doc]
 
     assert scraper.add_documents_to_db() is True
 
@@ -241,7 +242,7 @@ def test_add_documents_to_db_persists(monkeypatch):
 
 def test_add_documents_to_db_asserts_when_empty():
     scraper = RawBillDocumentScraper()
-    scraper.urls = []
+    scraper.documents = []
 
     with pytest.raises(AssertionError):
         scraper.add_documents_to_db()
@@ -249,7 +250,7 @@ def test_add_documents_to_db_asserts_when_empty():
 
 def test_add_documents_to_db_handles_sqlalchemy_error():
     scraper = RawBillDocumentScraper()
-    scraper.urls = [
+    scraper.documents = [
         RawBillDocument(
             timestamp=datetime.now(timezone.utc),
             bill_id="2021_4",
@@ -294,7 +295,7 @@ def test_add_documents_to_db_handles_sqlalchemy_error():
 def test_load_raw_documents_calls_add_and_clears(monkeypatch):
     scraper = RawBillDocumentScraper()
     # Put a dummy object so assertion in add_documents_to_db would pass
-    scraper.urls = ["dummy"]
+    scraper.documents = ["dummy"]
 
     calls = {"added": False}
 
@@ -307,4 +308,4 @@ def test_load_raw_documents_calls_add_and_clears(monkeypatch):
     scraper.load_raw_documents()
 
     assert calls["added"] is True
-    assert scraper.urls == []
+    assert scraper.documents == []

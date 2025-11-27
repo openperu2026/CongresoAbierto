@@ -42,13 +42,14 @@ def test_create_raw_motion_sets_id_and_sections():
 
     # firmantes and seguimientos were popped out of data,
     # and "general" holds the remaining dict
-    assert "firmantes" not in raw_motion.general
-    assert "seguimientos" not in raw_motion.general
-    assert set(raw_motion.general.keys()) == original_keys - {
+    general_dict = json.loads(raw_motion.general)
+    assert "firmantes" not in general_dict
+    assert "seguimientos" not in general_dict
+    assert set(general_dict.keys()) == original_keys - {
         "firmantes",
         "seguimientos",
     }
-    assert raw_motion.general["titulo"] == "Moción de prueba"
+    assert general_dict["titulo"] == "Moción de prueba"
 
 
 def test_create_raw_motion_handles_missing_sections():
@@ -69,7 +70,8 @@ def test_create_raw_motion_handles_missing_sections():
     assert raw_motion.steps is None
 
     # general should contain full original data (since nothing was popped)
-    assert raw_motion.general == {"titulo": "Sin firmantes"}
+    general_dict = json.loads(raw_motion.general)
+    assert general_dict == {"titulo": "Sin firmantes"}
 
 
 # ---------- add_motions_to_db ----------
@@ -185,5 +187,6 @@ def test_scrape_motion_appends_raw_motion(monkeypatch):
     assert json.loads(motion.steps)[0]["evento"] == "ingreso"
 
     # general contains remaining fields (after pops)
-    assert "titulo" in motion.general
-    assert motion.general["titulo"] == "Moción X"
+    general_dict = json.loads(motion.general)
+    assert "titulo" in general_dict
+    assert general_dict["titulo"] == "Moción X"
