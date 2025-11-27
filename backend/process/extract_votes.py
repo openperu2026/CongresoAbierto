@@ -1,4 +1,4 @@
-from .schema import Vote
+from backend.process.schema import Vote
 import pytesseract
 import os
 import fitz

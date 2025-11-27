@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Adjust this import to your actual module path
-from backend.scrapers.scrape_raw_project_bills import RawBillScraper, BASE_URL
+from backend.scrapers.scrape_raw_bills import RawBillScraper, BASE_URL
 from backend.database.raw_models import Base, RawBill
 
 
@@ -143,7 +143,7 @@ def test_scrape_bill_appends_raw_bill(monkeypatch):
 
     # Patch get_url_text in the scraper module
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_project_bills.get_url_text", fake_get_url_text
+        "backend.scrapers.scrape_raw_bills.get_url_text", fake_get_url_text
     )
 
     scraper.scrape_bill("2021", "1234")

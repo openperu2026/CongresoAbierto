@@ -1,5 +1,9 @@
 import os
 from loguru import logger
+from itertools import product
+from datetime import datetime
+from typing import Literal
+
 from lxml.html import HtmlElement
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -7,15 +11,14 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from itertools import product
-from datetime import datetime
+
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+
+from backend.config import settings
 from backend.database.raw_models import RawCommittee
-from typing import Literal
-from .scrape_utils import parse_url
-from ..config import settings
+from backend.scrapers.scrape_utils import parse_url
 
 BASE_URL = "https://www.congreso.gob.pe/CuadrodeComisiones"
 RAW_DB_PATH = settings.RAW_DB_URL

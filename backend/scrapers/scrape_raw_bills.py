@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import datetime
 from loguru import logger
 
@@ -6,12 +7,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-import time
-
+from backend.config import settings
 from backend.scrapers.scrape_utils import get_url_text
 from backend.database.raw_models import RawBill
-from ..config import settings
-
 
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"
 RAW_DB_PATH = settings.RAW_DB_URL
@@ -104,11 +102,10 @@ class RawBillScraper:
             session.close()
 
     def load_raw_bills(self):
-        scraper.add_bills_to_db()
-        scraper.raw_bills = []
+        self.add_bills_to_db()
+        self.raw_bills = []
 
-
-if __name__ == "__main__":
+def main():
     scraper = RawBillScraper()
     years = ["2021"]
     bills = [str(num) for num in range(1, 13330)]
@@ -128,3 +125,6 @@ if __name__ == "__main__":
 
         if len(scraper.raw_bills) % 100 == 0:
             scraper.load_raw_bills()
+
+if __name__ == "__main__":
+    main()

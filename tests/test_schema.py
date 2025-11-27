@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, timedelta
-from backend.scrapers.schema import (
+from backend.process.schema import (
     Vote,
     VoteEvent,
     Attendance,

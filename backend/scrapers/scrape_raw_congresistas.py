@@ -1,12 +1,15 @@
 import re
+from loguru import logger
+from datetime import datetime
+
 from lxml.html import HtmlElement, fromstring
 from urllib.parse import urljoin
-from loguru import logger
-from backend.config import settings
-from datetime import datetime
+
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+
+from backend.config import settings
 from backend.database.raw_models import RawCongresista
 from backend.scrapers.scrape_utils import (
     parse_url,

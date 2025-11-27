@@ -26,14 +26,14 @@ class RawBill(Base):
     steps = Column(String, nullable=True)
 
 
-class RawBillDocuments(Base):
+class RawBillDocument(Base):
     """
-    Raw documents url and text content extracted by scrape_project_bills.py
+    Raw documents url and text content extracted by scrape_raw_bills_documents.py
 
     Attributes:
         id (str): Unique identifier for raw document.
         timestamp (datetime): timestamp of the scraping task
-        bill_id (str): Unique identifier for the membership relationship.
+        bill_id (str): Unique identifier for the bill.
         step_date (datetime): date of the event related to the document
         seguimiento_id (str): Event to which the document is related to.
         archivo_id (str): id related to the document
@@ -116,3 +116,67 @@ class RawMotion(Base):
     general = Column(String, nullable=True)
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
+
+class RawMotionDocument(Base):
+    """
+    Raw documents url and text content extracted by scrape_raw_motions_documents.py
+
+    Attributes:
+        id (str): Unique identifier for raw document.
+        timestamp (datetime): timestamp of the scraping task
+        motion_id (str): Unique identifier for the motion.
+        step_date (datetime): date of the event related to the document
+        seguimiento_id (str): Event to which the document is related to.
+        archivo_id (str): id related to the document
+        url (str): complete document's url.
+        text (str): extracted text from the pdf
+    """
+
+    __tablename__ = "raw_motion_documents"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    motion_id = Column(String, nullable=False)
+    step_date = Column(DateTime, nullable=False)
+    seguimiento_id = Column(String, nullable=False)
+    archivo_id = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+
+class RawBancada(Base):
+    """
+    Represents a raw scraped bancada in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the bancada.
+        timestamp (datetime): timestamp of the scraping task
+        leg_period (str): Legislative period
+        raw_html (str): Html text
+    """
+
+    __tablename__ = "raw_bancadas"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    legislative_period = Column(String, nullable=False)
+    raw_html = Column(String, nullable=False)
+
+class RawOrganization(Base):
+    """
+    Represents a raw scraped organization in the peruvian parliament such as 
+    Junta de Portavoces, Consejo Directivo, Mesa Directiva y Comisión Permanente.
+
+    Attributes:
+        id (str): Unique identifier for the organization.
+        timestamp (datetime): timestamp of the scraping task
+        legislative_year (str): Legislative year
+        raw_html (str): Html text
+    """
+    
+    __tablename__ = "raw_organizations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    legislative_year = Column(Integer, nullable=False)
+    type_org = Column(String, nullable=False)
+    raw_html = Column(String, nullable=False)

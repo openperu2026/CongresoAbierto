@@ -2,8 +2,8 @@ import httpx
 import polars as pl
 import time
 import base64
-from .schema import Bill
-from .scrape_utils import url_to_cache_file, save_ocr_txt_to_cache, render_pdf
+from backend.process.schema import Bill
+from ..scrapers.scrape_utils import url_to_cache_file, save_ocr_txt_to_cache, render_pdf
 import pandas as pd
 import re
 from pathlib import Path

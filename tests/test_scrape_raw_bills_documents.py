@@ -6,11 +6,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.scrapers.scrape_raw_bill_documents import (
+from backend.scrapers.scrape_raw_bills_documents import (
     RawBillDocumentScraper,
     BASE_URL,
 )
-from backend.database.raw_models import Base, RawBill, RawBillDocuments
+from backend.database.raw_models import Base, RawBill, RawBillDocument
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -33,11 +33,11 @@ def test_filter_steps_filters_existing(monkeypatch):
     scraper.engine = engine
     scraper.Session = SessionLocal
 
-    # Seed DB with some RawBillDocuments for a given bill_id
+    # Seed DB with some RawBillDocument for a given bill_id
     with SessionLocal() as session:
         session.add_all(
             [
-                RawBillDocuments(
+                RawBillDocument(
                     timestamp=datetime.now(timezone.utc),
                     bill_id="2021_1",
                     step_date=datetime.now(timezone.utc),
@@ -46,7 +46,7 @@ def test_filter_steps_filters_existing(monkeypatch):
                     url="http://example.com/a",
                     text="A",
                 ),
-                RawBillDocuments(
+                RawBillDocument(
                     timestamp=datetime.now(timezone.utc),
                     bill_id="2021_1",
                     step_date=datetime.now(timezone.utc),
@@ -128,7 +128,7 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
         return f"TEXT_FROM_{url}"
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_bill_documents.render_pdf", fake_render_pdf
+        "backend.scrapers.scrape_raw_bills_documents.render_pdf", fake_render_pdf
     )
 
     scraper.get_bill_urls(bill_id=bill_id)
@@ -140,7 +140,7 @@ def test_get_bill_urls_populates_urls_and_calls_render_pdf(monkeypatch):
     expected_url = f"{BASE_URL}/archivo/{expected_b64}/pdf"
     assert calls[0] == expected_url
 
-    # Scraper should have one RawBillDocuments object
+    # Scraper should have one RawBillDocument object
     assert len(scraper.urls) == 1
     doc = scraper.urls[0]
     assert doc.bill_id == bill_id
@@ -186,7 +186,7 @@ def test_get_bill_urls_respects_update_flag(monkeypatch):
 
     # Patch render_pdf to avoid network
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_bill_documents.render_pdf",
+        "backend.scrapers.scrape_raw_bills_documents.render_pdf",
         lambda url: "OK",
     )
 
@@ -217,7 +217,7 @@ def test_add_documents_to_db_persists(monkeypatch):
     scraper.Session = SessionLocal
 
     bill_id = "2021_3"
-    doc = RawBillDocuments(
+    doc = RawBillDocument(
         timestamp=datetime.now(timezone.utc),
         bill_id=bill_id,
         step_date=datetime.now(timezone.utc),
@@ -231,9 +231,9 @@ def test_add_documents_to_db_persists(monkeypatch):
     assert scraper.add_documents_to_db() is True
 
     with SessionLocal() as session:
-        count = session.query(RawBillDocuments).count()
+        count = session.query(RawBillDocument).count()
         assert count == 1
-        db_doc = session.query(RawBillDocuments).first()
+        db_doc = session.query(RawBillDocument).first()
         assert db_doc.bill_id == bill_id
         assert db_doc.archivo_id == '123'
         assert db_doc.text == "SOME TEXT"
@@ -250,7 +250,7 @@ def test_add_documents_to_db_asserts_when_empty():
 def test_add_documents_to_db_handles_sqlalchemy_error():
     scraper = RawBillDocumentScraper()
     scraper.urls = [
-        RawBillDocuments(
+        RawBillDocument(
             timestamp=datetime.now(timezone.utc),
             bill_id="2021_4",
             step_date=datetime.now(timezone.utc),

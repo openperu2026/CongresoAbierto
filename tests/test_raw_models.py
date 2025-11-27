@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from backend.database.raw_models import (
     Base,
     RawBill,
-    RawBillDocuments,
+    RawBillDocument,
     RawCommittee,
     RawCongresista,
     RawMotion,
@@ -110,7 +110,7 @@ def test_can_create_raw_bill(session):
 def test_can_create_raw_bill_document(session):
     now = datetime.now(UTC)
     step_date = now.date()
-    doc = RawBillDocuments(
+    doc = RawBillDocument(
         timestamp=now,
         bill_id="PL-1234",
         step_date=now,
@@ -122,7 +122,7 @@ def test_can_create_raw_bill_document(session):
     session.add(doc)
     session.commit()
 
-    fetched = session.query(RawBillDocuments).filter_by(archivo_id="ARCH-1").one()
+    fetched = session.query(RawBillDocument).filter_by(archivo_id="ARCH-1").one()
     assert fetched.url == "https://example.com/doc.pdf"
     assert "extracted text" in fetched.text
 
