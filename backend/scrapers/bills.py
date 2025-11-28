@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.config import settings
-from backend.scrapers.scrape_utils import get_url_text
+from backend.scrapers.utils import get_url_text
 from backend.database.raw_models import RawBill
 
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"

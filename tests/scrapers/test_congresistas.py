@@ -5,7 +5,7 @@ from lxml.html import fromstring
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.scrapers.scrape_raw_congresistas import (
+from backend.scrapers.congresistas import (
     RawCongresistasScraper,
     BASE_URL,
     API_MEMBERSHIP,
@@ -101,7 +101,7 @@ def test_get_dict_periodos(monkeypatch):
         return fromstring(html)
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_congresistas.parse_url", fake_parse_url
+        "backend.scrapers.congresistas.parse_url", fake_parse_url
     )
 
     s.get_dict_periodos()
@@ -163,7 +163,7 @@ def test_create_raw_congresista_modern_success(monkeypatch):
         raise AssertionError(f"Unexpected URL in fake_parse_url: {url}")
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_congresistas.parse_url", fake_parse_url
+        "backend.scrapers.congresistas.parse_url", fake_parse_url
     )
 
     def fake_get_url_text(url):
@@ -172,7 +172,7 @@ def test_create_raw_congresista_modern_success(monkeypatch):
         return '{"ok": true}'
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_congresistas.get_url_text", fake_get_url_text
+        "backend.scrapers.congresistas.get_url_text", fake_get_url_text
     )
 
     period = "Congresistas 2021-2026"
@@ -201,7 +201,7 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
         return fromstring(html)
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_congresistas.parse_url", fake_parse_url
+        "backend.scrapers.congresistas.parse_url", fake_parse_url
     )
 
     # Force cargos URL (we don't care what it is)

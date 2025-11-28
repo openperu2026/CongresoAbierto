@@ -6,8 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from backend.database.raw_models import Base as RawBase, RawMotion, RawMotionDocument
-import backend.scrapers.scrape_raw_motions_documents as scrape_raw_motions_documents
-from backend.scrapers.scrape_raw_motions_documents import (
+import backend.scrapers.motions_documents as motions_documents
+from backend.scrapers.motions_documents import (
     RawMotionDocumentScraper,
     BASE_URL,
 )
@@ -127,7 +127,7 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
         return "dummy text"
 
     monkeypatch.setattr(
-        scrape_raw_motions_documents, "render_pdf", fake_render_pdf
+        motions_documents, "render_pdf", fake_render_pdf
     )
 
     scraper.get_motion_urls(motion_id=motion_id)
@@ -198,7 +198,7 @@ def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
         raise AssertionError("render_pdf should not be called when no steps remain")
 
     monkeypatch.setattr(
-        scrape_raw_motions_documents, "render_pdf", fake_render_pdf
+        motions_documents, "render_pdf", fake_render_pdf
     )
 
     result = scraper.get_motion_urls(motion_id=motion_id, prioritize=True)

@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.scrapers.scrape_raw_motions import RawMotionScraper, BASE_URL
+from backend.scrapers.motions import RawMotionScraper, BASE_URL
 from backend.database.raw_models import Base, RawMotion
 
 
@@ -172,7 +172,7 @@ def test_scrape_motion_appends_raw_motion(monkeypatch):
 
     # Patch get_url_text in this module
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_motions.get_url_text",
+        "backend.scrapers.motions.get_url_text",
         fake_get_url_text,
     )
 

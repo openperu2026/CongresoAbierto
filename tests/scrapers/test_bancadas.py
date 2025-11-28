@@ -7,8 +7,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import declarative_base, sessionmaker
 from selenium.common.exceptions import NoSuchElementException
 
-import backend.scrapers.scrape_raw_bancadas as scrape_raw_bancadas
-from backend.scrapers.scrape_raw_bancadas import RawBancadaScraper
+import backend.scrapers.bancadas as bancadas
+from backend.scrapers.bancadas import RawBancadaScraper
 
 
 # ---------- Unit tests for get_options ----------
@@ -36,7 +36,7 @@ def test_get_options_returns_expected_dict(monkeypatch):
 
     # Monkeypatch parse_url to return our fake HTML element
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "parse_url",
         lambda url: doc,
     )
@@ -101,14 +101,14 @@ def test_get_html_with_selections_success(monkeypatch):
 
     # Patch webdriver.Chrome to return our dummy driver
     monkeypatch.setattr(
-        scrape_raw_bancadas.webdriver,
+        bancadas.webdriver,
         "Chrome",
         lambda service=None, options=None: dummy_driver,
     )
 
     # Patch WebDriverWait used in the module to avoid real waiting/EC logic
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "WebDriverWait",
         _DummyWait,
     )
@@ -134,13 +134,13 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
     dummy_driver = _DummyDriver(page_source="<html>ShouldNotMatter</html>")
 
     monkeypatch.setattr(
-        scrape_raw_bancadas.webdriver,
+        bancadas.webdriver,
         "Chrome",
         lambda service=None, options=None: dummy_driver,
     )
 
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "WebDriverWait",
         _FailingWait,
     )
@@ -175,7 +175,7 @@ def test_get_raw_bancadas_only_current(monkeypatch):
     """
     # Use our dummy RawBancada class
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "RawBancada",
         _DummyRawBancada,
     )
@@ -213,7 +213,7 @@ def test_get_raw_bancadas_all_conditions(monkeypatch):
     product of periods and conditions.
     """
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "RawBancada",
         _DummyRawBancada,
     )
@@ -269,7 +269,7 @@ def test_add_bancadas_to_db_success(monkeypatch):
     """
     # Use our test model instead of the real RawBancada
     monkeypatch.setattr(
-        scrape_raw_bancadas,
+        bancadas,
         "RawBancada",
         RawBancadaTest,
     )

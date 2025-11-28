@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from backend.config import settings
 from backend.database.raw_models import RawCongresista
-from backend.scrapers.scrape_utils import (
+from backend.scrapers.utils import (
     parse_url,
     get_url_text,
     normalize_text,

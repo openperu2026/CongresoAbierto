@@ -5,7 +5,7 @@ from lxml.html import fromstring
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.scrapers.scrape_raw_committees import (
+from backend.scrapers.committees import (
     RawCommitteeScraper,
     BASE_URL,
 )
@@ -41,7 +41,7 @@ def test_get_options_parses_select(monkeypatch):
         return fromstring(html)
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_committees.parse_url", fake_parse_url
+        "backend.scrapers.committees.parse_url", fake_parse_url
     )
 
     options = scraper.get_options(url=BASE_URL, select_name="idRegistroPadre")
@@ -92,11 +92,11 @@ def test_get_html_with_selections_success(monkeypatch):
 
     # Patch Chrome constructor and Select inside the scraper module
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_committees.webdriver.Chrome",
+        "backend.scrapers.committees.webdriver.Chrome",
         lambda *a, **k: FakeDriver(),
     )
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_committees.Select",
+        "backend.scrapers.committees.Select",
         FakeSelect,
     )
 
@@ -124,7 +124,7 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
             pass
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_committees.webdriver.Chrome",
+        "backend.scrapers.committees.webdriver.Chrome",
         lambda *a, **k: FakeDriver(),
     )
 

@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.scrapers.scrape_raw_bills_documents import (
+from backend.scrapers.bills_documents import (
     RawBillDocumentScraper,
     BASE_URL,
 )
@@ -129,7 +129,7 @@ def test_get_bill_documents_populates_documents_and_calls_render_pdf(monkeypatch
         return f"TEXT_FROM_{url}"
 
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_bills_documents.render_pdf", fake_render_pdf
+        "backend.scrapers.bills_documents.render_pdf", fake_render_pdf
     )
 
     scraper.get_bill_documents(bill_id=bill_id)
@@ -187,7 +187,7 @@ def test_get_bill_documents_respects_update_flag(monkeypatch):
 
     # Patch render_pdf to avoid network
     monkeypatch.setattr(
-        "backend.scrapers.scrape_raw_bills_documents.render_pdf",
+        "backend.scrapers.bills_documents.render_pdf",
         lambda url: "OK",
     )
 

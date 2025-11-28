@@ -4,7 +4,7 @@ import pytest
 import httpx
 from lxml.html import fromstring
 
-from backend.scrapers import scrape_utils as u
+from backend.scrapers import utils as u
 
 
 # ---------- simple pure functions ----------

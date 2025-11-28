@@ -5,7 +5,7 @@ from loguru import logger
 from lxml.html import fromstring
 from typing import List, Dict, Tuple
 from backend import URL, LegPeriod, PARTY_ALIASES
-from backend.scrapers.scrape_utils import parse_url, xpath2
+from backend.scrapers.utils import parse_url, xpath2
 from backend.process.schema import Congresista, Party
 
 PARTY_ID_MAP = {period: {} for period in LegPeriod._member_names_}

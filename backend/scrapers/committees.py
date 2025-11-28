@@ -18,7 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from backend.config import settings
 from backend.database.raw_models import RawCommittee
-from backend.scrapers.scrape_utils import parse_url
+from backend.scrapers.utils import parse_url
 
 BASE_URL = "https://www.congreso.gob.pe/CuadrodeComisiones"
 RAW_DB_PATH = settings.RAW_DB_URL

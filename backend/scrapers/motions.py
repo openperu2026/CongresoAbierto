@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from backend.config import settings
 from backend.database.raw_models import RawMotion
-from backend.scrapers.scrape_utils import get_url_text
+from backend.scrapers.utils import get_url_text
 
 BASE_URL = "https://wb2server.congreso.gob.pe/smociones-portal-service"
 RAW_DB_PATH = settings.RAW_DB_URL
