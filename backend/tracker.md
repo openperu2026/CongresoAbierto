@@ -4,23 +4,27 @@ This document tracks the status, update frequency, and source details for each e
 
 ## 🔄 Summary
 
-| Object                  | Status     | Source/Notes |
-|-------------------------|------------|--------------|
-| Congresistas            | ✅ Finished | Official web page |
-| Parties                 | ✅ Finished | Official web page |
-| Bancadas                | 🔴 Not implemented   | Official web page |
-| Organization (Committee)| 🟡 Pending review   | Official web page |
-| Bill / Motion           | ⏳ In Progress | Official web page |
-| BillCongresista         | 🔴 Not implemented  | Official web page |
-| BillCommittee           | 🔴 Not implemented  | Official web page |
-| BillSteps               | 🔴 Not implemented  | Official web page |
-| VoteEvent               | 🔴 Not implemented  | PDF |
-| Vote                    | ⏳ In Progress  | PDF |
-| Vote_counts             | 🔴 Not implemented | PDF |
-| Membership              | ⏳ In Progress | Congressmen web page |
-| Event                   | 🔴 Not implemented | PDF |
-| Attendance              | 🔴 Not implemented | PDF |
-_Last updated: 16th July 2025_
+| Object            | Status - Raw    | Status - Clean  | Source/Notes |
+|-------------------|-----------------|--------------|--------|
+| Congresistas      | ✅ Finished    | 🔴 Not implemented | Official web page |
+| Bancadas          | ✅ Finished    | 🔴 Not implemented | Official web page |
+| Organization      | ✅ Finished    | 🔴 Not implemented | Official web page |
+| Committee         | ✅ Finished    | 🔴 Not implemented | Official web page |
+| Bill              | ✅ Finished    | 🔴 Not implemented | Official web page |
+| Motion            | ⏳ In Progress | 🔴 Not implemented | Official web page |
+| BillCongresista   | N/A            | 🔴 Not implemented | Official web page |
+| BillCommittee     | N/A            | 🔴 Not implemented | Official web page |
+| BillSteps         | N/A            | 🔴 Not implemented | Official web page |
+| MotionCongresista | N/A            | 🔴 Not implemented | Official web page |
+| MotionCommittee   | N/A            | 🔴 Not implemented | Official web page |
+| MotionSteps       | N/A            | 🔴 Not implemented | Official web page |
+| VoteEvent         | N/A            | 🔴 Not implemented | PDF |
+| Vote              | N/A            | ⏳ In Progress | PDF |
+| VoteCounts        | N/A            | 🔴 Not implemented | PDF |
+| Membership        | N/A            | 🔴 Not implemented | Congressmen web page |
+| BancadaMembership | N/A            | 🔴 Not implemented | Congressmen web page |
+| Attendance        | N/A            | 🔴 Not implemented | PDF |
+_Last updated: Nov 28th 2025_
 
 ---
 

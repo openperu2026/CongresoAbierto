@@ -301,27 +301,9 @@ class Congresista(Base):
         PrimaryKeyConstraint("id", "leg_period"),
     )
 
-
-class Party(Base):
-    """
-    Represent a Political Party in the peruvian government
-
-    Attributes:
-        leg_period (str): Legislative period.
-        party_id (int): Unique identifier for the party
-        party_name (str): Name of the party
-    """
-
-    __tablename__ = "partidos"
-
-    leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
-    party_id = Column(Integer, primary_key=True)
-    party_name = Column(String, nullable=False)
-
-
 class Bancada(Base):
     """
-    Represent a Bancada in the peruvian government
+    Represent a Bancada (Grupo Parlamentario) in the peruvian parliament
 
     Attributes:
         leg_year (str): Year period of the bancada

@@ -283,7 +283,7 @@ class Congresista(PrintableModel):
         id (str): Unique identifier for the person.
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
-        party_id (str): Unique identifier for the party.
+        party_name (str): Name of the party from where the person was elected.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
@@ -294,7 +294,7 @@ class Congresista(PrintableModel):
     id: int
     leg_period: LegPeriod
     nombre: str
-    party_id: int
+    party_name: int
     votes_in_election: int
     dist_electoral: Optional[str]
     condicion: str
@@ -304,21 +304,6 @@ class Congresista(PrintableModel):
 
     def __str__(self):
         return "\n".join(f"{key}: {value}" for key, value in self.model_dump().items())
-
-
-class Party(PrintableModel):
-    """
-    Represent a Political Party in the peruvian government
-
-    Attributes:
-        leg_period (str): Legislative period.
-        party_id (int): Unique identifier for the party
-        party_name (str): Name of the party
-    """
-
-    leg_period: LegPeriod
-    party_id: int
-    party_name: str
 
 
 class Bancada(PrintableModel):
