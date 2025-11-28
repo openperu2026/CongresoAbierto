@@ -1,7 +1,5 @@
-import os
 import re
 import fitz
-import pytesseract
 from io import BytesIO
 from jellyfish import jaro_winkler_similarity as jws
 
