@@ -50,7 +50,8 @@ class RawBillScraper:
             resp = json.loads(response)
 
             # Successfully built the raw bill!
-            self.raw_bills.append(self.create_raw_bill(year, bill_number, resp["data"]))
+            bill = self.create_raw_bill(year, bill_number, resp["data"])
+            self.raw_bills.append(self.update_tracking(bill))
             logger.success(f"Successfully scraped Raw Bill {year}_{bill_number}")
 
         except TypeError as e:
@@ -58,7 +59,7 @@ class RawBillScraper:
 
     def create_raw_bill(self, year: str, bill_number: str, data: dict) -> RawBill:
         # Initialize raw bill with id and timestamp
-        raw_bill = RawBill(id=f"{year}_{bill_number}", timestamp=datetime.now())
+        raw_bill = RawBill(id=f"{year}_{bill_number}", timestamp=datetime.now(), processed = False)
 
         # Add sections
         for raw_name, attribute_name in self.section_mapping.items():
@@ -73,6 +74,28 @@ class RawBillScraper:
                 setattr(raw_bill, attribute_name, json.dumps(attribute_value))
 
         return raw_bill
+
+    def update_tracking(self, bill: RawBill) -> RawBill:
+        """Update the tracking columns of a RawBill object"""
+        
+        with self.Session() as session:
+            last_bill = session.query(RawBill).filter(RawBill.id == bill.id).order_by(RawBill.timestamp.desc()).first()
+        
+            # First ever version of this bill
+            if last_bill is None:
+                bill.changed = True
+                bill.last_update = True
+            else:
+                # Compare last vs new
+                bill.changed = (bill != last_bill)
+                bill.last_update = True
+
+                # Update the old version AFTER comparison
+                last_bill.last_update = False
+                session.add(last_bill)
+                session.commit()
+
+            return bill
 
     def add_bills_to_db(self) -> bool:
         """
@@ -107,8 +130,6 @@ class RawBillScraper:
 
 def main():
     scraper = RawBillScraper()
-    years = ["2021"]
-    bills = [str(num) for num in range(1, 13330)]
 
     bill = 101
     year = 2021

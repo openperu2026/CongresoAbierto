@@ -48,7 +48,8 @@ class RawMotionScraper:
             resp = json.loads(response)
 
             # Successfully built the raw bill!
-            self.raw_motions.append(self.create_raw_motion(year, motion_number, resp["data"]))
+            new_motion = self.create_raw_motion(year, motion_number, resp["data"])
+            self.raw_motions.append(self.update_tracking(new_motion))
             logger.success(f"Successfully scraped Raw Motion {year}_{motion_number}")
 
         except TypeError as e:
@@ -56,7 +57,7 @@ class RawMotionScraper:
 
     def create_raw_motion(self, year: str, motion_number: str, data: dict) -> RawMotion:
         # Initialize raw bill with id and timestamp
-        raw_motion = RawMotion(id=f"{year}_{motion_number}", timestamp=datetime.now())
+        raw_motion = RawMotion(id=f"{year}_{motion_number}", timestamp=datetime.now(), processed = False, last_update = True)
 
         # Add sections
         for raw_name, attribute_name in self.section_mapping.items():
@@ -73,6 +74,28 @@ class RawMotionScraper:
         raw_motion.general = json.dumps(data)
 
         return raw_motion
+    
+    def update_tracking(self, motion: RawMotion) -> RawMotion:
+        """Update the tracking columns of a RawMotion object"""
+        
+        with self.Session() as session:
+            last_motion = session.query(RawMotion).filter(RawMotion.id == motion.id).order_by(RawMotion.timestamp.desc()).first()
+        
+            # First ever version of this motion
+            if last_motion is None:
+                motion.changed = True
+                motion.last_update = True
+            else:
+                # Compare last vs new
+                motion.changed = (motion != last_motion)
+                motion.last_update = True
+
+                # Update the old version AFTER comparison
+                last_motion.last_update = False
+                session.add(last_motion)
+                session.commit()
+
+            return motion
 
     def add_motions_to_db(self) -> bool:
         """
@@ -110,7 +133,7 @@ if __name__ == "__main__":
     scraper = RawMotionScraper()
     years = ["2021"]
 
-    motion = 1
+    motion = 20771
     year = 2021
     while True:
         try:

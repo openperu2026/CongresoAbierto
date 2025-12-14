@@ -182,24 +182,6 @@ class Committee(PrintableModel):
     model_config = ConfigDict(use_enum_values=False)
 
 
-class RawBill(PrintableModel):
-    """
-    Represents a raw bill, with sections saved as attributes:
-        id (str) Unique identifier for the bill.
-        general (str) Main bill info
-        committees (str) Information about committees
-        congresistas (str) Information about authors and proponents
-        steps (str) Information about bill steps
-    """
-
-    id: str
-    timestamp: datetime
-    general: Optional[str] = None
-    committees: Optional[str] = None
-    congresistas: Optional[str] = None
-    steps: Optional[str] = None
-
-
 class Bill(PrintableModel):
     """
     Represents a bill in the peruvian parliament.
@@ -294,7 +276,7 @@ class Congresista(PrintableModel):
     id: int
     leg_period: LegPeriod
     nombre: str
-    party_name: int
+    party_name: str
     votes_in_election: int
     dist_electoral: Optional[str]
     condicion: str

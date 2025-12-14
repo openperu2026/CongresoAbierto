@@ -278,7 +278,7 @@ class Congresista(Base):
         id (str): Unique identifier for the person.
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
-        party_id (str): Unique identifier for the party.
+        party_name (str): Name of the party.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
@@ -290,7 +290,7 @@ class Congresista(Base):
     id = Column(Integer, nullable=False)
     nombre = Column(String, nullable=False)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
-    party_id = Column(Integer, ForeignKey("partidos.party_id"), nullable=False)
+    party_name = Column(String, nullable=False)
     votes_in_election = Column(Integer, nullable=False)
     dist_electoral = Column(String, nullable=True)
     condicion = Column(String, nullable=False)
