@@ -5,7 +5,8 @@ from jellyfish import jaro_winkler_similarity as jws
 
 from backend import PARTIES, VOTE_RESULTS
 from backend.process.schema import Vote
-from backend.process.utils import extract_text 
+from backend.process.utils import extract_text
+
 
 def find_bill(pdf_file: BytesIO, bill_desc: str) -> str:
     """

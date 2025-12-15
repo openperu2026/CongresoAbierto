@@ -59,7 +59,9 @@ class RawBillScraper:
 
     def create_raw_bill(self, year: str, bill_number: str, data: dict) -> RawBill:
         # Initialize raw bill with id and timestamp
-        raw_bill = RawBill(id=f"{year}_{bill_number}", timestamp=datetime.now(), processed = False)
+        raw_bill = RawBill(
+            id=f"{year}_{bill_number}", timestamp=datetime.now(), processed=False
+        )
 
         # Add sections
         for raw_name, attribute_name in self.section_mapping.items():
@@ -77,17 +79,22 @@ class RawBillScraper:
 
     def update_tracking(self, bill: RawBill) -> RawBill:
         """Update the tracking columns of a RawBill object"""
-        
+
         with self.Session() as session:
-            last_bill = session.query(RawBill).filter(RawBill.id == bill.id).order_by(RawBill.timestamp.desc()).first()
-        
+            last_bill = (
+                session.query(RawBill)
+                .filter(RawBill.id == bill.id)
+                .order_by(RawBill.timestamp.desc())
+                .first()
+            )
+
             # First ever version of this bill
             if last_bill is None:
                 bill.changed = True
                 bill.last_update = True
             else:
                 # Compare last vs new
-                bill.changed = (bill != last_bill)
+                bill.changed = bill != last_bill
                 bill.last_update = True
 
                 # Update the old version AFTER comparison
@@ -128,6 +135,7 @@ class RawBillScraper:
         self.add_bills_to_db()
         self.raw_bills = []
 
+
 def main():
     scraper = RawBillScraper()
 
@@ -146,6 +154,7 @@ def main():
 
         if len(scraper.raw_bills) % 100 == 0:
             scraper.load_raw_bills()
+
 
 if __name__ == "__main__":
     main()

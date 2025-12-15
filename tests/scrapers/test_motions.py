@@ -11,6 +11,7 @@ from backend.database.raw_models import Base, RawMotion
 
 # ---------- create_raw_motion ----------
 
+
 def test_create_raw_motion_sets_id_and_sections():
     scraper = RawMotionScraper()
 
@@ -33,12 +34,8 @@ def test_create_raw_motion_sets_id_and_sections():
     assert isinstance(raw_motion.timestamp, datetime)
 
     # Mapped sections should be JSON strings
-    assert raw_motion.congresistas == json.dumps(
-        [{"nombre": "Congresista A"}]
-    )
-    assert raw_motion.steps == json.dumps(
-        [{"evento": "presentada"}]
-    )
+    assert raw_motion.congresistas == json.dumps([{"nombre": "Congresista A"}])
+    assert raw_motion.steps == json.dumps([{"evento": "presentada"}])
 
     # firmantes and seguimientos were popped out of data,
     # and "general" holds the remaining dict
@@ -75,6 +72,7 @@ def test_create_raw_motion_handles_missing_sections():
 
 
 # ---------- add_motions_to_db ----------
+
 
 def _setup_inmemory_db():
     """Create in-memory SQLite engine and session factory for tests."""
@@ -129,6 +127,7 @@ def test_add_motions_to_db_handles_sqlalchemy_error(monkeypatch):
 
         def bulk_save_objects(self, objs):
             from sqlalchemy.exc import SQLAlchemyError
+
             raise SQLAlchemyError("boom")
 
         def commit(self):
@@ -153,6 +152,7 @@ def test_add_motions_to_db_handles_sqlalchemy_error(monkeypatch):
 
 
 # ---------- scrape_motion ----------
+
 
 def test_scrape_motion_appends_raw_motion(monkeypatch):
     scraper = RawMotionScraper()

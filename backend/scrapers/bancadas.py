@@ -25,6 +25,7 @@ from backend.scrapers.utils import parse_url
 BASE_URL = "https://www.congreso.gob.pe/integrantes-grupos-parlamentarios"
 RAW_DB_PATH = settings.RAW_DB_URL
 
+
 class RawBancadaScraper:
     """
     Class to scrape Grupos Parlamentarios' raw data from the congress web page
@@ -50,7 +51,9 @@ class RawBancadaScraper:
         """
         parse = parse_url(url)
         options = parse.xpath(f'//*[@name="{select_name}"]/option')
-        return {elem.text: elem.get("value") for elem in options if elem.text is not None}
+        return {
+            elem.text: elem.get("value") for elem in options if elem.text is not None
+        }
 
     def get_html_with_selections(
         self, url: str, period_value: str, condition_value: str = ""
@@ -70,10 +73,14 @@ class RawBancadaScraper:
         try:
             # Esperar a que existan los <select> ocultos
             wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'select[name="idPeriodo[]"]'))
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, 'select[name="idPeriodo[]"]')
+                )
             )
             wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'select[name="keyCondicion[]"]'))
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, 'select[name="keyCondicion[]"]')
+                )
             )
 
             # Helper JS para seleccionar opción en un <select multiple hidden>
@@ -94,26 +101,30 @@ class RawBancadaScraper:
             """
 
             # 1) Seleccionar periodo (idPeriodo[])
-            driver.execute_script(js_set_select, 'select[name="idPeriodo[]"]', period_value)
+            driver.execute_script(
+                js_set_select, 'select[name="idPeriodo[]"]', period_value
+            )
 
             # Pequeña espera para que se actualice el filtro, por si hace algo server-side
             wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, 'button.ui-multiselect'))
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "button.ui-multiselect")
+                )
             )
 
             # 2) Seleccionar condición (keyCondicion[])
             #   Para "Todas", condition_value debe ser "" (value="")
-            driver.execute_script(js_set_select, 'select[name="keyCondicion[]"]', condition_value)
+            driver.execute_script(
+                js_set_select, 'select[name="keyCondicion[]"]', condition_value
+            )
 
             # 3) Esperar a que la tabla de resultados esté presente
             #   (ajusta el selector si hace falta)
-            wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".table-cng"))
-            )
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".table-cng")))
 
             html = driver.page_source
             return html
-        
+
         except NoSuchElementException as e:
             logger.error(f"Error found: {e}")
             driver.quit()
@@ -123,15 +134,17 @@ class RawBancadaScraper:
         dict_periods = self.get_options(url=self.url, select_name="idPeriodo[]")
 
         if only_current:
-            dict_condicion = {"en Ejercicio" : "eej"}
+            dict_condicion = {"en Ejercicio": "eej"}
 
             # Only scrape current period
             key, val = list(dict_periods.items())[0]
             dict_periods = {key: val}
-        else: 
+        else:
             dict_periods = self.get_options(url=self.url, select_name="idPeriodo[]")
-            dict_condicion = self.get_options(url=self.url, select_name="keyCondicion[]")
-            
+            dict_condicion = self.get_options(
+                url=self.url, select_name="keyCondicion[]"
+            )
+
         final_lst = []
         for period_key, cond_key in product(dict_periods.keys(), dict_condicion.keys()):
             logger.info(
@@ -144,18 +157,46 @@ class RawBancadaScraper:
             html = self.get_html_with_selections(self.url, period, cond)
 
             if html is not None:
-                final_lst.append(
-                    RawBancada(
-                        timestamp=datetime.now(),
-                        legislative_period=period_key,
-                        raw_html=html,
-                    )
+                new_bancada = RawBancada(
+                    timestamp=datetime.now(),
+                    legislative_period=period_key,
+                    raw_html=html,
+                    processed=False,
+                    last_update=True,
                 )
+                final_lst.append(self.update_tracking(new_bancada))
 
         self.bancadas_list = final_lst
         logger.success(
             f"Successfully extracted {len(self.bancadas_list)} raw html bancadas"
         )
+
+    def update_tracking(self, bancada: RawBancada) -> RawBancada:
+        """Update the tracking columns of a RawBancada object"""
+
+        with self.Session() as session:
+            last_bancada = (
+                session.query(RawBancada)
+                .filter(RawBancada.id == bancada.id)
+                .order_by(RawBancada.timestamp.desc())
+                .first()
+            )
+
+            # First ever version of this bancada
+            if last_bancada is None:
+                bancada.changed = True
+                bancada.last_update = True
+            else:
+                # Compare last vs new
+                bancada.changed = bancada != last_bancada
+                bancada.last_update = True
+
+                # Update the old version AFTER comparison
+                last_bancada.last_update = False
+                session.add(last_bancada)
+                session.commit()
+
+            return bancada
 
     def add_bancadas_to_db(self) -> bool:
         """

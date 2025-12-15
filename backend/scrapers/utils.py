@@ -13,6 +13,7 @@ import cv2
 import os
 import shutil
 
+
 def _configure_tesseract() -> None:
     """
     Configure pytesseract in an environment-agnostic way.
@@ -122,6 +123,7 @@ def xpath2(xpath_query, parse):
     result = parse.xpath(xpath_query)
     return result[0].text if result else None
 
+
 def get_url(
     url: str,
     data: str | None = None,
@@ -158,8 +160,7 @@ def get_url(
         return None
 
 
-def get_url_text(
-    url: str, data: str | None = None) -> str | None:
+def get_url_text(url: str, data: str | None = None) -> str | None:
     try:
         response = get_url(url, data)
         return response.text

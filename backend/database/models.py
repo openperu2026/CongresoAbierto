@@ -301,6 +301,7 @@ class Congresista(Base):
         PrimaryKeyConstraint("id", "leg_period"),
     )
 
+
 class Bancada(Base):
     """
     Represent a Bancada (Grupo Parlamentario) in the peruvian parliament

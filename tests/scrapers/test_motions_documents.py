@@ -126,9 +126,7 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
         captured["url"] = url
         return "dummy text"
 
-    monkeypatch.setattr(
-        motions_documents, "render_pdf", fake_render_pdf
-    )
+    monkeypatch.setattr(motions_documents, "render_pdf", fake_render_pdf)
 
     scraper.get_motion_urls(motion_id=motion_id)
 
@@ -147,9 +145,7 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
     assert doc.seguimiento_id == 10
     assert doc.archivo_id == 111
     # Check that step_date was parsed correctly
-    assert doc.step_date == datetime.strptime(
-        step_date_str, "%Y-%m-%dT%H:%M:%S.%f%z"
-    )
+    assert doc.step_date == datetime.strptime(step_date_str, "%Y-%m-%dT%H:%M:%S.%f%z")
 
 
 def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
@@ -197,9 +193,7 @@ def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
     def fake_render_pdf(url):
         raise AssertionError("render_pdf should not be called when no steps remain")
 
-    monkeypatch.setattr(
-        motions_documents, "render_pdf", fake_render_pdf
-    )
+    monkeypatch.setattr(motions_documents, "render_pdf", fake_render_pdf)
 
     result = scraper.get_motion_urls(motion_id=motion_id, prioritize=True)
 

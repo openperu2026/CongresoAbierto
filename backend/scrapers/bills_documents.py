@@ -15,7 +15,16 @@ from backend.database.raw_models import RawBillDocument, RawBill
 
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"
 RAW_DB_PATH = settings.RAW_DB_URL
-PRIORITIES = set(["Publicada en el Diario Oficial El Peruano", "AUT\u00d3GRAFA", "APROBADO", "EN DEBATE - PLENO", "APROBADO 1ERA. VOTACI\u00d3N"])
+PRIORITIES = set(
+    [
+        "Publicada en el Diario Oficial El Peruano",
+        "AUT\u00d3GRAFA",
+        "APROBADO",
+        "EN DEBATE - PLENO",
+        "APROBADO 1ERA. VOTACI\u00d3N",
+    ]
+)
+
 
 class RawBillDocumentScraper:
     """
@@ -70,12 +79,13 @@ class RawBillDocumentScraper:
         if not update:
             steps = self.filter_steps(steps, bill_id)
 
+        if prioritize:
+            logger.info(f"Total number of steps: {len(steps)}")
+            steps = [step for step in steps if step.get("desEstado") in PRIORITIES]
+
         if len(steps) == 0:
             logger.info(f"No steps found for bill {bill_id}")
             return None
-        
-        if prioritize:
-            steps = [step for step in steps if step.get("desEstado") in PRIORITIES]
 
         logger.info(f"Extracting files from {len(steps)} steps of bill {bill_id}")
 
@@ -92,25 +102,49 @@ class RawBillDocumentScraper:
 
                 b64_id = base64.b64encode(str(file_id).encode()).decode()
                 url = f"{BASE_URL}/archivo/{b64_id}/pdf"
-
                 logger.info(f"Extracting document {ix + 1}/{len(steps)} at url: {url}")
                 extracted_text = render_pdf(url)
                 logger.success(f"Successfully extracted text from {url}")
 
-                self.documents.append(
-                    RawBillDocument(
-                        timestamp=datetime.now(),
-                        bill_id=bill_id,
-                        step_date=datetime.strptime(
-                            step_date, "%Y-%m-%dT%H:%M:%S.%f%z"
-                        ),
-                        seguimiento_id=seguimiento_id,
-                        archivo_id=file_id,
-                        url=url,
-                        text=extracted_text,
-                    )
+                new_doc = RawBillDocument(
+                    timestamp=datetime.now(),
+                    bill_id=bill_id,
+                    step_date=datetime.strptime(step_date, "%Y-%m-%dT%H:%M:%S.%f%z"),
+                    seguimiento_id=seguimiento_id,
+                    archivo_id=file_id,
+                    url=url,
+                    text=extracted_text,
+                    processed=False,
+                    last_update=True,
                 )
+                self.documents.append(self.update_tracking(new_doc))
 
+    def update_tracking(self, document: RawBillDocument) -> RawBillDocument:
+        """Update the tracking columns of a RawBillDocument object"""
+
+        with self.Session() as session:
+            last_document = (
+                session.query(RawBillDocument)
+                .filter(RawBillDocument.id == document.id)
+                .order_by(RawBillDocument.timestamp.desc())
+                .first()
+            )
+
+            # First ever version of this document
+            if last_document is None:
+                document.changed = True
+                document.last_update = True
+            else:
+                # Compare last vs new
+                document.changed = document != last_document
+                document.last_update = True
+
+                # Update the old version AFTER comparison
+                last_document.last_update = False
+                session.add(last_document)
+                session.commit()
+
+            return document
 
     def add_documents_to_db(self) -> bool:
         """
@@ -131,7 +165,6 @@ class RawBillDocumentScraper:
             return True
         except SQLAlchemyError as e:
             logger.error(
-                
                 f"Failed to add documents from bill {self.documents[0].bill_id}: {e}"
             )
             session.rollback()
@@ -141,19 +174,25 @@ class RawBillDocumentScraper:
             session.close()
 
     def load_raw_documents(self):
-        self.add_documents_to_db()
-        self.documents = []
+        if self.documents:
+            self.add_documents_to_db()
+            self.documents = []
+        else:
+            return None
+
 
 if __name__ == "__main__":
     logger.info("Starting Scraper")
     scraper = RawBillDocumentScraper()
 
-    bill = 209
+    bill = 865
     year = 2021
 
     while True:
         try:
-            scraper.get_bill_documents(bill_id=f"{year}_{bill}")
+            scraper.get_bill_documents(
+                bill_id=f"{year}_{bill}", update=False, prioritize=True
+            )
             scraper.load_raw_documents()
             bill += 1
         except TypeError as e:

@@ -27,6 +27,7 @@ def extract_text(text: str, initial: str = None, final: str = None) -> str:
     else:
         return result.group(1)
 
+
 def normalize_party_name(name: str) -> str:
     if name in PARTY_ALIASES.keys():
         canonical_name = PARTY_ALIASES[name]

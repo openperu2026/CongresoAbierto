@@ -15,7 +15,16 @@ from backend.database.raw_models import RawMotionDocument, RawMotion
 
 BASE_URL = "https://wb2server.congreso.gob.pe/smociones-portal-service"
 RAW_DB_PATH = settings.RAW_DB_URL
-PRIORITIES = set(["Aprobada", "Aprobada la Moción", "Aprobado Proyecto de Resolución", "Publicado Diario Oficial El Peruano", "Rechazada"])
+PRIORITIES = set(
+    [
+        "Aprobada",
+        "Aprobada la Moción",
+        "Aprobado Proyecto de Resolución",
+        "Publicado Diario Oficial El Peruano",
+        "Rechazada",
+    ]
+)
+
 
 class RawMotionDocumentScraper:
     """
@@ -63,7 +72,9 @@ class RawMotionDocumentScraper:
             .first()
         )
 
-        assert motion is not None, f"Motion with id {motion_id} has not been scraped yet"
+        assert motion is not None, (
+            f"Motion with id {motion_id} has not been scraped yet"
+        )
 
         steps: list[dict] = json.loads(motion.steps)
 
@@ -71,12 +82,14 @@ class RawMotionDocumentScraper:
             steps = self.filter_steps(steps, motion_id)
 
         if prioritize:
-            steps = [step for step in steps if step.get("desEstadoMocion") in PRIORITIES]
+            steps = [
+                step for step in steps if step.get("desEstadoMocion") in PRIORITIES
+            ]
 
         if len(steps) == 0:
             logger.info(f"No steps found for motion {motion_id}")
             return None
-        
+
         logger.info(f"Extracting files from {len(steps)} steps of motion {motion_id}")
 
         for ix, step in enumerate(steps):
@@ -96,19 +109,45 @@ class RawMotionDocumentScraper:
                 extracted_text = render_pdf(url)
                 logger.success(f"Successfully extracted text from {url}")
 
-                self.urls.append(
-                    RawMotionDocument(
-                        timestamp=datetime.now(),
-                        motion_id=motion_id,
-                        step_date=datetime.strptime(
-                            step_date, "%Y-%m-%dT%H:%M:%S.%f%z"
-                        ),
-                        seguimiento_id=seguimiento_id,
-                        archivo_id=file_id,
-                        url=url,
-                        text=extracted_text,
-                    )
+                new_doc = RawMotionDocument(
+                    timestamp=datetime.now(),
+                    motion_id=motion_id,
+                    step_date=datetime.strptime(step_date, "%Y-%m-%dT%H:%M:%S.%f%z"),
+                    seguimiento_id=seguimiento_id,
+                    archivo_id=file_id,
+                    url=url,
+                    text=extracted_text,
+                    processed=False,
+                    last_update=True,
                 )
+                self.urls.append(self.update_tracking(new_doc))
+
+    def update_tracking(self, document: RawMotionDocument) -> RawMotionDocument:
+        """Update the tracking columns of a RawMotionDocument object"""
+
+        with self.Session() as session:
+            last_document = (
+                session.query(RawMotionDocument)
+                .filter(RawMotionDocument.id == document.id)
+                .order_by(RawMotionDocument.timestamp.desc())
+                .first()
+            )
+
+            # First ever version of this document
+            if last_document is None:
+                document.changed = True
+                document.last_update = True
+            else:
+                # Compare last vs new
+                document.changed = document != last_document
+                document.last_update = True
+
+                # Update the old version AFTER comparison
+                last_document.last_update = False
+                session.add(last_document)
+                session.commit()
+
+            return document
 
     def add_documents_to_db(self) -> bool:
         """
@@ -129,7 +168,6 @@ class RawMotionDocumentScraper:
             return True
         except SQLAlchemyError as e:
             logger.error(
-                
                 f"Failed to add documents from motion {self.urls[0].motion_id}: {e}"
             )
             session.rollback()
@@ -141,6 +179,7 @@ class RawMotionDocumentScraper:
     def load_raw_documents(self):
         self.add_documents_to_db()
         self.urls = []
+
 
 if __name__ == "__main__":
     logger.info("Starting Scraper")
@@ -163,6 +202,8 @@ if __name__ == "__main__":
         try:
             scraper.load_raw_documents()
         except AssertionError:
-            logger.warning(f"No steps neither documents found for motion {year}_{motion-1}")
+            logger.warning(
+                f"No steps neither documents found for motion {year}_{motion - 1}"
+            )
 
         time.sleep(5)

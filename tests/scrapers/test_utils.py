@@ -9,6 +9,7 @@ from backend.scrapers import utils as u
 
 # ---------- simple pure functions ----------
 
+
 @pytest.mark.parametrize(
     "input_txt, expected",
     [
@@ -97,10 +98,14 @@ def test_get_url_success(monkeypatch):
             def __enter__(self_inner):
                 class Client:
                     def get(self, url):
-                        return DummyResponse(status_code=200, text="OK", is_success=True)
+                        return DummyResponse(
+                            status_code=200, text="OK", is_success=True
+                        )
 
                     def post(self, url, data=None):
-                        return DummyResponse(status_code=200, text="OK", is_success=True)
+                        return DummyResponse(
+                            status_code=200, text="OK", is_success=True
+                        )
 
                 return Client()
 
@@ -123,7 +128,9 @@ def test_get_url_non_success_returns_none(monkeypatch):
                 class Client:
                     def get(self, url):
                         # is_success False simulates HTTP error handled in get_url
-                        return DummyResponse(status_code=500, text="ERR", is_success=False)
+                        return DummyResponse(
+                            status_code=500, text="ERR", is_success=False
+                        )
 
                 return Client()
 
@@ -165,10 +172,14 @@ def test_get_url_text_with_response(monkeypatch):
             def __enter__(self_inner):
                 class Client:
                     def get(self, url):
-                        return DummyResponse(status_code=200, text="OK", is_success=True)
+                        return DummyResponse(
+                            status_code=200, text="OK", is_success=True
+                        )
 
                     def post(self, url, data=None):
-                        return DummyResponse(status_code=200, text="OK", is_success=True)
+                        return DummyResponse(
+                            status_code=200, text="OK", is_success=True
+                        )
 
                 return Client()
 
@@ -178,10 +189,11 @@ def test_get_url_text_with_response(monkeypatch):
         return Ctx()
 
     monkeypatch.setattr(u.httpx, "Client", fake_client)
-    
+
     resp = u.get_url("https://example.com")
     assert isinstance(resp, DummyResponse)
     assert resp.text == "OK"
+
 
 def test_get_url_text_with_none_returns_none():
     resp = None
@@ -255,6 +267,7 @@ async def test_fetch_multiple_urls_async(monkeypatch):
 
 
 # ---------- render_pdf (high-level wiring with mocks) ----------
+
 
 def test_render_pdf_uses_extract_text_from_page(monkeypatch):
     # Fake HTTP response for get_url

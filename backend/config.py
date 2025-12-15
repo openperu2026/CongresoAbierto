@@ -6,6 +6,7 @@ from tqdm import tqdm
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
+
 # Directories
 class Directories:
     """
@@ -65,6 +66,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
 
 def stop_logging_to_console(
     filename: str = directories.LOGS / "main.log", mode: str = "a"

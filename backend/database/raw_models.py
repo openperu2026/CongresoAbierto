@@ -5,8 +5,8 @@ from sqlalchemy.inspection import inspect
 
 Base = declarative_base()
 
+
 class RawBase(Base):
-    
     __abstract__ = True
 
     # Columns to ignore in ALL raw models
@@ -15,7 +15,7 @@ class RawBase(Base):
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        
+
         mapper = inspect(self).mapper
 
         for col in mapper.columns:
@@ -26,8 +26,9 @@ class RawBase(Base):
                 return False
 
         return True
-    
+
     __hash__ = None
+
 
 class RawBill(RawBase):
     """
@@ -52,9 +53,16 @@ class RawBill(RawBase):
     committees = Column(String, nullable=True)
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+
 
 class RawBillDocument(RawBase):
     """
@@ -84,9 +92,15 @@ class RawBillDocument(RawBase):
     archivo_id = Column(String, nullable=False)
     url = Column(String, nullable=False)
     text = Column(String, nullable=False)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
 
 class RawCommittee(RawBase):
@@ -111,9 +125,15 @@ class RawCommittee(RawBase):
     legislative_year = Column(Integer, nullable=False)
     committee_type = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
 
 class RawCongresista(RawBase):
@@ -140,9 +160,16 @@ class RawCongresista(RawBase):
     url = Column(String, nullable=False)
     profile_content = Column(String, nullable=False)
     memberships_content = Column(String, nullable=True)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+
 
 class RawMotion(RawBase):
     """
@@ -160,15 +187,22 @@ class RawMotion(RawBase):
     """
 
     __tablename__ = "raw_motions"
-    
+
     id = Column(String, primary_key=True)
     timestamp = Column(DateTime, primary_key=True)
     general = Column(String, nullable=True)
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+
 
 class RawMotionDocument(RawBase):
     """
@@ -198,9 +232,16 @@ class RawMotionDocument(RawBase):
     archivo_id = Column(String, nullable=False)
     url = Column(String, nullable=False)
     text = Column(String, nullable=False)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+
 
 class RawBancada(RawBase):
     """
@@ -222,13 +263,20 @@ class RawBancada(RawBase):
     timestamp = Column(DateTime, nullable=False)
     legislative_period = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+
 
 class RawOrganization(RawBase):
     """
-    Represents a raw scraped organization in the peruvian parliament such as 
+    Represents a raw scraped organization in the peruvian parliament such as
     Junta de Portavoces, Consejo Directivo, Mesa Directiva y Comisión Permanente.
 
     Attributes:
@@ -240,7 +288,7 @@ class RawOrganization(RawBase):
         changed (bool): Column that indicates if the last update has any difference from the previous update
         processed (bool): Column that indicates if the last update with changes have been updated
     """
-    
+
     __tablename__ = "raw_organizations"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -248,6 +296,12 @@ class RawOrganization(RawBase):
     legislative_year = Column(Integer, nullable=False)
     type_org = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
-    last_update = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    changed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
-    processed = Column(Boolean, nullable=False, server_default=expression.false(), default=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )

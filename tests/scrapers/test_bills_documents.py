@@ -16,6 +16,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 # ---------- helpers for in-memory DB ----------
 
+
 def _setup_inmemory_db():
     """Create in-memory SQLite engine and session factory for tests."""
     engine = create_engine("sqlite:///:memory:")
@@ -25,6 +26,7 @@ def _setup_inmemory_db():
 
 
 # ---------- filter_steps ----------
+
 
 def test_filter_steps_filters_existing(monkeypatch):
     engine, SessionLocal = _setup_inmemory_db()
@@ -73,6 +75,7 @@ def test_filter_steps_filters_existing(monkeypatch):
 
 # ---------- get_bill_documents ----------
 
+
 def test_get_bill_documents_raises_if_bill_not_found():
     engine, SessionLocal = _setup_inmemory_db()
 
@@ -98,7 +101,7 @@ def test_get_bill_documents_populates_documents_and_calls_render_pdf(monkeypatch
         {
             "seguimientoPleyId": 10,
             "fecha": step_date_str,
-            "desEstado" : "Publicada en el Diario Oficial El Peruano",
+            "desEstado": "Publicada en el Diario Oficial El Peruano",
             "archivos": [
                 {
                     "proyectoArchivoId": 111,
@@ -128,9 +131,7 @@ def test_get_bill_documents_populates_documents_and_calls_render_pdf(monkeypatch
         calls.append(url)
         return f"TEXT_FROM_{url}"
 
-    monkeypatch.setattr(
-        "backend.scrapers.bills_documents.render_pdf", fake_render_pdf
-    )
+    monkeypatch.setattr("backend.scrapers.bills_documents.render_pdf", fake_render_pdf)
 
     scraper.get_bill_documents(bill_id=bill_id)
     # Should have called render_pdf once
@@ -164,7 +165,7 @@ def test_get_bill_documents_respects_update_flag(monkeypatch):
     steps = [
         {
             "seguimientoPleyId": 1,
-            "desEstado" : "Publicada en el Diario Oficial El Peruano",
+            "desEstado": "Publicada en el Diario Oficial El Peruano",
             "fecha": "2021-01-01T00:00:00.000000+0000",
             "archivos": [
                 {"proyectoArchivoId": 999, "seguimientoPleyId": 1},
@@ -210,6 +211,7 @@ def test_get_bill_documents_respects_update_flag(monkeypatch):
 
 # ---------- add_documents_to_db ----------
 
+
 def test_add_documents_to_db_persists(monkeypatch):
     engine, SessionLocal = _setup_inmemory_db()
 
@@ -236,7 +238,7 @@ def test_add_documents_to_db_persists(monkeypatch):
         assert count == 1
         db_doc = session.query(RawBillDocument).first()
         assert db_doc.bill_id == bill_id
-        assert db_doc.archivo_id == '123'
+        assert db_doc.archivo_id == "123"
         assert db_doc.text == "SOME TEXT"
 
 
@@ -291,6 +293,7 @@ def test_add_documents_to_db_handles_sqlalchemy_error():
 
 
 # ---------- load_raw_documents ----------
+
 
 def test_load_raw_documents_calls_add_and_clears(monkeypatch):
     scraper = RawBillDocumentScraper()

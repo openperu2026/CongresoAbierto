@@ -1,14 +1,13 @@
-import httpx
-import polars as pl
-import time
-import base64
-from backend.process.schema import Bill
-from ..scrapers.utils import url_to_cache_file, save_ocr_txt_to_cache, render_pdf
-import pandas as pd
-import re
-from pathlib import Path
-import random
-
+from backend.database.crud.bills import get_bills_ids, get_bill_last, mark_raw_bill_processed
+from backend.database.raw_models import RawBill
+from backend.database.models import (
+    Bill,
+    BillCommittees,
+    BillCongresistas,
+    BillStep,
+    BillStepType,
+    RoleTypeBill,
+)
 
 BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"
 BASE_DIR = Path(__file__).parent.parent.parent

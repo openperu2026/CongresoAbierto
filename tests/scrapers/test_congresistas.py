@@ -15,6 +15,7 @@ from backend.database.raw_models import Base, RawCongresista
 
 # ---------- helpers for DB tests ----------
 
+
 def _setup_inmemory_db():
     """Create in-memory SQLite engine and session factory for tests."""
     engine = create_engine("sqlite:///:memory:")
@@ -24,6 +25,7 @@ def _setup_inmemory_db():
 
 
 # ---------- small helper methods ----------
+
 
 @pytest.mark.parametrize(
     "txt, expected",
@@ -85,6 +87,7 @@ def test_get_cong_website():
 
 # ---------- get_dict_periodos ----------
 
+
 def test_get_dict_periodos(monkeypatch):
     s = RawCongresistasScraper()
 
@@ -100,15 +103,14 @@ def test_get_dict_periodos(monkeypatch):
         """
         return fromstring(html)
 
-    monkeypatch.setattr(
-        "backend.scrapers.congresistas.parse_url", fake_parse_url
-    )
+    monkeypatch.setattr("backend.scrapers.congresistas.parse_url", fake_parse_url)
 
     s.get_dict_periodos()
     assert s.periods == {"Periodo A": "1", "Periodo B": "2"}
 
 
 # ---------- create_raw_congresista (old periods) ----------
+
 
 def test_create_raw_congresista_old_period(monkeypatch):
     s = RawCongresistasScraper()
@@ -130,6 +132,7 @@ def test_create_raw_congresista_old_period(monkeypatch):
 
 
 # ---------- create_raw_congresista (modern period, success path) ----------
+
 
 def test_create_raw_congresista_modern_success(monkeypatch):
     s = RawCongresistasScraper()
@@ -162,18 +165,14 @@ def test_create_raw_congresista_modern_success(monkeypatch):
             return fromstring(html)
         raise AssertionError(f"Unexpected URL in fake_parse_url: {url}")
 
-    monkeypatch.setattr(
-        "backend.scrapers.congresistas.parse_url", fake_parse_url
-    )
+    monkeypatch.setattr("backend.scrapers.congresistas.parse_url", fake_parse_url)
 
     def fake_get_url_text(url):
         # should be membership API call with id from iframe
         assert url == API_MEMBERSHIP + "ABC123"
         return '{"ok": true}'
 
-    monkeypatch.setattr(
-        "backend.scrapers.congresistas.get_url_text", fake_get_url_text
-    )
+    monkeypatch.setattr("backend.scrapers.congresistas.get_url_text", fake_get_url_text)
 
     period = "Congresistas 2021-2026"
     cong_link = "/perfil/123"
@@ -189,6 +188,7 @@ def test_create_raw_congresista_modern_success(monkeypatch):
 
 # ---------- create_raw_congresista (partial failure -> no iframe) ----------
 
+
 def test_create_raw_congresista_partial_failure(monkeypatch):
     s = RawCongresistasScraper()
 
@@ -200,12 +200,12 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
         html = "<html><body>No iframe here</body></html>"
         return fromstring(html)
 
-    monkeypatch.setattr(
-        "backend.scrapers.congresistas.parse_url", fake_parse_url
-    )
+    monkeypatch.setattr("backend.scrapers.congresistas.parse_url", fake_parse_url)
 
     # Force cargos URL (we don't care what it is)
-    s.get_best_cargos_link = lambda doc, base_url: "https://example.com/cargos-no-iframe"
+    s.get_best_cargos_link = (
+        lambda doc, base_url: "https://example.com/cargos-no-iframe"
+    )
 
     period = "Congresistas 2016-2021"
     cong_link = "/perfil/abc"
@@ -222,6 +222,7 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
 
 # ---------- extract_cong_from_period ----------
 
+
 def test_extract_cong_from_period_uses_links_and_creator(monkeypatch):
     s = RawCongresistasScraper()
 
@@ -234,6 +235,7 @@ def test_extract_cong_from_period_uses_links_and_creator(monkeypatch):
 
 
 # ---------- extract_and_load_all ----------
+
 
 def test_extract_and_load_all_requires_periods():
     s = RawCongresistasScraper()
@@ -270,6 +272,7 @@ def test_extract_and_load_all_calls_add(monkeypatch):
 
 
 # ---------- add_congresistas_to_db ----------
+
 
 def test_add_congresistas_to_db_persists(monkeypatch):
     engine, SessionLocal = _setup_inmemory_db()
@@ -323,6 +326,7 @@ def test_add_congresistas_to_db_handles_sqlalchemy_error(monkeypatch):
 
         def bulk_save_objects(self, objs):
             from sqlalchemy.exc import SQLAlchemyError
+
             raise SQLAlchemyError("boom")
 
         def commit(self):

@@ -8,7 +8,10 @@ from .raw_models import Base as RawBase
 
 import os
 
-def _ensure_columns(base, engine, cols: list[str] = ['last_update', 'changed', 'processed']):
+
+def _ensure_columns(
+    base, engine, cols: list[str] = ["last_update", "changed", "processed"]
+):
     """
     For each table in `base`, if the SQLAlchemy model defines a 'processed'
     column but the actual DB table does not have it yet, add it via ALTER TABLE.
@@ -27,7 +30,9 @@ def _ensure_columns(base, engine, cols: list[str] = ['last_update', 'changed', '
                 if col_name not in table.c:
                     continue
 
-                existing_cols = {col["name"] for col in inspector.get_columns(table_name)}
+                existing_cols = {
+                    col["name"] for col in inspector.get_columns(table_name)
+                }
 
                 if col_name in existing_cols:
                     # Already present in DB
@@ -65,7 +70,7 @@ def create_database(base, db_url: str):
             _ensure_columns(base, engine)
         except SQLAlchemyError as e:
             print(f"Error updating existing database schema: {e}")
-            return False        
+            return False
         return False
 
     # If DB does not exist, create it and all tables

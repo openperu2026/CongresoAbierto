@@ -57,7 +57,12 @@ class RawMotionScraper:
 
     def create_raw_motion(self, year: str, motion_number: str, data: dict) -> RawMotion:
         # Initialize raw bill with id and timestamp
-        raw_motion = RawMotion(id=f"{year}_{motion_number}", timestamp=datetime.now(), processed = False, last_update = True)
+        raw_motion = RawMotion(
+            id=f"{year}_{motion_number}",
+            timestamp=datetime.now(),
+            processed=False,
+            last_update=True,
+        )
 
         # Add sections
         for raw_name, attribute_name in self.section_mapping.items():
@@ -70,24 +75,29 @@ class RawMotionScraper:
                 )
             else:
                 setattr(raw_motion, attribute_name, json.dumps(attribute_value))
-        
+
         raw_motion.general = json.dumps(data)
 
         return raw_motion
-    
+
     def update_tracking(self, motion: RawMotion) -> RawMotion:
         """Update the tracking columns of a RawMotion object"""
-        
+
         with self.Session() as session:
-            last_motion = session.query(RawMotion).filter(RawMotion.id == motion.id).order_by(RawMotion.timestamp.desc()).first()
-        
+            last_motion = (
+                session.query(RawMotion)
+                .filter(RawMotion.id == motion.id)
+                .order_by(RawMotion.timestamp.desc())
+                .first()
+            )
+
             # First ever version of this motion
             if last_motion is None:
                 motion.changed = True
                 motion.last_update = True
             else:
                 # Compare last vs new
-                motion.changed = (motion != last_motion)
+                motion.changed = motion != last_motion
                 motion.last_update = True
 
                 # Update the old version AFTER comparison
@@ -141,7 +151,6 @@ if __name__ == "__main__":
             motion += 1
         except TypeError:
             break
-
 
         if len(scraper.raw_motions) % 10 == 0:
             time.sleep(5)

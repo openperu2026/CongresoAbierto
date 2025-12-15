@@ -12,6 +12,7 @@ from backend.database.raw_models import Base, RawBill
 
 # ---------- create_raw_bill ----------
 
+
 def test_create_raw_bill_sets_id_and_sections():
     scraper = RawBillScraper()
 
@@ -40,6 +41,7 @@ def test_create_raw_bill_sets_id_and_sections():
 
 
 # ---------- add_bills_to_db ----------
+
 
 def _setup_inmemory_db():
     """Create in-memory SQLite engine and session factory for tests."""
@@ -97,6 +99,7 @@ def test_add_bills_to_db_handles_sqlalchemy_error(monkeypatch):
 
         def bulk_save_objects(self, objs):
             from sqlalchemy.exc import SQLAlchemyError
+
             raise SQLAlchemyError("boom")
 
         def commit(self):
@@ -123,6 +126,7 @@ def test_add_bills_to_db_handles_sqlalchemy_error(monkeypatch):
 
 # ---------- scrape_bill ----------
 
+
 def test_scrape_bill_appends_raw_bill(monkeypatch):
     scraper = RawBillScraper()
 
@@ -142,9 +146,7 @@ def test_scrape_bill_appends_raw_bill(monkeypatch):
         )
 
     # Patch get_url_text in the scraper module
-    monkeypatch.setattr(
-        "backend.scrapers.bills.get_url_text", fake_get_url_text
-    )
+    monkeypatch.setattr("backend.scrapers.bills.get_url_text", fake_get_url_text)
 
     scraper.scrape_bill("2021", "1234")
 

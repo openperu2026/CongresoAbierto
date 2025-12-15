@@ -14,6 +14,7 @@ engine = create_engine(
 RawBase.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 def get_db():
     """Get a database session."""
     db = SessionLocal()

@@ -95,19 +95,48 @@ class RawCommitteeScraper:
             html = self.get_html_with_selections(self.url, year, types)
 
             if html is not None:
-                final_lst.append(
-                    RawCommittee(
-                        timestamp=datetime.now(),
-                        legislative_year=int(year_key),
-                        committee_type=type_key,
-                        raw_html=html,
-                    )
+                new_committee = RawCommittee(
+                    timestamp=datetime.now(),
+                    legislative_year=int(year_key),
+                    committee_type=type_key,
+                    raw_html=html,
+                    processed=False,
+                    last_update=True,
                 )
+
+                final_lst.append(self.update_tracking(new_committee))
 
         self.committee_list = final_lst
         logger.success(
             f"Successfully extracted {len(self.committee_list)} raw html committees"
         )
+
+    def update_tracking(self, committee: RawCommittee) -> RawCommittee:
+        """Update the tracking columns of a RawCommittee object"""
+
+        with self.Session() as session:
+            last_committee = (
+                session.query(RawCommittee)
+                .filter(RawCommittee.id == committee.id)
+                .order_by(RawCommittee.timestamp.desc())
+                .first()
+            )
+
+            # First ever version of this committee
+            if last_committee is None:
+                committee.changed = True
+                committee.last_update = True
+            else:
+                # Compare last vs new
+                committee.changed = committee != last_committee
+                committee.last_update = True
+
+                # Update the old version AFTER comparison
+                last_committee.last_update = False
+                session.add(last_committee)
+                session.commit()
+
+            return committee
 
     def add_committees_to_db(self) -> bool:
         """

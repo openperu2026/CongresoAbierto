@@ -181,9 +181,37 @@ class RawCongresistasScraper:
 
         links = self.get_urls_from_table(period_value)
         for cong_link in links:
-            congresistas.append(self.create_raw_congresista(period_key, cong_link))
+            new_cong = self.create_raw_congresista(period_key, cong_link)
+            congresistas.append(self.update_tracking(new_cong))
 
         return congresistas
+
+    def update_tracking(self, congresista: RawCongresista) -> RawCongresista:
+        """Update the tracking columns of a RawCongresista object"""
+
+        with self.Session() as session:
+            last_congresista = (
+                session.query(RawCongresista)
+                .filter(RawCongresista.id == congresista.id)
+                .order_by(RawCongresista.timestamp.desc())
+                .first()
+            )
+
+            # First ever version of this congresista
+            if last_congresista is None:
+                congresista.changed = True
+                congresista.last_update = True
+            else:
+                # Compare last vs new
+                congresista.changed = congresista != last_congresista
+                congresista.last_update = True
+
+                # Update the old version AFTER comparison
+                last_congresista.last_update = False
+                session.add(last_congresista)
+                session.commit()
+
+            return congresista
 
     def extract_and_load_all(self) -> list[RawCongresista]:
         assert self.periods, (

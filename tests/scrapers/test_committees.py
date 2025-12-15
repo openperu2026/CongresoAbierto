@@ -14,6 +14,7 @@ from backend.database.raw_models import Base, RawCommittee
 
 # ---------- helpers for DB tests ----------
 
+
 def _setup_inmemory_db():
     """Create in-memory SQLite engine and session factory for tests."""
     engine = create_engine("sqlite:///:memory:")
@@ -23,6 +24,7 @@ def _setup_inmemory_db():
 
 
 # ---------- get_options ----------
+
 
 def test_get_options_parses_select(monkeypatch):
     scraper = RawCommitteeScraper()
@@ -40,9 +42,7 @@ def test_get_options_parses_select(monkeypatch):
         """
         return fromstring(html)
 
-    monkeypatch.setattr(
-        "backend.scrapers.committees.parse_url", fake_parse_url
-    )
+    monkeypatch.setattr("backend.scrapers.committees.parse_url", fake_parse_url)
 
     options = scraper.get_options(url=BASE_URL, select_name="idRegistroPadre")
 
@@ -53,7 +53,9 @@ def test_get_options_parses_select(monkeypatch):
     if "--Seleccione--" in options:
         assert options["--Seleccione--"] is None
 
+
 # ---------- get_html_with_selections ----------
+
 
 def test_get_html_with_selections_success(monkeypatch):
     scraper = RawCommitteeScraper()
@@ -134,6 +136,7 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
 
 # ---------- get_raw_committees ----------
 
+
 def test_get_raw_committees_builds_committee_list(monkeypatch):
     scraper = RawCommitteeScraper()
 
@@ -153,7 +156,9 @@ def test_get_raw_committees_builds_committee_list(monkeypatch):
         return f"<html>Year={year_value},Type={committee_value}</html>"
 
     monkeypatch.setattr(scraper, "get_options", fake_get_options)
-    monkeypatch.setattr(scraper, "get_html_with_selections", fake_get_html_with_selections)
+    monkeypatch.setattr(
+        scraper, "get_html_with_selections", fake_get_html_with_selections
+    )
 
     scraper.get_raw_committees()
 
@@ -170,6 +175,7 @@ def test_get_raw_committees_builds_committee_list(monkeypatch):
 
 
 # ---------- add_committees_to_db ----------
+
 
 def test_add_committees_to_db_persists(monkeypatch):
     engine, SessionLocal = _setup_inmemory_db()
