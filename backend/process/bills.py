@@ -1,3 +1,5 @@
+import re
+
 from backend.database.crud.bills import get_bills_ids, get_bill_last, mark_raw_bill_processed
 from backend.database.raw_models import RawBill
 from backend.database.models import (
@@ -9,10 +11,6 @@ from backend.database.models import (
     RoleTypeBill,
 )
 
-BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"
-BASE_DIR = Path(__file__).parent.parent.parent
-OCR_CACHE_DIR = BASE_DIR / "data" / "ocr_cache"
-BILL_JSONS = BASE_DIR / "data" / "bill_jsons"
 VOTE_PATTERN = re.compile(
     r"\bSI\s*\+{2,}.*?\bNO\s*-{2,}|\bNO\s*-{2,}.*?\bSI\s*\+{2,}",
     re.IGNORECASE | re.DOTALL,

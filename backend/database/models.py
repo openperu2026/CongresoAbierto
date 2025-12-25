@@ -12,6 +12,8 @@ from sqlalchemy import (
 )
 from backend import (
     VoteOption,
+    VoteResult,
+    MajorityType,
     AttendanceStatus,
     BillStepType,
     RoleTypeBill,
@@ -65,15 +67,18 @@ class VoteEvent(Base):
 
     __tablename__ = "vote_events"
 
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, autoincrement = True)
     org_id = Column(Integer, ForeignKey("organizations.org_id"), nullable=False)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
-    bill_id = Column(String, ForeignKey("bills.id"), nullable=False)
+    bill_or_motion = Column(String, nullable = False)
+    bill_motion_id = Column(String, nullable = False)
     date = Column(DateTime, nullable=False)
+    result = Column(Enum(VoteResult, name = "vote_result"), nullable = False)
+    majority_type = Column(Enum(MajorityType, name = "majority_type"), nullable = True)
 
     __table_args__ = (
-        UniqueConstraint("org_id", "leg_period", "bill_id", "id", name="uq_vote_event"),
-        Index("ix_vote_event_bill_id", "bill_id"),
+        UniqueConstraint("org_id", "leg_period", "bill_or_motion", "bill_motion_id", "date", name="uq_vote_event"),
+        Index("ix_vote_event_bill_motion_id", "bill_motion_id"),
     )
 
 
@@ -334,11 +339,11 @@ class Organization(Base):
 
     __tablename__ = "organizations"
 
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
     leg_year = Column(
         Enum(LegislativeYear, name="leg_year"), primary_key=True, nullable=False
     )
-    org_id = Column(Integer, primary_key=True)
     org_name = Column(String, nullable=False)
     org_type = Column(Enum(TypeOrganization, name="type_organization"), nullable=False)
 

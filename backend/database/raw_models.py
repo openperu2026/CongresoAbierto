@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Index
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import expression
 from sqlalchemy.inspection import inspect
@@ -83,6 +83,19 @@ class RawBillDocument(RawBase):
     """
 
     __tablename__ = "raw_bill_documents"
+
+    __table_args__ = (
+        Index(
+            "idx_raw_bill_documents_bill_last",
+            "bill_id",
+            "last_update",
+        ),
+        Index(
+            "idx_raw_bill_documents_bill_processed",
+            "bill_id",
+            "processed",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(DateTime, nullable=False)

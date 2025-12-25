@@ -1,6 +1,8 @@
 from pydantic import BaseModel, field_validator, ConfigDict
 from backend import (
     VoteOption,
+    VoteResult,
+    MajorityType,
     AttendanceStatus,
     BillStepType,
     RoleTypeBill,
@@ -70,11 +72,13 @@ class VoteEvent(PrintableModel):
     """
 
     # Attributes that fit in in Popolo structure
-    id: str
     org_id: int
     leg_period: LegPeriod
-    bill_id: str
+    bill_or_motion: str
+    bill_motion_id: str
     date: datetime
+    result: VoteResult
+    majority_type: MajorityType | None
     votes: Optional[List[Vote]] = None
     attendance: Optional[List[Attendance]] = None
 

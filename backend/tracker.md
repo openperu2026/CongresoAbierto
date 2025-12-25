@@ -11,7 +11,9 @@ This document tracks the status, update frequency, and source details for each e
 | Organization      | ✅ Finished    | 🔴 Not implemented | Official web page |
 | Committee         | ✅ Finished    | 🔴 Not implemented | Official web page |
 | Bill              | ✅ Finished    | 🔴 Not implemented | Official web page |
-| Motion            | ⏳ In Progress | 🔴 Not implemented | Official web page |
+| BillDocuments     | ✅ Finished    | N/A                | Official web page |
+| Motion            | ✅ Finished    | 🔴 Not implemented | Official web page |
+| MotionDocuments   | ✅ Finished    | N/A                | Official web page |
 | BillCongresista   | N/A            | 🔴 Not implemented | Official web page |
 | BillCommittee     | N/A            | 🔴 Not implemented | Official web page |
 | BillSteps         | N/A            | 🔴 Not implemented | Official web page |

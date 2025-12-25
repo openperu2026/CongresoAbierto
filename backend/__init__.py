@@ -53,6 +53,20 @@ PARTY_ALIASES = {
     "Unión por el Perú": "Unión por el Perú - Social Democracia",
 }
 
+class MajorityType(str, Enum):
+    SIMPLE = "simple"
+    ABSOLUTE = "absolute"
+    QUALIFIED = "qualified"    
+
+class VoteResult(str, Enum):
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    TIED = "tied"
+    NO_QUORUM = "no_quorum"
+    SUSPENDED = "suspended"          # cuarto intermedio
+    RETURNED_TO_COMMITTEE = "returned_to_committee"
+    FILED = "filed"
+    WITHDRAWN = "withdrawn"
 
 class VoteOption(str, Enum):
     SI = "si"
@@ -167,3 +181,4 @@ class TypeOrganization(str, Enum):
     JUNTA_DE_PORTAVOCES = "junta de portavoces"
     MESA_DIRECTIVA = "mesa directiva"
     COMISION_PERMANENTE = "comision permanente"
+    CONSEJO_DIRECTIVO = "consejo directivo"

@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from backend.database.models import (
     Bill,
@@ -20,8 +21,7 @@ def get_bills_ids(session: Session) -> list[str]:
 
     Returns: List of bill's ids
     """
-    raw_bills = session.query(RawBill).distinct(RawBill.id).all()
-    return [raw_bill.id for raw_bill in raw_bills]
+    return [row[0] for row in session.query(RawBill.id).distinct().all()]
 
 
 def get_bill_last(session: Session, bill_id: str) -> RawBill | None:
@@ -50,13 +50,21 @@ def mark_raw_bill_processed(session: Session, bill_id: str) -> bool:
         - session (Session): Raw DB Session from Open Peru DB
         - bill_id (str): unique identifier from the bill
     """
-    raw_bill = session.get(RawBill, bill_id)
-    if raw_bill:
-        raw_bill.processed = True
-        session.add(raw_bill)
-        session.commit()
-        return True
-    return False
+    max_ts = (
+        session.query(func.max(RawBill.timestamp))
+        .filter(RawBill.id == bill_id)
+        .scalar()
+    )
+    if max_ts is None:
+        return False
+
+    updated = (
+        session.query(RawBill)
+        .filter(RawBill.id == bill_id, RawBill.timestamp == max_ts)
+        .update({RawBill.processed: True}, synchronize_session=False)
+    )
+    session.commit()
+    return updated == 1
 
 ########################################
 # Bill CRUD Operations
