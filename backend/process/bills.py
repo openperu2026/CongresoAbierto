@@ -1,7 +1,5 @@
 import re
 
-from backend.database.crud.bills import get_bills_ids, get_bill_last, mark_raw_bill_processed
-from backend.database.raw_models import RawBill
 from backend.database.models import (
     Bill,
 )

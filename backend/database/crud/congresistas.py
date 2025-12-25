@@ -1,6 +1,5 @@
 from sqlalchemy import func, and_
 from sqlalchemy.orm import Session
-from backend.database.models import Congresista
 from backend.database.raw_models import RawCongresista
 
 ########################################
