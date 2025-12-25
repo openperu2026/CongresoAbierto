@@ -4,11 +4,6 @@ from backend.database.crud.bills import get_bills_ids, get_bill_last, mark_raw_b
 from backend.database.raw_models import RawBill
 from backend.database.models import (
     Bill,
-    BillCommittees,
-    BillCongresistas,
-    BillStep,
-    BillStepType,
-    RoleTypeBill,
 )
 
 VOTE_PATTERN = re.compile(

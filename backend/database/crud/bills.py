@@ -1,11 +1,5 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from backend.database.models import (
-    Bill,
-    BillCommittees,
-    BillCongresistas,
-    BillStep,
-)
 from backend.database.raw_models import RawBill
 
 ########################################
