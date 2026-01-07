@@ -50,3 +50,16 @@ def mark_raw_cong_processed(session: Session, id: int) -> bool:
     raw_cong.processed = True
     session.commit()
     return True
+
+########################################
+# Congresistas CRUD Operations
+########################################
+
+def get_cong_by_web_name(session: Session, name: str, leg_period: str, web: str) -> Congresista:
+
+    cong = session.query(Congresista).filter(Congresista.website == web).first()
+
+    if cong:
+        return cong
+    
+    return session.query(Congresista).filter(Congresista.nombre == name, Congresista.leg_period == leg_period).first()

@@ -1,6 +1,12 @@
 import re
-from backend import PARTY_ALIASES
+import json
+import polars as pl
+from pathlib import Path
 
+from backend import PARTY_ALIASES
+from backend.config import directories
+from sqlalchemy.orm import Session
+from backend.database.raw_models import RawBill, RawMotion
 
 def extract_text(text: str, initial: str = None, final: str = None) -> str:
     """
@@ -33,3 +39,31 @@ def normalize_party_name(name: str) -> str:
         canonical_name = PARTY_ALIASES[name]
         return canonical_name
     return name
+
+
+def gen_congresistas_df(session: Session) -> None:
+    
+    bills_congresistas = session.query(RawBill.congresistas).distinct().all()
+    motions_congresistas = session.query(RawMotion.congresistas).distinct().all()
+
+    all_cong = []
+
+    for (json_str,) in bills_congresistas + motions_congresistas:
+        try:
+            parsed = json.loads(json_str)
+            if isinstance(parsed, list):
+                all_cong.extend(parsed)
+        except json.JSONDecodeError:
+            continue
+
+    unique_by_congresista = {
+        d["congresistaId"]: d
+        for d in all_cong
+        if "congresistaId" in d
+    }
+
+    df = pl.DataFrame(list(unique_by_congresista.values()))
+
+    df.write_json(directories.PROCESSED_DATA / 'cong_info_2021_2026.json')
+
+    return None

@@ -296,6 +296,7 @@ class RawOrganization(RawBase):
         id (str): Unique identifier for the organization.
         timestamp (datetime): timestamp of the scraping task
         legislative_year (str): Legislative year
+        org_link (str): Organization's website
         raw_html (str): Html text
         last_update (bool): Column that indicates if this tuple is the last update for the bill_id
         changed (bool): Column that indicates if the last update has any difference from the previous update
@@ -308,6 +309,7 @@ class RawOrganization(RawBase):
     timestamp = Column(DateTime, nullable=False)
     legislative_year = Column(Integer, nullable=False)
     type_org = Column(String, nullable=False)
+    org_link = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
     last_update = Column(
         Boolean, nullable=False, server_default=expression.false(), default=False

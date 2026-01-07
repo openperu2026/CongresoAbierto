@@ -46,7 +46,7 @@ class RawBillScraper:
         bill_url = f"{BASE_URL}/expediente/{year}/{bill_number}"
         response = get_url_text(bill_url)
 
-        try:
+        if response:
             resp = json.loads(response)
 
             # Successfully built the raw bill!
@@ -54,8 +54,8 @@ class RawBillScraper:
             self.raw_bills.append(self.update_tracking(bill))
             logger.success(f"Successfully scraped Raw Bill {year}_{bill_number}")
 
-        except TypeError as e:
-            raise e
+        else:
+            return None
 
     def create_raw_bill(self, year: str, bill_number: str, data: dict) -> RawBill:
         # Initialize raw bill with id and timestamp

@@ -44,7 +44,7 @@ class RawMotionScraper:
         motion_url = f"{BASE_URL}/mocion/{year}/{motion_number}"
         response = get_url_text(motion_url)
 
-        try:
+        if response:
             resp = json.loads(response)
 
             # Successfully built the raw bill!
@@ -52,8 +52,8 @@ class RawMotionScraper:
             self.raw_motions.append(self.update_tracking(new_motion))
             logger.success(f"Successfully scraped Raw Motion {year}_{motion_number}")
 
-        except TypeError as e:
-            raise e
+        else:
+            return None
 
     def create_raw_motion(self, year: str, motion_number: str, data: dict) -> RawMotion:
         # Initialize raw bill with id and timestamp

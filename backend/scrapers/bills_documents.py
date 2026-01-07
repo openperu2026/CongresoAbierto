@@ -9,7 +9,6 @@ from sqlalchemy import create_engine, tuple_, select
 
 from sqlalchemy.exc import SQLAlchemyError
 
-
 from backend.config import settings, directories, stop_logging_to_console
 from backend.scrapers.utils import render_pdf
 from backend.database.raw_models import RawBillDocument, RawBill
