@@ -1,7 +1,6 @@
 import os
 import time
 from loguru import logger
-from itertools import product
 from datetime import datetime
 from typing import Literal
 

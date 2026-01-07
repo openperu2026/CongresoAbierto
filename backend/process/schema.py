@@ -4,7 +4,6 @@ from backend import (
     VoteResult,
     MajorityType,
     AttendanceStatus,
-    BillStepType,
     RoleTypeBill,
     LegPeriod,
     Legislature,
@@ -17,7 +16,7 @@ from backend import (
     parse_legislature,
     parse_role_bill
 )
-from typing import List, Optional, Dict
+from typing import Optional
 from datetime import datetime
 from pathlib import Path
 
