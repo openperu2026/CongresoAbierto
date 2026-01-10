@@ -141,7 +141,13 @@ class VoteCount(PrintableModel):
 
     vote_event_id: str
     option: VoteOption
-    bancada_id: int    """
+    bancada_id: int
+    count: int
+
+    model_config = ConfigDict(use_enum_values=False)
+
+class Bill(PrintableModel):
+    """
     Represents a bill in the peruvian parliament.
 
     Attributes:
@@ -159,13 +165,6 @@ class VoteCount(PrintableModel):
         author_web (str): Unique identifier for the political group associated with the bill.
         bill_approved (bool): Boolean indicating if the bill has been published
     """
-    count: int
-
-    model_config = ConfigDict(use_enum_values=False)
-
-
-class Bill(PrintableModel):
-
 
     # Attributes that fit in in Popolo structure
     id: str
