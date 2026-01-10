@@ -141,14 +141,7 @@ class VoteCount(PrintableModel):
 
     vote_event_id: str
     option: VoteOption
-    bancada_id: int
-    count: int
-
-    model_config = ConfigDict(use_enum_values=False)
-
-
-class Bill(PrintableModel):
-    """
+    bancada_id: int    """
     Represents a bill in the peruvian parliament.
 
     Attributes:
@@ -166,6 +159,13 @@ class Bill(PrintableModel):
         author_web (str): Unique identifier for the political group associated with the bill.
         bill_approved (bool): Boolean indicating if the bill has been published
     """
+    count: int
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class Bill(PrintableModel):
+
 
     # Attributes that fit in in Popolo structure
     id: str
@@ -324,6 +324,25 @@ class Bancada(PrintableModel):
 
     model_config = ConfigDict(use_enum_values=False)
 
+class Motion(PrintableModel):
+    """
+    Represents a motion in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the bill.
+        leg_period (str): Legislative period of the bill.
+        legislature (str): Legislature where the bill was presented.
+        presentation_date (datetime): Date when the bill was presented.
+        title (str): Title of the bill.
+        summary (str): Summary of the bill.
+        observations (str): Observations on the bill.
+        complete_text (str): Complete text of the bill.
+        status (str): Current status of the bill.
+        proponent (str): Type of proponent of the bill
+        author_name (str): Unique identifier for the author of the bill.
+        author_web (str): Unique identifier for the political group associated with the bill.
+        bill_approved (bool): Boolean indicating if the bill has been published
+    """
 
 class Organization(PrintableModel):
     """
