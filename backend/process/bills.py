@@ -114,6 +114,7 @@ def process_bill_steps_and_comms(raw_bill: RawBill) -> list[BillStep] | None:
                         vote_step_counter += 1
                         vote_id = f"{raw_bill.id}_{vote_step_counter}"
 
+                    #TODO: Mejorar el codigo para obtener todos los urls
 
             final_steps.append(BillStep(
                 id = id,
