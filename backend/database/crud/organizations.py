@@ -1,6 +1,8 @@
+from loguru import logger
 from sqlalchemy.orm import Session
 from backend.database.models import Organization
 from backend.database.raw_models import RawOrganization, RawCommittee
+from backend.process.schema import Organization as OrgSchema
 
 ########################################
 # Raw Committee CRUD Operations
@@ -72,56 +74,38 @@ def get_organization_by_name_year(session: Session, org_name: str, year: str) ->
     
     return session.query(Organization).filter(Organization.org_name == org_name, Organization.leg_year == year).first()
 
-def batch_create_action_history(
-    db: Session, actions_data: List[ActionHistorySchema]
-) -> List[ActionHistoryModel]:
-    """Batch create multiple action history records."""
-    logger.info(
-        f"Batch creating or updating {len(actions_data)} action history records"
-    )
-
-    actions = []
-    for action_data in actions_data:
-        try:
-            action = create_action_history(db, action_data)
-            actions.append(action)
-        except Exception as e:
-            logger.error(
-                f"Error processing action history for ticket {action_data.ticket_no}: {e}"
-            )
-            continue
-    return actions
-
-def bulk_load_action_histories(
-    db: Session, actions_data: List[ActionHistorySchema]
-) -> List[ActionHistoryModel]:
-    """Bulk load action histories for fast ingestion."""
+def bulk_load_organizations(
+    db: Session, orgs_lst: list[OrgSchema]
+) -> list[Organization]:
+    """Bulk load organizations for fast ingestion."""
     try:
-        logger.info(f"Bulk loading {len(actions_data)} action histories")
+        logger.info(f"Bulk loading {len(orgs_lst)} organizations")
 
-        existing_actions_map = {
-            (a.ticket_no, a.action_taken_date): a
-            for a in get_action_history_by_ticket(db, actions_data[0].ticket_no)
+        existing_orgs_map = {
+            (o.leg_period, o.leg_year, o.org_name, o.org_type): o
+            for o in db.query(Organization).filter(
+                 Organization.org_name.in_([c.org_name for c in orgs_lst])
+            ).all()
         }
 
         to_insert = []
         to_update = []
 
-        for action in actions_data:
-            a_dict = action.model_dump(by_alias=False)
-            key = (action.ticket_no, action.action_taken_date)
-            exist_action = existing_actions_map.get(key)
+        for org in orgs_lst:
+            org_dict = org.model_dump(by_alias=False)
+            key = (org.leg_period, org.leg_year, org.org_name, org.org_type)
+            exist_org = existing_orgs_map.get(key)
 
-            if exist_action is None:
-                to_insert.append(ActionHistoryModel(**a_dict))
+            if exist_org is None:
+                to_insert.append(Organization(**org_dict))
             else:
                 updated = False
-                for field, value in a_dict.items():
-                    if getattr(exist_action, field) != value:
-                        setattr(exist_action, field, value)
+                for field, value in org_dict.items():
+                    if getattr(exist_org, field) != value:
+                        setattr(exist_org, field, value)
                         updated = True
                 if updated:
-                    to_update.append(exist_action)
+                    to_update.append(exist_org)
 
         if to_insert:
             db.bulk_save_objects(to_insert, return_defaults=True)
@@ -129,9 +113,9 @@ def bulk_load_action_histories(
             db.add_all(to_update)
 
         db.commit()
-        logger.info(f"{len(to_insert)} new, {len(to_update)} updated action history")
+        logger.info(f"{len(to_insert)} new, {len(to_update)} updated organizations")
         return to_insert + to_update
 
     except Exception as e:
         db.rollback()
-        logger.error(f"Bulk load action histories failed: {e}")
+        logger.error(f"Bulk load organizations failed: {e}")
