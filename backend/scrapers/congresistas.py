@@ -2,7 +2,7 @@ import re
 from loguru import logger
 from datetime import datetime
 
-from lxml.html import HtmlElement, fromstring
+from lxml.html import HtmlElement
 from urllib.parse import urljoin
 
 from sqlalchemy.orm import sessionmaker
@@ -15,6 +15,7 @@ from backend.scrapers.utils import (
     parse_url,
     get_url_text,
     normalize_text,
+    get_cong_website
 )
 
 BASE_URL = "https://www.congreso.gob.pe/pleno/congresistas/"
@@ -56,11 +57,6 @@ class RawCongresistasScraper:
     def get_profile_content(self, cong_link: str) -> str:
         full_url = self.url + cong_link
         return get_url_text(full_url)
-
-    def get_cong_website(self, profile_content: str) -> str | None:
-        parse = fromstring(profile_content)
-        website = parse.xpath('//*[@class="web"]/span[2]/a/@href')
-        return website[0] if website else None
 
     def _is_cargos_label(self, txt: str) -> bool:
         """
@@ -122,7 +118,7 @@ class RawCongresistasScraper:
         self, period: str, cong_link: str
     ) -> RawCongresista | None:
         profile_content = self.get_profile_content(cong_link)
-        website = self.get_cong_website(profile_content)
+        website = get_cong_website(profile_content)
 
         if period in [
             "Parlamentario 2001 - 2006",
