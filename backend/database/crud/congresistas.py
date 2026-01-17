@@ -2,7 +2,6 @@ from loguru import logger
 from sqlalchemy import func, and_, select
 from sqlalchemy.orm import Session
 
-from backend.database.crud.organizations import get_organization_by_name_year
 from backend.database.raw_models import RawCongresista
 from backend.database.models import Congresista, Membership, Organization
 from backend.process.schema import Congresista as CongresistaSchema, Membership as MembershipSchema

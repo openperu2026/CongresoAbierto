@@ -1,6 +1,5 @@
 from lxml.html import fromstring
-from datetime import datetime
-from backend import LegPeriod, LegislativeYear, find_leg_period, parse_leg_period
+from backend import LegislativeYear, find_leg_period
 from backend.database.raw_models import RawBancada
 from backend.process.schema import Bancada, BancadaMembership
 from backend.process.utils import get_current_leg_year
