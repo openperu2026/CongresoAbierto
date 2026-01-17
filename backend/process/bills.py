@@ -1,8 +1,6 @@
 import re
 import json
-import base64
 
-from backend.database.crud.bills import get_documents_by_id
 from backend.database.raw_models import RawBill, RawBillDocument
 from backend.process.schema import Bill, BillCommittees, BillCongresistas, BillStep, BillDocument
 

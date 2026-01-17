@@ -1,8 +1,6 @@
 import re
 import json
-import base64
 
-from backend.scrapers.motions import BASE_URL
 from backend.database.raw_models import RawMotion, RawMotionDocument
 from backend.process.schema import Motion, MotionCongresistas, MotionStep, MotionDocument
 
