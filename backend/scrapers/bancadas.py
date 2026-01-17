@@ -225,5 +225,5 @@ class RawBancadaScraper:
 
 if __name__ == "__main__":
     scraper = RawBancadaScraper()
-    scraper.get_raw_bancadas()
+    scraper.get_raw_bancadas(only_current=False)
     scraper.add_bancadas_to_db()
