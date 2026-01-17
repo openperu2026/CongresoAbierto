@@ -1,3 +1,4 @@
+from backend import normalize_membership_role
 from backend.database.raw_models import RawCongresista
 from backend.process.schema import Congresista, Membership
 
@@ -16,7 +17,7 @@ def process_profile_content(raw_cong: RawCongresista) -> Congresista:
         nombre=xpath2('//*[@class="nombres"]/span[2]', html),
         leg_period=raw_cong.leg_period,
         party_name=xpath2('//*[@class="grupo"]/span[2]', html),
-        votes_in_election=xpath2('//*[@class="votacion"]/span[2]', html),
+        votes_in_election=int(xpath2('//*[@class="votacion"]/span[2]', html).replace(',','')),
         dist_electoral=xpath2('//*[@class="representa"]/span[2]', html),
         condicion=xpath2('//*[@class="condicion"]/span[2]', html),
         website=raw_cong.url,
@@ -35,11 +36,22 @@ def process_memberships(raw_cong: RawCongresista, cong: Congresista) -> list[Mem
         year = membership.get('anio')
         type_org = membership.get('desOrgano')
         org_name = membership.get('desOrganoCongresista')
-        cargo = membership.get('desCargo')
+        cargo = normalize_membership_role(membership.get('desCargo'))
         start_date = membership.get('fechaInicio')
         end_date = membership.get('fechaFin')
 
-        if type_org == '':
+        if org_name == 'Subcomisión de Acusaciones Constitucionales':
+            final_lst.append(Membership(
+                role = cargo,
+                nombre = cong.nombre,
+                leg_period=cong.leg_period,
+                org_name = org_name,
+                org_type = "Comisión",
+                comm_type = org_name,
+                start_date = start_date,
+                end_date = end_date
+                ))
+        elif type_org != '':
             final_lst.append(Membership(
                 role = cargo,
                 nombre = cong.nombre,
