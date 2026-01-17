@@ -175,7 +175,7 @@ class Bill(PrintableModel):
     title: str
     summary: str
     observations: str
-    complete_text: str
+    complete_text: str | None
     status: str
     proponent: Proponents
     author_name: str | None
@@ -243,7 +243,7 @@ class BillCommittees(PrintableModel):
     """
 
     bill_id: str
-    committee_name: int
+    committee_name: str
 
 
 class BillStep(PrintableModel):
@@ -256,7 +256,6 @@ class BillStep(PrintableModel):
         vote_step (bool): Records if the step is a vote or not.
         step_date (datetime): The date and time when the step occured.
         step_detail (str): The details on the step
-        step_url (str): The url associated to the step
     """
 
     id: int
@@ -265,7 +264,28 @@ class BillStep(PrintableModel):
     vote_id: str | None
     step_date: datetime
     step_detail: str
-    step_url: str
+    step_files: list[int]
+
+    model_config = ConfigDict(use_enum_values=False)
+
+class BillDocument(PrintableModel):
+    """
+    Represents a document object related to a Bill and to a specific BillStep
+
+    Attributes:
+        bill_id (str): The identifier of the bill associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+    bill_id: str
+    step_id: int
+    archivo_id: int
+    url: str
+    text: str
+    vote_doc: bool
 
     model_config = ConfigDict(use_enum_values=False)
 
@@ -296,7 +316,7 @@ class Motion(PrintableModel):
     motion_type: MotionType
     summary: str
     observations: str
-    complete_text: str
+    complete_text: str | None
     status: str
     author_name: str | None
     author_web: str | None
@@ -372,7 +392,29 @@ class MotionStep(PrintableModel):
     vote_id: str | None
     step_date: datetime
     step_detail: str
-    step_url: str
+    step_files: list[int]
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class MotionDocument(PrintableModel):
+    """
+    Represents a document object related to a Motion and to a specific MotionStep
+
+    Attributes:
+        motion_id (str): The identifier of the motion associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+    motion_id: str
+    step_id: int
+    archivo_id: int
+    url: str
+    text: str
+    vote_doc: bool
 
     model_config = ConfigDict(use_enum_values=False)
 
