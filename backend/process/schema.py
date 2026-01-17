@@ -19,7 +19,6 @@ from backend import (
 )
 from typing import Optional
 from datetime import datetime
-from pathlib import Path
 
 
 class PrintableModel(BaseModel):
