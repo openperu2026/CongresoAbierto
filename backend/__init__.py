@@ -82,6 +82,148 @@ class AttendanceStatus(str, Enum):
     LICENCIA = "con licencia"
     SUSPENDIDO = "suspendido"
 
+class MotionType(str, Enum):
+    SALUDO = "Saludo"
+    CENSURA_MESA = 'Censura Mesa Directiva del Congreso'
+    CENSURA_MINISTRO = 'Censura al Consejo de Ministros'
+    INTERES = 'Interés Nacional'
+    INTERPELACION = 'Interpelación'
+    INFORME_MINISTROS = 'Invitación a Ministros para Informar'
+    VACANCIA = 'Vacancia'
+    COMISION_INVESTIGADORA = ['Otorgar Facultades de Comisión Investigadora', 'Comisiones Investigadoras']
+    COMISION_ESPECIAL = 'Comisiones Especiales'
+    PESAR = 'Pesar'
+    OTRAS = 'Otras'
+
+class MotionStepType(str, Enum):
+    UNKNOWN = "unknown"
+
+    # Intake / start
+    PRESENTED = "presented"
+    ADMITTED = "admitted to debate"
+
+    # Routing / admin handling
+    ASSIGNED = "assigned"
+    INTERNAL_ROUTE = "internal routing"
+    AGENDA = "agenda"
+
+    # Deliberation
+    DEBATE = "debate"
+    VOTE = "vote"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+    # Reconsideration
+    RECONSIDERATION = "reconsideration"
+
+    # Text / documents
+    TEXT_UPDATE = "text update"
+    OFFICIAL_COMMUNICATION = "official communication"
+
+    # Attendance / appearances (minister, etc.)
+    APPEARANCE = "appearance"
+
+    # Other outcomes
+    WITHDRAWN = "withdrawn"
+    ARCHIVED = "archived"
+    PUBLISHED = "published"
+    RESIGNATION = "resignation"
+    DISCIPLINE_OR_ORDER = "question of order"
+    REQUIREMENTS_BLOCK = "requirements not met"
+
+
+DES_ESTADO_TO_MOTION_STEP_TYPE: dict[str, MotionStepType] = {
+    # Presented
+    "Presentado": MotionStepType.PRESENTED,
+
+    # Admitted / not admitted
+    "Admitida la Moción": MotionStepType.ADMITTED,
+    "NO ADMITIDA A DEBATE": MotionStepType.REJECTED,
+    "RECHAZADA LA ADMISIÓN A DEBATE": MotionStepType.REJECTED,
+
+    # Assigned / in committee
+    "En Comisión": MotionStepType.ASSIGNED,
+    "Integrantes de Comisión": MotionStepType.ASSIGNED,
+    "Aprobado integrantes de Comisión": MotionStepType.ASSIGNED,
+
+    # Agenda / internal routing (CD = Consejo Directivo)
+    "En Agenda C.D": MotionStepType.AGENDA,
+    "PARA SER VISTA POR EL CONSEJO DIRECTIVO": MotionStepType.INTERNAL_ROUTE,
+    "Tramitada con conocimiento del CD": MotionStepType.INTERNAL_ROUTE,
+    "TRAMITADA CON ACUERDO DE CD": MotionStepType.INTERNAL_ROUTE,
+    "Por Acuerdo de CD.": MotionStepType.INTERNAL_ROUTE,
+    "Acuerdo Junta de Portavoces": MotionStepType.INTERNAL_ROUTE,
+
+    # Pleno routing / agenda
+    "Para ser vista por el Pleno": MotionStepType.AGENDA,
+    "En Agenda del Pleno": MotionStepType.AGENDA,
+    "Orden del Día": MotionStepType.AGENDA,
+    "Dado cuenta en el Pleno": MotionStepType.INTERNAL_ROUTE,
+    "Por Acuerdo de Pleno": MotionStepType.INTERNAL_ROUTE,
+
+    # Debate
+    "En Debate": MotionStepType.DEBATE,
+    "Leída en sesión": MotionStepType.DEBATE,
+
+    # Vote-ish / outcomes
+    "Aprobada": MotionStepType.APPROVED,
+    "Aprobada la Moción": MotionStepType.APPROVED, 
+    "Rechazada": MotionStepType.REJECTED,
+
+    # Reconsideration
+    "Reconsideración": MotionStepType.RECONSIDERATION,
+    "Rechazada Reconsideración": MotionStepType.RECONSIDERATION,  # still a reconsideration event
+
+    # Text updates
+    "Texto consensuado": MotionStepType.TEXT_UPDATE,
+    "Texto Sustitutorio": MotionStepType.TEXT_UPDATE,
+    "Retiro de Firma": MotionStepType.WITHDRAWN,
+    "Adhesión": MotionStepType.TEXT_UPDATE,         # signature/support update
+
+    # Official comms / documents
+    "Oficio": MotionStepType.OFFICIAL_COMMUNICATION,
+
+    # Publication
+    "Publicado Diario Oficial  El Peruano": MotionStepType.PUBLISHED,
+
+    # Appearances (minister, etc.)
+    "Concurre Ministro": MotionStepType.APPEARANCE,
+    "Asiste": MotionStepType.APPEARANCE,
+    "Asistió el Ministro  para contestar el pliego.": MotionStepType.APPEARANCE,
+
+    # Order / procedural
+    "Cuestión de Orden": MotionStepType.DISCIPLINE_OR_ORDER,
+
+    # Requirements / blocking status
+    "INCUMPLE REQUISITOS PARA CONTINUAR SU TRÁMITE": MotionStepType.REQUIREMENTS_BLOCK,
+
+    # Withdrawal
+    "Solicita retiro de moción": MotionStepType.WITHDRAWN,
+    "RETIRADA POR SU AUTOR": MotionStepType.WITHDRAWN,
+
+    # Archive
+    "Al archivo": MotionStepType.ARCHIVED,
+    "En Archivo General": MotionStepType.ARCHIVED,
+
+    # Resignation (if applicable in your domain)
+    "Renuncia": MotionStepType.RESIGNATION,
+
+    # External routing / referrals
+    "En Fiscalía de la Nación": MotionStepType.INTERNAL_ROUTE,
+}
+
+def classify_motion_des_estado(des_estado: str | None) -> MotionStepType:
+    if not des_estado:
+        return MotionStepType.UNKNOWN
+
+    key = " ".join(des_estado.strip().split())  # trim + collapse whitespace
+    return (
+        DES_ESTADO_TO_MOTION_STEP_TYPE.get(key)
+        or DES_ESTADO_TO_MOTION_STEP_TYPE.get(key.upper())
+        or DES_ESTADO_TO_MOTION_STEP_TYPE.get(key.title())
+        or MotionStepType.UNKNOWN
+    )
+
 
 class BillStepType(str, Enum):
     UNKNOWN = "unknown"
@@ -224,6 +366,7 @@ class Proponents(str, Enum):
 
 
 class LegPeriod(str, Enum):
+    PERIODO_2021_2026 = "2026-2031"
     PERIODO_2021_2026 = "2021-2026"
     PERIODO_2016_2021 = "2016-2021"
     PERIODO_2011_2016 = "2011-2016"
@@ -234,7 +377,10 @@ class LegPeriod(str, Enum):
     PERIODO_1992_1995 = "1992-1995"
 
 LEG_PERIOD_ALIASES = {
+    "Parlamentario 2026 - 2031": "2026-2031",
+
     "Parlamentario 2021 - 2026": "2021-2026",
+    "Parlamentario 2021-2026": "2021-2026",
     "2021 - 2026": "2021-2026",
     "2021–2026": "2021-2026",
     "2021-2026": "2021-2026",
@@ -287,7 +433,6 @@ def _normalize_leg_period(value: str) -> str:
 def parse_leg_period(value: str) -> LegPeriod:
     if value is None:
         raise ValueError("leg_period cannot be null")
-
     v = _normalize_leg_period(value)
     canon = LEG_PERIOD_ALIASES.get(v)
     if canon is None:
@@ -376,6 +521,7 @@ def parse_legislature(value: str) -> Legislature:
 
 
 class LegislativeYear(str, Enum):
+    YEAR_2026_2027 = "2026"
     YEAR_2025_2026 = "2025"
     YEAR_2024_2025 = "2024"
     YEAR_2023_2024 = "2023"
@@ -391,22 +537,24 @@ def find_leg_period(leg_year: LegislativeYear):
 
     int_year = int(leg_year)
 
-    if int_year in range(2021,2026):
-        return LegPeriod("Parlamentario 2021 - 2026")
+    if int_year in range(2026,2031):
+        return parse_leg_period("Parlamentario 2026 - 2031")
+    elif int_year in range(2021,2026):
+        return parse_leg_period("Parlamentario 2021 - 2026")
     elif int_year in range(2016,2021):
-        return LegPeriod("Parlamentario 2016 - 2021")
+        return parse_leg_period("Parlamentario 2016 - 2021")
     elif int_year in range(2011,2016):
-        return LegPeriod("Parlamentario 2011 - 2016")
+        return parse_leg_period("Parlamentario 2011 - 2016")
     elif int_year in range(2006,2011):
-        return LegPeriod("Parlamentario 2006 - 2011")
+        return parse_leg_period("Parlamentario 2006 - 2011")
     elif int_year in range(2001,2006):
-        return LegPeriod("Parlamentario 2001 - 2006")
+        return parse_leg_period("Parlamentario 2001 - 2006")
     elif int_year in range(2000,2001):
-        return LegPeriod("Parlamentario 2000 - 2001")
+        return parse_leg_period("Parlamentario 2000 - 2001")
     elif int_year in range(1995,2000):
-        return LegPeriod("Parlamentario 1995 - 2000")
+        return parse_leg_period("Parlamentario 1995 - 2000")
     else:
-        return LegPeriod("CCD 1992 -1995")
+        return parse_leg_period("CCD 1992 -1995")
 
 class RoleOrganization(str, Enum):
     # For Bancadas | Partidos
