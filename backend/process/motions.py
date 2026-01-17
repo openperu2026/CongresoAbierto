@@ -3,24 +3,24 @@ import json
 import base64
 
 from backend.scrapers.motions import BASE_URL
-from backend.database.raw_models import RawMotion
-from backend.process.schema import Motion, MotionCongresistas, MotionStep
+from backend.database.raw_models import RawMotion, RawMotionDocument
+from backend.process.schema import Motion, MotionCongresistas, MotionStep, MotionDocument
 
 VOTE_PATTERN = re.compile(
     r"\bSI\s*\+{2,}.*?\bNO\s*-{2,}|\bNO\s*-{2,}.*?\bSI\s*\+{2,}",
     re.IGNORECASE | re.DOTALL,
 )
 
-def process_bill(raw_motion: RawMotion) -> tuple[Motion, list[MotionCongresistas]]:
+def process_motion(raw_motion: RawMotion) -> tuple[Motion, list[MotionCongresistas]]:
     """
     Process a RawMotion instance into a Motion instance and a list of MotionCongresistas 
     that maps all the congresistas that have a role in the Motion process
 
     Args:
-        raw_motion (RawMotion): RawMotion instance that contains the scraped information from a bill
+        raw_motion (RawMotion): RawMotion instance that contains the scraped information from a motion
 
     Returns:
-        Motion: instance that contains general information of the bill
+        Motion: instance that contains general information of the motion
         list[MotionCongresistas]: list of instances that relates congresistas to a Motion
     """
     # Obtaining dictionaries from the raw_motion columns 
@@ -73,13 +73,13 @@ def process_bill(raw_motion: RawMotion) -> tuple[Motion, list[MotionCongresistas
 
     return motion, cong_list
 
-def process_motion_steps_and_comms(raw_motion: RawMotion) -> list[MotionStep] | None:
+def process_motion_steps(raw_motion: RawMotion) -> list[MotionStep] | None:
     """
     Process a RawMotion instance into a list of MotionStep 
-    that maps all the steps that have happended during the bill processess
+    that maps all the steps that have happended during the motion processess
 
     Args:
-        raw_motion (RawMotion): RawMotion instance that contains the scraped information from a bill
+        raw_motion (RawMotion): RawMotion instance that contains the scraped information from a motion
 
     Returns:
         list[MotionStep]: list of instances that contains all the steps related to a Motion
@@ -98,35 +98,48 @@ def process_motion_steps_and_comms(raw_motion: RawMotion) -> list[MotionStep] | 
             date = step.get("fecSeguimiento")
             details = step.get("detalle")
             files = step.get("adjuntos")
-            vote_step = "votación" in details.lower() or "votacion" in details.lower()
+            vote_step = any(vote_word in details.lower() for vote_word in ["votacion", "votación"])
             vote_id = None
-            # TODO: Think how to assess if it's a proper pdf with votes/attendance.
 
-            if files:
-                for file in files:
-                    file_id = file["seguimientoAdjuntoId"]
-                    b64_id = base64.b64encode(str(file_id).encode()).decode()
-                    url = f"{BASE_URL}/seguimiento-adjunto/{b64_id}/pdf"
+            file_ids = [file["proyectoArchivoId"] for file in files]
 
-                    #TODO: Mejorar el codigo para obtener todos los urls
+            if vote_step:
+                vote_step_counter += 1
+                vote_id = f"{raw_motion.id}_{vote_step_counter}"
 
-                    if vote_step:
-                        vote_step_counter += 1
-                        vote_id = f"{raw_motion.id}_{vote_step_counter}"
-
-
-            final_steps.append(MotionStep(
+            motion_step = MotionStep(
                 id = id,
                 motion_id = raw_motion.id,
                 vote_step = vote_step,
                 vote_id = vote_id,
                 step_date = date,
                 step_detail = details,
-                step_url = url,
-            ))
+                step_files = file_ids,
+            )
+
+            final_steps.append(motion_step)
 
         return final_steps
 
     else:
         return None
 
+
+def process_motion_document(raw_motion_document: RawMotionDocument) -> MotionDocument:
+    """
+    Process a RawMotionDocument into a MotionDocument
+
+    Args:
+        raw_motion_document (RawMotionDocument): RawMotionDocument instance 
+
+    Returns:
+        MotionDocument: clean MotionDocument instance
+    """
+    return MotionDocument(
+        motion_id= raw_motion_document.motion_id,
+        step_id= raw_motion_document.seguimiento_id,
+        archivo_id= raw_motion_document.archivo_id,
+        url = raw_motion_document.url,
+        text = raw_motion_document.text,
+        vote_doc= bool(VOTE_PATTERN.search(raw_motion_document.text))
+    )

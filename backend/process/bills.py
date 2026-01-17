@@ -2,9 +2,9 @@ import re
 import json
 import base64
 
-from backend.scrapers.bills import BASE_URL
-from backend.database.raw_models import RawBill
-from backend.process.schema import Bill, BillCommittees, BillCongresistas, BillStep
+from backend.database.crud.bills import get_documents_by_id
+from backend.database.raw_models import RawBill, RawBillDocument
+from backend.process.schema import Bill, BillCommittees, BillCongresistas, BillStep, BillDocument
 
 VOTE_PATTERN = re.compile(
     r"\bSI\s*\+{2,}.*?\bNO\s*-{2,}|\bNO\s*-{2,}.*?\bSI\s*\+{2,}",
@@ -55,6 +55,9 @@ def process_bill(raw_bill: RawBill) -> tuple[Bill, list[BillCongresistas]]:
                 leg_period = leg_period,
                 role_type = cong.get('tipoFirmanteId')
             ))
+    else:
+        author_name = None
+        author_web = None
 
     # Creating Bill instance
     bill = Bill(
@@ -75,7 +78,7 @@ def process_bill(raw_bill: RawBill) -> tuple[Bill, list[BillCongresistas]]:
 
     return bill, cong_list
 
-def process_bill_steps_and_comms(raw_bill: RawBill) -> list[BillStep] | None:
+def process_bill_steps(raw_bill: RawBill) -> list[BillStep] | None:
     """
     Process a RawBill instance into a list of BillStep 
     that maps all the steps that have happended during the bill processess
@@ -99,37 +102,51 @@ def process_bill_steps_and_comms(raw_bill: RawBill) -> list[BillStep] | None:
             id = step.get("seguimientoPleyId")
             date = step.get("fecha")
             details = step.get("detalle")
-            vote_step = "votación" in details.lower() or "votacion" in details.lower()
+            vote_step = any(vote_word in details.lower() for vote_word in ["votacion", "votación"])
             vote_id = None
 
             files = step.get("archivos")
-            # TODO: Think how to assess if it's a proper pdf with votes/attendance.
-            if files:
-                for file in files:
-                    file_id = file["proyectoArchivoId"]
-                    b64_id = base64.b64encode(str(file_id).encode()).decode()
-                    url = f"{BASE_URL}/archivo/{b64_id}/pdf"
+            file_ids = [file["proyectoArchivoId"] for file in files]
 
-                    if vote_step:
-                        vote_step_counter += 1
-                        vote_id = f"{raw_bill.id}_{vote_step_counter}"
+            if vote_step:
+                vote_step_counter += 1
+                vote_id = f"{raw_bill.id}_{vote_step_counter}"
 
-                    #TODO: Mejorar el codigo para obtener todos los urls
-
-            final_steps.append(BillStep(
+            bill_step = BillStep(
                 id = id,
                 bill_id = raw_bill.id,
                 vote_step = vote_step,
                 vote_id = vote_id,
                 step_date = date,
                 step_detail = details,
-                step_url = url,
-            ))
+                step_files = file_ids,
+            )
+
+            final_steps.append(bill_step)
 
         return final_steps
 
     else:
         return None
+
+def process_bill_document(raw_bill_document: RawBillDocument) -> BillDocument:
+    """
+    Process a RawBillDocument into a BillDocument
+
+    Args:
+        raw_bill_document (RawBillDocument): RawBillDocument instance 
+
+    Returns:
+        BillDocument: clean BillDocument instance
+    """
+    return BillDocument(
+        bill_id= raw_bill_document.bill_id,
+        step_id= raw_bill_document.seguimiento_id,
+        archivo_id= raw_bill_document.archivo_id,
+        url = raw_bill_document.url,
+        text = raw_bill_document.text,
+        vote_doc= bool(VOTE_PATTERN.search(raw_bill_document.text))
+    )
 
 def get_committees(raw_bill: RawBill) -> list[BillCommittees] | None:
     """
