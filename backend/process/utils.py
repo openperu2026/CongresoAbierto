@@ -66,3 +66,18 @@ def gen_congresistas_df(session: Session) -> None:
     df.write_json(directories.PROCESSED_DATA / 'cong_info_2021_2026.json')
 
     return None
+
+from datetime import datetime
+from backend import LegislativeYear
+def get_current_leg_year(timestamp: str) -> LegislativeYear:
+
+    dt = datetime.fromisoformat(timestamp)
+    year = dt.year
+
+    cutoff = datetime(year, 7, 28)
+    if dt < cutoff:
+        # Before 28th July
+        return LegislativeYear(str(year-1))
+    else:
+        # After 28th July 
+        return LegislativeYear(str(year))
