@@ -366,7 +366,7 @@ class Proponents(str, Enum):
 
 
 class LegPeriod(str, Enum):
-    PERIODO_2021_2026 = "2026-2031"
+    PERIODO_2026_2031 = "2026-2031"
     PERIODO_2021_2026 = "2021-2026"
     PERIODO_2016_2021 = "2016-2021"
     PERIODO_2011_2016 = "2011-2016"
@@ -563,15 +563,38 @@ class RoleOrganization(str, Enum):
 
     # For Comisiones, Mesa Directiva, Junta de Portavoces
     PRESIDENTE = "presidente"
-    PRESIDENTA = "presidenta"
     VICEPRESIDENTE = "vicepresidente"
-    VICEPRESIDENTA = "vicepresidenta"
     SECRETARIO = "secretario"
-    SECRETARIA = "secretaria"
     TITULAR = "titular"
     SUPLENTE = "suplente"
     ACCESITARIO = "accesitario"
 
+def normalize_membership_role(raw: str) -> str:
+    if not raw:
+        raise ValueError("Empty membership role")
+
+    role = raw.strip().lower()
+
+    ROLE_MAP = {
+        "presidenta": "presidente",
+        "presidente": "presidente",
+        "vicepresidenta": "vicepresidente",
+        "vicepresidente": "vicepresidente",
+        "secretaria": "secretario",
+        "secretario": "secretario",
+        "vocera": "vocero",
+        "vocero": "vocero",
+        "miembro": "miembro",
+        "titular": "titular",
+        "suplente": "suplente",
+        "accesitaria": "accesitario",
+        "accesitario": "accesitario",
+    }
+
+    try:
+        return ROLE_MAP[role]
+    except KeyError:
+        raise ValueError(f"Unknown membership role: {raw}")
 
 class TypeOrganization(str, Enum):
     COMISON = "Comisión"
@@ -579,6 +602,7 @@ class TypeOrganization(str, Enum):
     MESA_DIRECTIVA = "Mesa Directiva"
     COMISION_PERMANENTE = "Comisión Permanente"
     CONSEJO_DIRECTIVO = "Consejo Directivo"
+    SUBCOM_ACUSACIONES = 'Subcomisión de Acusaciones Constitucionales'
 
 class TypeCommittee(str, Enum):
     # For Committees
