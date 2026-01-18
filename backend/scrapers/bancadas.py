@@ -161,6 +161,7 @@ class RawBancadaScraper:
                     timestamp=datetime.now(),
                     legislative_period=period_key,
                     raw_html=html,
+                    changed=False,
                     processed=False,
                     last_update=True,
                 )

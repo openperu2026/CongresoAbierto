@@ -79,8 +79,8 @@ class VoteEvent(PrintableModel):
     date: datetime
     result: VoteResult
     majority_type: MajorityType | None
-    # votes: Optional[List[Vote]] = None
-    # attendance: Optional[List[Attendance]] = None
+    votes: Optional[list[Vote]] = None
+    attendance: Optional[list[Attendance]] = None
 
     @field_validator("leg_period", mode="before")
     @classmethod
@@ -91,41 +91,41 @@ class VoteEvent(PrintableModel):
 
     model_config = ConfigDict(use_enum_values=False)
 
-    # def get_counts(self) -> Dict[VoteOption, int]:
-    #     """
-    #     Counts the number of votes per option.
-    #     """
-    #     if not self.votes:
-    #         return {}
-    #     return {
-    #         option: sum(1 for vote in self.votes if vote.option == option)
-    #         for option in set(vote.option for vote in self.votes)
-    #     }
+    def get_counts(self) -> dict[VoteOption, int]:
+        """
+        Counts the number of votes per option.
+        """
+        if not self.votes:
+            return {}
+        return {
+            option: sum(1 for vote in self.votes if vote.option == option)
+            for option in set(vote.option for vote in self.votes)
+        }
 
-    # def get_counts_by_bancada(self) -> Dict[int, Dict[VoteOption, int]]:
-    #     """
-    #     Returns vote counts grouped by bancada and option.
-    #     """
-    #     if not self.votes:
-    #         return {}
+    def get_counts_by_bancada(self) -> dict[int, dict[VoteOption, int]]:
+        """
+        Returns vote counts grouped by bancada and option.
+        """
+        if not self.votes:
+            return {}
 
-    #     counts: Dict[int, Dict[VoteOption, int]] = {}
-    #     for vote in self.votes:
-    #         counts.setdefault(vote.bancada_id, {}).setdefault(vote.option, 0)
-    #         counts[vote.bancada_id][vote.option] += 1
-    #     return counts
+        counts: dict[int, dict[VoteOption, int]] = {}
+        for vote in self.votes:
+            counts.setdefault(vote.bancada_id, {}).setdefault(vote.option, 0)
+            counts[vote.bancada_id][vote.option] += 1
+        return counts
 
-    # def get_attendance_summary(self) -> Dict[str, int]:
-    #     """
-    #     Returns a summary count of attendance statuses.
-    #     """
-    #     if not self.attendance:
-    #         return {}
+    def get_attendance_summary(self) -> dict[str, int]:
+        """
+        Returns a summary count of attendance statuses.
+        """
+        if not self.attendance:
+            return {}
 
-    #     summary: Dict[str, int] = {}
-    #     for att in self.attendance:
-    #         summary[att.status] = summary.get(att.status, 0) + 1
-    #     return summary
+        summary: dict[str, int] = {}
+        for att in self.attendance:
+            summary[att.status] = summary.get(att.status, 0) + 1
+        return summary
 
 
 class VoteCount(PrintableModel):

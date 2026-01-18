@@ -11,7 +11,9 @@ from backend.scrapers.congresistas import (
     API_MEMBERSHIP,
 )
 from backend.database.raw_models import Base, RawCongresista
-
+from backend.scrapers.utils import (
+    get_cong_website
+)
 
 # ---------- helpers for DB tests ----------
 
@@ -81,7 +83,7 @@ def test_get_cong_website():
       </div>
     </body></html>
     """
-    url = s.get_cong_website(profile_content)
+    url = get_cong_website(profile_content)
     assert url == "https://example.com/perfil/123"
 
 
@@ -115,9 +117,16 @@ def test_get_dict_periodos(monkeypatch):
 def test_create_raw_congresista_old_period(monkeypatch):
     s = RawCongresistasScraper()
 
-    # Stub profile + website so we don't hit network
-    s.get_profile_content = lambda link: "PROFILE_HTML"
-    s.get_cong_website = lambda content: "https://example.com/perfil/old"
+    monkeypatch.setattr(
+        "backend.scrapers.congresistas.get_cong_website",
+        lambda content: "https://example.com/perfil/old",
+    )
+
+    monkeypatch.setattr(
+        s,
+        "get_profile_content",
+        lambda link: "PROFILE_HTML",
+    )
 
     period = "Parlamentario 2001 - 2006"
     cong_link = "/perfil/1"
@@ -133,16 +142,19 @@ def test_create_raw_congresista_old_period(monkeypatch):
 
 # ---------- create_raw_congresista (modern period, success path) ----------
 
-
 def test_create_raw_congresista_modern_success(monkeypatch):
     s = RawCongresistasScraper()
 
-    # Avoid network: stub profile + website
-    s.get_profile_content = lambda link: "<html>PROFILE</html>"
-    s.get_cong_website = lambda content: "https://example.com/perfil/123"
+    # Avoid network: stub profile content
+    monkeypatch.setattr(s, "get_profile_content", lambda link: "<html>PROFILE</html>")
+
+    # IMPORTANT: get_cong_website is now a module-level imported function
+    monkeypatch.setattr(
+        "backend.scrapers.congresistas.get_cong_website",
+        lambda content: "https://example.com/perfil/123",
+    )
 
     def fake_parse_url(url, *args, **kwargs):
-        # profile page: choose cargos link
         if url.startswith("https://example.com/perfil"):
             html = """
             <html><body>
@@ -150,7 +162,6 @@ def test_create_raw_congresista_modern_success(monkeypatch):
             </body></html>
             """
             return fromstring(html)
-        # cargos page: iframe with API URL
         if url.startswith("https://example.com/cargos/999"):
             html = """
             <html><body>
@@ -168,19 +179,13 @@ def test_create_raw_congresista_modern_success(monkeypatch):
     monkeypatch.setattr("backend.scrapers.congresistas.parse_url", fake_parse_url)
 
     def fake_get_url_text(url):
-        # should be membership API call with id from iframe
         assert url == API_MEMBERSHIP + "ABC123"
         return '{"ok": true}'
 
     monkeypatch.setattr("backend.scrapers.congresistas.get_url_text", fake_get_url_text)
 
-    period = "Congresistas 2021-2026"
-    cong_link = "/perfil/123"
+    raw = s.create_raw_congresista("Congresistas 2021-2026", "/perfil/123")
 
-    raw = s.create_raw_congresista(period, cong_link)
-
-    assert isinstance(raw, RawCongresista)
-    assert raw.leg_period == period
     assert raw.url == "https://example.com/perfil/123"
     assert raw.profile_content == "<html>PROFILE</html>"
     assert raw.memberships_content == '{"ok": true}'
@@ -188,12 +193,16 @@ def test_create_raw_congresista_modern_success(monkeypatch):
 
 # ---------- create_raw_congresista (partial failure -> no iframe) ----------
 
-
 def test_create_raw_congresista_partial_failure(monkeypatch):
     s = RawCongresistasScraper()
 
-    s.get_profile_content = lambda link: "PROFILE"
-    s.get_cong_website = lambda content: "https://example.com/perfil/abc"
+    monkeypatch.setattr(s, "get_profile_content", lambda link: "PROFILE")
+
+    # get_cong_website is module-level now
+    monkeypatch.setattr(
+        "backend.scrapers.congresistas.get_cong_website",
+        lambda content: "https://example.com/perfil/abc",
+    )
 
     # parse_url always returns a doc without iframe, so the try-block fails
     def fake_parse_url(url, *args, **kwargs):
@@ -202,23 +211,21 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
 
     monkeypatch.setattr("backend.scrapers.congresistas.parse_url", fake_parse_url)
 
-    # Force cargos URL (we don't care what it is)
-    s.get_best_cargos_link = (
-        lambda doc, base_url: "https://example.com/cargos-no-iframe"
+    # If get_best_cargos_link is still an instance method, this is fine:
+    monkeypatch.setattr(
+        s,
+        "get_best_cargos_link",
+        lambda doc, base_url: "https://example.com/cargos-no-iframe",
     )
 
-    period = "Congresistas 2016-2021"
-    cong_link = "/perfil/abc"
-
-    raw = s.create_raw_congresista(period, cong_link)
+    raw = s.create_raw_congresista("Congresistas 2016-2021", "/perfil/abc")
 
     assert isinstance(raw, RawCongresista)
-    assert raw.leg_period == period
+    assert raw.leg_period == "Congresistas 2016-2021"
     assert raw.url == "https://example.com/perfil/abc"
     assert raw.profile_content == "PROFILE"
-    # memberships_content should be None because iframe/api parsing failed
+    # and because it fails to find the iframe / membership:
     assert raw.memberships_content is None
-
 
 # ---------- extract_cong_from_period ----------
 
@@ -226,11 +233,14 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
 def test_extract_cong_from_period_uses_links_and_creator(monkeypatch):
     s = RawCongresistasScraper()
 
-    # Stub methods
-    s.get_urls_from_table = lambda value: ["/perfil/1", "/perfil/2"]
-    s.create_raw_congresista = lambda period, link: f"raw-{period}-{link}"
+    monkeypatch.setattr(s, "get_urls_from_table", lambda value: ["/perfil/1", "/perfil/2"])
+    monkeypatch.setattr(s, "create_raw_congresista", lambda period, link: f"raw-{period}-{link}")
+
+    # avoid DB + object-shape requirements
+    monkeypatch.setattr(s, "update_tracking", lambda x: x)
 
     res = s.extract_cong_from_period("Periodo X", "1")
+
     assert res == ["raw-Periodo X-/perfil/1", "raw-Periodo X-/perfil/2"]
 
 

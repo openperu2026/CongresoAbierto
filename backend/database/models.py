@@ -214,7 +214,6 @@ class BillCommittees(Base):
     committee_id = Column(Integer, ForeignKey("organizations.org_id"), nullable=False)
 
     __table_args__ = (
-        PrimaryKeyConstraint("bill_id", "committee_id"),
         UniqueConstraint("bill_id", "committee_id", name="bill_committee_uniq"),
         Index("ix_billcommittees_committee_id", "committee_id"),
     )
@@ -243,13 +242,13 @@ class BillStep(Base):
 
     __table_args__ = (Index("ix_billstep_bill_id", "bill_id"),)
 
-class BillDocument(Base):
-    """
-    Represents a bill document record.    
+# class BillDocument(Base):
+#     """
+#     Represents a bill document record.    
 
-    Attributes:
-        Base (_type_): _description_
-    """
+#     Attributes:
+#         Base (_type_): _description_
+#     """
 
 class Congresista(Base):
     """

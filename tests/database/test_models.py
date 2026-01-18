@@ -13,7 +13,6 @@ from backend.database.models import (
     BillCongresistas,
     BillCommittees,
     BillStep,
-    Committee,
     Congresista,
     Organization,
     Membership,

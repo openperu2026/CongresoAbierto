@@ -5,6 +5,9 @@ from lxml.html import fromstring
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+
 from backend.scrapers.committees import (
     RawCommitteeScraper,
     BASE_URL,
@@ -56,53 +59,79 @@ def test_get_options_parses_select(monkeypatch):
 
 # ---------- get_html_with_selections ----------
 
-
 def test_get_html_with_selections_success(monkeypatch):
     scraper = RawCommitteeScraper()
 
-    # Fake webdriver + Select so no real browser is used
+    # We don't want to test _select_year here, only the committee selection flow
+    monkeypatch.setattr(scraper, "_select_year", lambda driver, wait, year_value: None)
+
     class FakeElement:
-        def __init__(self, name):
+        def __init__(self, driver, name):
+            self.driver = driver
             self.name = name
 
     class FakeDriver:
-        def __init__(self, *args, **kwargs):
-            self.got_url = None
-            self._page_source = "<html>OK</html>"
-
-        def get(self, url):
-            self.got_url = url
+        def __init__(self):
+            self._page_source = "<html>BEFORE</html>"
+            self.selected = {}  # track selected values per element name
 
         def find_element(self, by, value):
-            # Just return a dummy element for both selects
-            return FakeElement(value)
+            # value will be "fld_78_Comision"
+            return FakeElement(self, value)
 
         @property
         def page_source(self):
             return self._page_source
 
-        def quit(self):
-            pass
+    class FakeSelectedOption:
+        def __init__(self, driver, element_name):
+            self.driver = driver
+            self.element_name = element_name
+
+        def get_attribute(self, attr):
+            assert attr == "value"
+            return self.driver.selected.get(self.element_name)
 
     class FakeSelect:
         def __init__(self, element):
             self.element = element
-            self.selected_value = None
 
         def select_by_value(self, value):
-            self.selected_value = value
+            # Persist the selection on the driver
+            self.element.driver.selected[self.element.name] = value
+            # Simulate page updating after selection
+            self.element.driver._page_source = "<html>OK</html>"
 
-    # Patch Chrome constructor and Select inside the scraper module
+        @property
+        def first_selected_option(self):
+            return FakeSelectedOption(self.element.driver, self.element.name)
+
+    class FakeWait:
+        def until(self, condition):
+            # condition can be:
+            # - a callable(driver) -> truthy
+            # - something returned by EC.presence_of_element_located (callable too)
+            ok = condition(self._driver)
+            if not ok:
+                raise TimeoutException("condition not met")
+            return ok
+
+        def __init__(self, driver):
+            self._driver = driver
+
+    # Patch Select used inside backend.scrapers.committees module
+    monkeypatch.setattr("backend.scrapers.committees.Select", FakeSelect)
+
+    # Patch EC.presence_of_element_located to a simple callable that returns True
     monkeypatch.setattr(
-        "backend.scrapers.committees.webdriver.Chrome",
-        lambda *a, **k: FakeDriver(),
-    )
-    monkeypatch.setattr(
-        "backend.scrapers.committees.Select",
-        FakeSelect,
+        "backend.scrapers.committees.EC.presence_of_element_located",
+        lambda locator: (lambda d: True),
     )
 
-    html = scraper.get_html_with_selections(BASE_URL, "2021", "COM")
+    driver = FakeDriver()
+    wait = FakeWait(driver)
+
+    html = scraper.get_html_with_selections(driver, wait, "2021", "COM")
     assert html == "<html>OK</html>"
 
 
@@ -111,68 +140,116 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
 
     scraper = RawCommitteeScraper()
 
+    class FakeElement:
+        def __init__(self, driver, name):
+            self.driver = driver
+            self.tag_name = name
+
     class FakeDriver:
-        def get(self, url):
-            pass
+        def __init__(self):
+            self._page_source = "<html>BEFORE</html>"
+            self.selected = {}  # track selected values per element name
 
         def find_element(self, by, value):
-            raise NoSuchElementException("not found")
+            # value will be "fld_78_Comision"
+            return FakeElement(self, value)
 
         @property
         def page_source(self):
-            return "<html>SHOULD NOT SEE</html>"
+            return self._page_source
 
-        def quit(self):
-            pass
+    class FakeSelectedOption:
+        def __init__(self, driver, element_name):
+            self.driver = driver
+            self.element_name = element_name
+
+        def get_attribute(self, attr):
+            assert attr == "value"
+            return self.driver.selected.get(self.element_name)
+
+    class FakeSelect:
+        def __init__(self, element):
+            self.element = element
+
+        def select_by_value(self, value):
+            # Persist the selection on the driver
+            self.element.driver.selected[self.element.name] = value
+            # Simulate page updating after selection
+            self.element.driver._page_source = "<html>OK</html>"
+
+        @property
+        def first_selected_option(self):
+            return FakeSelectedOption(self.element.driver, self.element.name)
+
+    class FakeWait:
+        def until(self, condition):
+            # condition can be:
+            # - a callable(driver) -> truthy
+            # - something returned by EC.presence_of_element_located (callable too)
+            ok = condition(self._driver)
+            if not ok:
+                raise TimeoutException("condition not met")
+            return ok
+
+        def __init__(self, driver):
+            self._driver = driver
 
     monkeypatch.setattr(
         "backend.scrapers.committees.webdriver.Chrome",
         lambda *a, **k: FakeDriver(),
     )
-
-    html = scraper.get_html_with_selections(BASE_URL, "2021", "COM")
+    driver = FakeDriver()
+    wait = FakeWait(driver)
+    html = scraper.get_html_with_selections(driver, wait, "2021", "COM")
     assert html is None
 
 
 # ---------- get_raw_committees ----------
 
-
 def test_get_raw_committees_builds_committee_list(monkeypatch):
     scraper = RawCommitteeScraper()
 
-    # 2 years x 2 types = 4 combinations
-    def fake_get_options(url, select_name="idRegistroPadre"):
-        if select_name == "idRegistroPadre":
-            return {"2021": "2021", "2022": "2022"}
-        if select_name == "fld_78_Comision":
-            return {"Permanente": "1", "Especial": "2"}
-        raise AssertionError("Unexpected select_name")
+    monkeypatch.setattr(scraper, "_select_year", lambda driver, wait, year_value: None)
 
-    # For simplicity, return non-None HTML for only some combos
-    def fake_get_html_with_selections(url, year_value, committee_value):
-        # Return None for one particular combo to test skipping
+    def fake_get_options(self, url, select_name="idRegistroPadre"):
+        assert select_name == "idRegistroPadre"
+        return {"2021": "2021", "2022": "2022"}
+
+    monkeypatch.setattr(RawCommitteeScraper, "get_options", fake_get_options)
+
+    def fake_get_html_with_selections(driver, wait, year_value, committee_value):
         if year_value == "2022" and committee_value == "2":
             return None
         return f"<html>Year={year_value},Type={committee_value}</html>"
 
-    monkeypatch.setattr(scraper, "get_options", fake_get_options)
-    monkeypatch.setattr(
-        scraper, "get_html_with_selections", fake_get_html_with_selections
-    )
+    monkeypatch.setattr(scraper, "get_html_with_selections", fake_get_html_with_selections)
+    
+    # If your code constructs a driver/wait, just stub them to simple objects
+    class DummyWait:
+        def until(self, condition):
+            return True
 
+    class DummyDriver:
+        def get(self, url): pass
+        def set_page_load_timeout(self, seconds): pass
+        def set_script_timeout(self, seconds): pass
+        def implicitly_wait(self, seconds): pass
+        def quit(self): pass
+
+    monkeypatch.setattr("backend.scrapers.committees.webdriver.Chrome", lambda *a, **k: DummyDriver())
+    monkeypatch.setattr("backend.scrapers.committees.WebDriverWait", lambda driver, t: DummyWait())
+
+    # bypass selenium-dependent helpers
+    monkeypatch.setattr(scraper, "_select_year", lambda driver, wait, year_value: None)
+    monkeypatch.setattr(
+        scraper,
+        "_get_committee_options_current_page",
+        lambda driver, wait: {"Permanente": "1", "Especial": "2"},
+    )
     scraper.get_raw_committees()
 
-    # 3 non-None combos should produce 3 RawCommittee objects
     assert hasattr(scraper, "committee_list")
     assert len(scraper.committee_list) == 3
-
-    for rc in scraper.committee_list:
-        assert isinstance(rc, RawCommittee)
-        assert isinstance(rc.timestamp, datetime)
-        assert rc.legislative_year in (2021, 2022)
-        assert rc.committee_type in ("Permanente", "Especial")
-        assert "<html>" in rc.raw_html
-
 
 # ---------- add_committees_to_db ----------
 

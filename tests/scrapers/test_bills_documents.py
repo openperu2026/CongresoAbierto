@@ -264,28 +264,35 @@ def test_add_documents_to_db_handles_sqlalchemy_error():
         )
     ]
 
+    class DummyQuery:
+        def filter(self, *args, **kwargs):
+            return self
+        def all(self):
+            return []
+
     class DummySession:
         def __init__(self):
             self.rolled_back = False
 
-        def bulk_save_objects(self, objs):
-            raise SQLAlchemyError("boom")
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc, tb):
+            self.close()
+            return False
 
-        def commit(self):
-            pass
+        def query(self, *args, **kwargs): return DummyQuery()
+
+        def add_all(self, documents):
+            raise SQLAlchemyError("boom")  # <-- key change
+
+        def commit(self): pass
 
         def rollback(self):
             self.rolled_back = True
 
-        def close(self):
-            pass
+        def close(self): pass
 
     dummy_session = DummySession()
-
-    def fake_sessionmaker():
-        return dummy_session
-
-    scraper.Session = fake_sessionmaker
+    scraper.Session = lambda: dummy_session
 
     ok = scraper.add_documents_to_db()
     assert ok is False

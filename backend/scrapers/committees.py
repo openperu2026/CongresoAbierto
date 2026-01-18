@@ -245,8 +245,7 @@ class RawCommitteeScraper:
         Add the committees to the database.
         Returns True on success, False on failure.
         """
-        if not hasattr(self, "committee_list"):
-            raise RuntimeError("Committees must be scraped before saving")
+        assert self.committee_list, "Committees must be scraped before it can be saved"
 
         session = self.Session()
 
