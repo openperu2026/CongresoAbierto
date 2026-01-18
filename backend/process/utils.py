@@ -39,7 +39,6 @@ def normalize_party_name(name: str) -> str:
         return canonical_name
     return name
 
-
 def gen_congresistas_df(session: Session) -> None:
     
     bills_congresistas = session.query(RawBill.congresistas).distinct().all()

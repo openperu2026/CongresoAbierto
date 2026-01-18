@@ -1,7 +1,9 @@
 from lxml.html import fromstring
+
 from backend import LegislativeYear, find_leg_period
 from backend.database.raw_models import RawBancada
 from backend.process.schema import Bancada, BancadaMembership
+
 from backend.process.utils import get_current_leg_year
 from backend.scrapers.utils import get_url_text, get_cong_website
 

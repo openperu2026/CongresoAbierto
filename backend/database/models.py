@@ -44,7 +44,7 @@ class Vote(Base):
     __tablename__ = "votes"
 
     vote_event_id = Column(String, ForeignKey("vote_events.id"), primary_key=True)
-    voter_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=False)
+    voter_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     option = Column(Enum(VoteOption, name="option"), nullable=False)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=False)
 
@@ -68,7 +68,7 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     event_id = Column(String, ForeignKey("vote_events.id"), primary_key=True)
-    attendee_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=False)
+    attendee_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     status = Column(Enum(AttendanceStatus, name="attendance_status"), nullable=False)
 
     __table_args__ = (
@@ -164,7 +164,7 @@ class Bill(Base):
     complete_text = Column(String, nullable=False)
     status = Column(String, nullable=False)
     proponent = Column(Enum(Proponents, name="proponent"), nullable=False)
-    author_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=True)
+    author_id = Column(Integer, ForeignKey("congresistas.id"), nullable=True)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=True)
     bill_approved = Column(Boolean, nullable=False)
 
@@ -189,7 +189,7 @@ class BillCongresistas(Base):
     __tablename__ = "bills_congresistas"
 
     bill_id = Column(String, ForeignKey("bills.id"), nullable=False)
-    person_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=False)
+    person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     role_type = Column(Enum(RoleTypeBill, name="role_type"), nullable=False)
 
     __table_args__ = (
@@ -243,7 +243,13 @@ class BillStep(Base):
 
     __table_args__ = (Index("ix_billstep_bill_id", "bill_id"),)
 
+class BillDocument(Base):
+    """
+    Represents a bill document record.    
 
+    Attributes:
+        Base (_type_): _description_
+    """
 
 class Congresista(Base):
     """
@@ -263,7 +269,7 @@ class Congresista(Base):
 
     __tablename__ = "congresistas"
 
-    id = Column(Integer, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String, nullable=False)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
     party_name = Column(String, nullable=False)
@@ -274,8 +280,7 @@ class Congresista(Base):
     photo_url = Column(String, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("id", "leg_period", name="congresista_uniq"),
-        PrimaryKeyConstraint("id", "leg_period"),
+        UniqueConstraint("nombre", "leg_period", name="congresista_uniq"),
     )
 
 
@@ -342,7 +347,7 @@ class Membership(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     role = Column(Enum(RoleOrganization, name="role"), nullable=False)
-    person_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=False)
+    person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     org_id = Column(Integer, ForeignKey("organizations.org_id"), nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
@@ -365,5 +370,5 @@ class BancadaMembership(Base):
 
     id = Column(Integer, primary_key=True)
     leg_year = Column(Enum(LegislativeYear, name="leg_year"), nullable=False)
-    person_id = Column(Integer, ForeignKey("congresistas.id", "congresistas.leg_period"), nullable=False)
+    person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=False)
