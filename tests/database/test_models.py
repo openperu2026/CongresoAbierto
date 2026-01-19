@@ -26,43 +26,49 @@ from backend.database.models import (
     LegislativeYear,
     TypeOrganization,
     RoleOrganization,
+    TypeCommittee,
+    VoteResult,
+    MajorityType
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def session():
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
-    yield session
-    session.close()
-    Base.metadata.drop_all(engine)
+    try:
+        yield session
+    finally:
+        session.close()
+        Base.metadata.drop_all(engine)
 
 
 def test_create_organization(session):
     org = Organization(
         leg_period=LegPeriod.PERIODO_2021_2026,
-        leg_year=LegislativeYear.YEAR_2022,
-        org_id=1,
+        leg_year=LegislativeYear.YEAR_2021_2022,
         org_name="Congreso del Perú",
-        org_type=TypeOrganization.COMMITTEE,
+        org_type=TypeOrganization.COMISON,
+        comm_type = TypeCommittee.COM_ETICA,
+        org_link = "www.congreso.gob.pe/comision"
     )
     session.add(org)
     session.commit()
-    assert org.org_id == 1
+    assert org.org_link == "www.congreso.gob.pe/comision"
 
 
 def test_create_congresista(session):
     congresista = Congresista(
-        id=1,
-        leg_period=LegPeriod.PERIODO_2021_2026,
         nombre="Ana Torres",
+        leg_period=LegPeriod.PERIODO_2021_2026,
         party_name="Partido 1",
         votes_in_election=25000,
         dist_electoral="Lima",
         condicion="Activo",
         website="https://example.com",
+        photo_url="https://example.com/photo",
     )
     session.add(congresista)
     session.commit()
@@ -92,11 +98,12 @@ def test_create_bill(session):
 
 def test_create_vote_event_and_vote(session):
     vote_event = VoteEvent(
-        id="VOT123",
-        org_id=1,
         leg_period=LegPeriod.PERIODO_2021_2026,
-        bill_id="B001",
+        bill_or_motion="Bill",
+        bill_motion_id="B001",
         date=datetime.now(),
+        result= VoteResult.APPROVED,
+        majority_type = MajorityType.SIMPLE
     )
     session.add(vote_event)
     vote = Vote(vote_event_id="VOT123", voter_id=1, option=VoteOption.SI, bancada_id=10)
@@ -107,7 +114,9 @@ def test_create_vote_event_and_vote(session):
 
 def test_attendance(session):
     attendance = Attendance(
-        org_id=1, event_id="VOT123", attendee_id=1, status=AttendanceStatus.PRESENTE
+        event_id=1, 
+        attendee_id=1, 
+        status=AttendanceStatus.PRESENTE
     )
     session.add(attendance)
     session.commit()
@@ -143,10 +152,14 @@ def test_membership_validation(session):
 
 
 def test_unique_vote_constraint(session):
-    vote = Vote(vote_event_id="VOT123", voter_id=1, option=VoteOption.NO, bancada_id=10)
-    session.add(vote)
+    v1 = Vote(vote_event_id="VOT123", voter_id="1", option=VoteOption.NO, bancada_id=10)
+    v2 = Vote(vote_event_id="VOT123", voter_id="1", option=VoteOption.SI, bancada_id=10)  # same unique key
+
+    session.add_all([v1, v2])
+
     with pytest.raises(IntegrityError):
         session.commit()
+
     session.rollback()
 
 
@@ -160,25 +173,26 @@ def test_bill_congresistas(session):
 
 
 def test_bill_committees(session):
-    committee = Committee(
+    committee = Organization(
         leg_period=LegPeriod.PERIODO_2021_2026,
-        leg_year=LegislativeYear.YEAR_2022,
-        org_id=1,
-        id=100,
-        name="Comisión de Economía",
+        leg_year=LegislativeYear.YEAR_2021_2022,
+        org_name="Congreso del Perú",
+        org_type=TypeOrganization.COMISON,
+        comm_type = TypeCommittee.COM_ETICA,
+        org_link = "www.congreso.gob.pe/comision"
     )
     session.add(committee)
     session.commit()
 
-    relation = BillCommittees(bill_id="B001", committee_id=100)
+    relation = BillCommittees(bill_id="B001", committee_id=committee.org_id)
     session.add(relation)
     session.commit()
-    assert relation.committee_id == 100
+    assert relation.committee_id == 1
 
 
 def test_vote_counts(session):
     vote_count = VoteCounts(
-        org_id=1, vote_event_id="VOT123", option=VoteOption.SI, bancada_id=10, count=40
+        vote_event_id=1, option=VoteOption.SI, bancada_id=10, count=40
     )
     session.add(vote_count)
     session.commit()

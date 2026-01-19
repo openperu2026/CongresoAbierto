@@ -30,7 +30,7 @@ def _setup_inmemory_db():
 
 def test_filter_steps_skips_existing_steps(monkeypatch):
     """
-    filter_steps should drop steps whose seguimientoPleyId is already in the DB.
+    filter_steps should drop steps whose seguimientoId is already in the DB.
     """
     engine, SessionLocal = _setup_inmemory_db()
 
@@ -57,31 +57,31 @@ def test_filter_steps_skips_existing_steps(monkeypatch):
 
     extracted_steps = [
         {
-            "seguimientoPleyId": 10,  # already in DB -> should be filtered out
+            "seguimientoId": 10,  # already in DB -> should be filtered out
         },
         {
-            "seguimientoPleyId": 11,  # new -> should remain
+            "seguimientoId": 11,  # new -> should remain
         },
     ]
 
     filtered = scraper.filter_steps(extracted_steps, motion_id=motion_id)
 
     assert len(filtered) == 1
-    assert filtered[0]["seguimientoPleyId"] == 11
+    assert filtered[0]["seguimientoId"] == 11
 
 
 # --------------------------------------------------------------------------------------
-# get_motion_urls
+# get_motion_documents
 # --------------------------------------------------------------------------------------
 
 
-def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
+def test_get_motion_documents_populates_urls_and_calls_render_pdf(monkeypatch):
     """
-    get_motion_urls should:
+    get_motion_documents should:
       - fetch the latest RawMotion
       - filter/prioritize steps
       - call render_pdf for each file
-      - populate scraper.urls with RawMotionDocument objects
+      - populate scraper.documents with RawMotionDocument objects
     """
     engine, SessionLocal = _setup_inmemory_db()
 
@@ -94,7 +94,7 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
 
     steps = [
         {
-            "seguimientoPleyId": 10,
+            "seguimientoId": 10,
             "desEstadoMocion": "Aprobada",  # in PRIORITIES
             "fecSeguimiento": step_date_str,
             "adjuntos": [
@@ -128,11 +128,11 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
 
     monkeypatch.setattr(motions_documents, "render_pdf", fake_render_pdf)
 
-    scraper.get_motion_urls(motion_id=motion_id)
+    scraper.get_motion_documents(motion_id=motion_id)
 
     # One document should have been created
-    assert len(scraper.urls) == 1
-    doc = scraper.urls[0]
+    assert len(scraper.documents) == 1
+    doc = scraper.documents[0]
     assert isinstance(doc, RawMotionDocument)
 
     # URL should match the BASE_URL + encoded id
@@ -148,7 +148,7 @@ def test_get_motion_urls_populates_urls_and_calls_render_pdf(monkeypatch):
     assert doc.step_date == datetime.strptime(step_date_str, "%Y-%m-%dT%H:%M:%S.%f%z")
 
 
-def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
+def test_get_motion_documents_returns_none_when_no_priority_steps(monkeypatch):
     """
     If prioritize=True and no steps match PRIORITIES, the method
     should log and return None without populating urls.
@@ -165,7 +165,7 @@ def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
     # desEstadoMocion is not in PRIORITIES -> should be filtered out
     steps = [
         {
-            "seguimientoPleyId": 10,
+            "seguimientoId": 10,
             "desEstadoMocion": "En trámite",
             "fecSeguimiento": step_date_str,
             "adjuntos": [
@@ -195,10 +195,10 @@ def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
 
     monkeypatch.setattr(motions_documents, "render_pdf", fake_render_pdf)
 
-    result = scraper.get_motion_urls(motion_id=motion_id, prioritize=True)
+    result = scraper.get_motion_documents(motion_id=motion_id, prioritize=True)
 
     assert result is None
-    assert scraper.urls == []
+    assert scraper.documents == []
 
 
 # --------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ def test_get_motion_urls_returns_none_when_no_priority_steps(monkeypatch):
 
 def test_add_documents_to_db_persists_urls(monkeypatch):
     """
-    add_documents_to_db should insert all documents in scraper.urls
+    add_documents_to_db should insert all documents in scraper.documents
     and return True on success.
     """
     engine, SessionLocal = _setup_inmemory_db()
@@ -219,8 +219,8 @@ def test_add_documents_to_db_persists_urls(monkeypatch):
 
     motion_id = "2021_3"
 
-    # Manually populate scraper.urls with two docs
-    scraper.urls = [
+    # Manually populate scraper.documents with two docs
+    scraper.documents = [
         RawMotionDocument(
             timestamp=datetime.now(),
             motion_id=motion_id,
@@ -264,7 +264,7 @@ def test_load_raw_documents_calls_add_and_resets_urls(monkeypatch):
     scraper.Session = SessionLocal
 
     # Put one doc in urls
-    scraper.urls = [
+    scraper.documents = [
         RawMotionDocument(
             timestamp=datetime.now(),
             motion_id="2021_4",
@@ -288,4 +288,4 @@ def test_load_raw_documents_calls_add_and_resets_urls(monkeypatch):
     scraper.load_raw_documents()
 
     assert called.get("called") is True
-    assert scraper.urls == []
+    assert scraper.documents == []

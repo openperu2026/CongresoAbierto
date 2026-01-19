@@ -67,7 +67,7 @@ class Attendance(Base):
 
     __tablename__ = "attendance"
 
-    event_id = Column(String, ForeignKey("vote_events.id"), primary_key=True)
+    event_id = Column(Integer, ForeignKey("vote_events.id"), primary_key=True)
     attendee_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     status = Column(Enum(AttendanceStatus, name="attendance_status"), nullable=False)
 
@@ -91,7 +91,7 @@ class VoteEvent(Base):
 
     __tablename__ = "vote_events"
 
-    id = Column(String, primary_key=True, autoincrement = True)
+    id = Column(Integer, primary_key=True, autoincrement = True)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
     bill_or_motion = Column(String, nullable = False)
     bill_motion_id = Column(String, nullable = False)

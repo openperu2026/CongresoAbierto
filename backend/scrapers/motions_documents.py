@@ -5,11 +5,11 @@ from loguru import logger
 from datetime import datetime
 
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.exc import SQLAlchemyError
 
 
-from backend.config import settings
+from backend.config import settings, directories, stop_logging_to_console
 from backend.scrapers.utils import render_pdf
 from backend.database.raw_models import RawMotionDocument, RawMotion
 
@@ -36,8 +36,22 @@ class RawMotionDocumentScraper:
         self.engine = create_engine(RAW_DB_PATH)
         self.Session = sessionmaker(bind=self.engine)
 
-        self.urls = []
+        self.documents = []
 
+    def get_motions_pending_documents(self) -> list[str]:
+
+        with self.Session() as session:
+            stmt = (
+                select(RawMotion.id)
+                .outerjoin(
+                    RawMotionDocument,
+                    RawMotion.id == RawMotionDocument.motion_id
+                )
+                .where(RawMotionDocument.motion_id.is_(None))
+            )
+            
+            return session.scalars(stmt).all()
+        
     def filter_steps(self, extracted_steps: list[dict], motion_id: str):
         """
         Filter steps that are already loaded in the DB
@@ -53,38 +67,36 @@ class RawMotionDocumentScraper:
         filtered_steps = [
             step
             for step in extracted_steps
-            if step["seguimientoPleyId"] not in seguimiento_ids
+            if step["seguimientoId"] not in seguimiento_ids
         ]
 
         return filtered_steps
 
-    def get_motion_urls(
+    def get_motion_documents(
         self, motion_id: str, update: bool = False, prioritize: bool = True
     ) -> list[RawMotionDocument]:
         """
-        Extract the urls from a RawMotion's files and extract the text from each of them
+        Extract the documents from a RawMotion's files and extract the text from each of them
         """
-        session = self.Session()
-        motion = (
-            session.query(RawMotion)
-            .filter(RawMotion.id == motion_id)
-            .order_by(RawMotion.timestamp.desc())
-            .first()
-        )
 
-        assert motion is not None, (
-            f"Motion with id {motion_id} has not been scraped yet"
-        )
+        with self.Session() as session:
+            motion = (
+                session.query(RawMotion)
+                .filter(RawMotion.id == motion_id)
+                .order_by(RawMotion.timestamp.desc())
+                .first()
+            )
 
-        steps: list[dict] = json.loads(motion.steps)
+            assert motion is not None, f"Moition with id {motion_id} has not been scraped yet"
+
+            steps: list[dict] = json.loads(motion.steps)
 
         if not update:
             steps = self.filter_steps(steps, motion_id)
 
         if prioritize:
-            steps = [
-                step for step in steps if step.get("desEstadoMocion") in PRIORITIES
-            ]
+            logger.info(f"Total number of steps: {len(steps)}")
+            steps = [step for step in steps if step.get("desEstadoMocion") in PRIORITIES]
 
         if len(steps) == 0:
             logger.info(f"No steps found for motion {motion_id}")
@@ -120,7 +132,7 @@ class RawMotionDocumentScraper:
                     processed=False,
                     last_update=True,
                 )
-                self.urls.append(self.update_tracking(new_doc))
+                self.documents.append(self.update_tracking(new_doc))
 
     def update_tracking(self, document: RawMotionDocument) -> RawMotionDocument:
         """Update the tracking columns of a RawMotionDocument object"""
@@ -155,20 +167,20 @@ class RawMotionDocumentScraper:
         Returns True on success, False on failure.
         """
 
-        assert self.urls, "Documents must be scraped before it can be saved"
+        assert self.documents, "Documents must be scraped before it can be saved"
 
         session = self.Session()
 
         try:
-            session.bulk_save_objects(self.urls)
+            session.bulk_save_objects(self.documents)
             session.commit()
             logger.success(
-                f"Added {len(self.urls)} documents to Raw Motion Documents table"
+                f"Added {len(self.documents)} documents to Raw Motion Documents table"
             )
             return True
         except SQLAlchemyError as e:
             logger.error(
-                f"Failed to add documents from motion {self.urls[0].motion_id}: {e}"
+                f"Failed to add documents from motion {self.documents[0].motion_id}: {e}"
             )
             session.rollback()
             return False
@@ -177,33 +189,31 @@ class RawMotionDocumentScraper:
             session.close()
 
     def load_raw_documents(self):
-        self.add_documents_to_db()
-        self.urls = []
+        if self.documents:
+            self.add_documents_to_db()
+            self.documents = []
+        else:
+            return None
 
 
 if __name__ == "__main__":
     logger.info("Starting Scraper")
     scraper = RawMotionDocumentScraper()
 
-    motion = 209
-    year = 2021
+    pending_motions = scraper.get_motions_pending_documents()
 
-    while True:
+    stop_logging_to_console(filename=directories.LOGS / "scrape_motions_documents.log")
+
+    for motion in pending_motions:
         try:
-            scraper.get_motion_urls(motion_id=f"{year}_{motion}")
-            motion += 1
+            scraper.get_motion_documents(
+                motion_id=motion, update=False, prioritize=True)
+            scraper.load_raw_documents()
         except TypeError as e:
             print(e)
             break
-        except:
-            time.sleep(10)
+        except AttributeError as e:
+            print(e)
+            time.sleep(3)
             continue
-
-        try:
-            scraper.load_raw_documents()
-        except AssertionError:
-            logger.warning(
-                f"No steps neither documents found for motion {year}_{motion - 1}"
-            )
-
-        time.sleep(5)
+        time.sleep(3)
