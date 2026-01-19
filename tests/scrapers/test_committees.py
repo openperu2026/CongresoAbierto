@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
 
 from backend.scrapers.committees import (
     RawCommitteeScraper,
@@ -136,7 +135,6 @@ def test_get_html_with_selections_success(monkeypatch):
 
 
 def test_get_html_with_selections_handles_no_such_element(monkeypatch):
-    from selenium.common.exceptions import NoSuchElementException
 
     scraper = RawCommitteeScraper()
 

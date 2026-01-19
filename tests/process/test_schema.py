@@ -22,7 +22,6 @@ from backend import (
     LegPeriod,
     TypeOrganization,
     RoleOrganization,
-    BillStepType,
     VoteResult,
     MajorityType,
     TypeCommittee
