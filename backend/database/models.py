@@ -24,6 +24,8 @@ from backend import (
     RoleOrganization,
     TypeOrganization,
     TypeCommittee,
+    MotionType,
+    MotionStepType
 )
 from sqlalchemy.orm import declarative_base
 
@@ -228,7 +230,6 @@ class BillStep(Base):
         step_type (str): The type of step record (e.g. "Vote", "Assigned to Committee", "Presented", etc.)
         step_date (datetime): The date and time when the step occured.
         step_detail (str): The details on the step
-        step_url (str): The url associated to the step
     """
 
     __tablename__ = "bill_steps"
@@ -238,17 +239,34 @@ class BillStep(Base):
     step_type = Column(Enum(BillStepType, name="type_step"), nullable=False)
     step_date = Column(DateTime, nullable=False)
     step_detail = Column(String, nullable=False)
-    step_url = Column(String, nullable=False)
 
     __table_args__ = (Index("ix_billstep_bill_id", "bill_id"),)
 
-# class BillDocument(Base):
-#     """
-#     Represents a bill document record.    
 
-#     Attributes:
-#         Base (_type_): _description_
-#     """
+class BillDocument(Base):
+    """
+    Represents a bill document record.    
+
+    Attributes:
+        bill_id (str): The identifier of the bill associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+    __tablename__ = "bill_documents"
+    
+    bill_id = Column(String, ForeignKey("bills.id"), nullable=False)
+    step_id = Column(Integer, ForeignKey("bill_steps.id"), nullable=False)
+    archivo_id = Column(Integer, primary_key=True, nullable=False)
+    url = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+    vote_doc = Column(Boolean, nullable=False)
+
+    __table_args__ = (Index("ix_billdocument_archivo_id", "archivo_id"),
+                      UniqueConstraint("bill_id","step_id", "archivo_id", name="bill_document_uniq"))
+
 
 class Congresista(Base):
     """
@@ -371,3 +389,107 @@ class BancadaMembership(Base):
     leg_year = Column(Enum(LegislativeYear, name="leg_year"), nullable=False)
     person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=False)
+
+
+class Motion(Base):
+    """
+    Represents a motion in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the motion.
+        leg_period (str): Legislative period of the motion.
+        legislature (str): Legislature where the motion was presented.
+        presentation_date (datetime): Date when the motion was presented.
+        motion_type (str): Type of the motion.
+        summary (str): Summary of the motion.
+        observations (str): Observations on the motion.
+        complete_text (str): Complete text of the motion.
+        status (str): Current status of the motion.
+        author_id (str): Unique identifier for the author of the motion.
+        motion_approved (bool): Boolean indicating if the motion has been published
+    """
+    __tablename__ = "motions"
+
+    id = Column(String, primary_key=True)
+    leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
+    legislature = Column(Enum(Legislature, name="legislature"), nullable=False)
+    presentation_date = Column(DateTime, nullable=False)
+    motion_type = Column(Enum(MotionType, name="motion_type"), nullable=False)
+    summary = Column(String, nullable=False)
+    observations = Column(String, nullable=False)
+    complete_text = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    author_id = Column(Integer, ForeignKey("congresistas.id"), nullable=True)
+    motion_approved= Column(Boolean, nullable = False, default=False)
+
+
+class MotionCongresistas(Base):
+    """
+    Represents a relation between a motion and parliament members based on their
+    role during the presentation of the motion.
+
+    Attributes:
+        motion_id (str): A unique identifier for the motion.
+        nombre (str): Name of the person.
+        leg_period (str): Legislative period.
+        role_type (str): The type of role that the person has in the motion (e.g. author, coauthor, adherente, etc)
+    """
+    __tablename__ = "motions_congresistas"
+
+    motion_id = Column(String, ForeignKey("motions.id"), nullable=False)
+    person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
+    role_type = Column(Enum(RoleTypeBill, name="role_type_motion"), nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint("motion_id", "person_id"),
+        Index("ix_motioncongresistas_person_id", "person_id"),
+    )
+
+class MotionStep(Base):
+    """
+    Represents a motion step record with details about the actions taken on a motion.
+
+    Attributes:
+        id (int): A unique identifier for each step record.
+        motion_id (str): The identifier of the motion associated with this step.
+        vote_step (bool): Records if the step is a vote or not.
+        step_date (datetime): The date and time when the step occured.
+        step_detail (str): The details on the step
+        step_url (str): The url associated to the step
+    """
+
+    __tablename__ = "motion_steps"
+
+    id = Column(Integer, primary_key=True)
+    motion_id = Column(String, ForeignKey("motions.id"), nullable=True)
+    step_type = Column(Enum(MotionStepType, name="type_step"), nullable=False)
+    step_date = Column(DateTime, nullable=False)
+    step_detail = Column(String, nullable=False)
+
+    __table_args__ = (Index("ix_motionstep_motion_id", "motion_id"),)
+
+
+class MotionDocument(Base):
+    """
+    Represents a document object related to a Motion and to a specific MotionStep
+
+    Attributes:
+        motion_id (str): The identifier of the motion associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+    __tablename__ = "motion_documents"
+    
+    motion_id = Column(String, ForeignKey("motions.id"), nullable=False)
+    step_id = Column(Integer, ForeignKey("motion_steps.id"), nullable=False)
+    archivo_id = Column(Integer, primary_key=True, nullable=False)
+    url = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+    vote_doc = Column(Boolean, nullable=False)
+
+    __table_args__ = (Index("ix_motiondocument_archivo_id", "archivo_id"),
+                      UniqueConstraint("motion_id","step_id", "archivo_id", name="motion_document_uniq"))
+

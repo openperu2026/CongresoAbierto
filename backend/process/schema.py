@@ -173,7 +173,7 @@ class Bill(PrintableModel):
     presentation_date: datetime
     title: str
     summary: str
-    observations: str
+    observations: str | None
     complete_text: str | None
     status: str
     proponent: Proponents
@@ -314,7 +314,7 @@ class Motion(PrintableModel):
     presentation_date: datetime
     motion_type: MotionType
     summary: str
-    observations: str
+    observations: str | None
     complete_text: str | None
     status: str
     author_name: str | None
@@ -520,7 +520,7 @@ class Membership(PrintableModel):
     org_type: TypeOrganization
     comm_type: TypeCommittee | None
     start_date: datetime
-    end_date: datetime
+    end_date: datetime | None
 
     model_config = ConfigDict(use_enum_values=False)
 

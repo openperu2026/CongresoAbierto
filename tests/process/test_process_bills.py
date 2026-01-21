@@ -1,10 +1,6 @@
 import json
 from types import SimpleNamespace
-
 import pytest
-
-# TODO: change this to your real import path
-# Example: import backend.process.bills as mod
 import backend.process.bills as mod
 
 def _raw_bill(

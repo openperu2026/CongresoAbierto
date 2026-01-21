@@ -32,8 +32,6 @@ def process_memberships(raw_cong: RawCongresista, cong: Congresista) -> list[Mem
 
     for membership in lst_membership:
 
-        period = membership.get('period')
-        year = membership.get('anio')
         type_org = membership.get('desOrgano')
         org_name = membership.get('desOrganoCongresista')
         cargo = normalize_membership_role(membership.get('desCargo'))

@@ -130,7 +130,6 @@ def test_bill_step(session):
         step_type=BillStepType.VOTE,
         step_date=datetime.now(),
         step_detail="Votación en pleno",
-        step_url="http://example.com",
     )
     session.add(step)
     session.commit()

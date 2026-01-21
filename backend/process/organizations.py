@@ -1,7 +1,7 @@
 from backend.database.raw_models import RawCommittee, RawOrganization
 from backend.process.schema import Organization, Membership
 
-from backend import find_leg_period
+from backend import find_leg_period, normalize_membership_role
 
 from lxml.html import fromstring
 from datetime import datetime
@@ -16,10 +16,12 @@ def process_committee(raw_comm: RawCommittee) -> list[Organization]:
     for comm in raw_lst:
         name_elem, content = comm.getchildren()
 
-        if content and name_elem != 'Comisión':
-            type_comm = name_elem.text
-            name_comm = content.text_content().strip()
-            link = content.getchildren()[0].get('href')
+        type_comm = (name_elem.text or "").strip()
+        name_comm = content.text_content().strip()
+
+        if type_comm and name_comm and type_comm != "Comisión":
+            link = content.xpath(".//a/@href")
+            link = link[0] if link else None
 
             final_lst.append(
                 Organization(
@@ -57,14 +59,14 @@ def process_org_membership(raw_org: RawOrganization, org: Organization) -> list[
         year = int(org.leg_year)
 
         final_lst.append(Membership(
-            role = cargo,
+            role = normalize_membership_role(cargo.text),
             nombre = name.text_content(),
             leg_period=org.leg_period,
             org_name = org.org_name,
             org_type = org.org_type,
             comm_type = org.comm_type,
-            start_date = datetime.date(year, 7, 28),
-            end_date = datetime.date(year + 1, 7, 28)
+            start_date = datetime(year, 7, 28, 0, 0, 0),
+            end_date = datetime(year + 1, 7, 28, 0, 0, 0)
             ))
 
     return final_lst

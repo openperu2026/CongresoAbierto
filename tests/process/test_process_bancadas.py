@@ -1,11 +1,5 @@
-# tests/test_process_bancada.py
-
 from types import SimpleNamespace
-
 import pytest
-
-# TODO: change this import to your real module path
-# Example: from backend.process.bancadas import process_bancada
 import backend.process.bancadas as mod
 
 

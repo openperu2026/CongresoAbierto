@@ -591,10 +591,12 @@ def normalize_membership_role(raw: str) -> str:
         "accesitario": "accesitario",
     }
 
-    try:
-        return ROLE_MAP[role]
-    except KeyError:
-        raise ValueError(f"Unknown membership role: {raw}")
+    canon = ROLE_MAP.get(role)
+
+    if canon is None:
+        raise ValueError(f"Unknown role: {role!r}")
+
+    return RoleOrganization(canon)
 
 class TypeOrganization(str, Enum):
     COMISON = "Comisión"
