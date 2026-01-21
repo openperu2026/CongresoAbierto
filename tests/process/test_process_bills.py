@@ -1,6 +1,5 @@
 import json
 from types import SimpleNamespace
-import pytest
 import backend.process.bills as mod
 
 def _raw_bill(
