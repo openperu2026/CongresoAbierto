@@ -25,7 +25,7 @@ from backend import (
     TypeOrganization,
     TypeCommittee,
     MotionType,
-    MotionStepType
+    MotionStepType,
 )
 from sqlalchemy.orm import declarative_base
 
@@ -56,7 +56,7 @@ class Vote(Base):
         Index("ix_vote_voter_id", "voter_id"),
     )
 
-    
+
 class Attendance(Base):
     """
     Represents attendance of a congressperson at an event.
@@ -80,7 +80,6 @@ class Attendance(Base):
     )
 
 
-
 class VoteEvent(Base):
     """
     Represents a vote event in a parliament session.
@@ -93,16 +92,22 @@ class VoteEvent(Base):
 
     __tablename__ = "vote_events"
 
-    id = Column(Integer, primary_key=True, autoincrement = True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
-    bill_or_motion = Column(String, nullable = False)
-    bill_motion_id = Column(String, nullable = False)
+    bill_or_motion = Column(String, nullable=False)
+    bill_motion_id = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
-    result = Column(Enum(VoteResult, name = "vote_result"), nullable = False)
-    majority_type = Column(Enum(MajorityType, name = "majority_type"), nullable = True)
+    result = Column(Enum(VoteResult, name="vote_result"), nullable=False)
+    majority_type = Column(Enum(MajorityType, name="majority_type"), nullable=True)
 
     __table_args__ = (
-        UniqueConstraint("leg_period", "bill_or_motion", "bill_motion_id", "date", name="uq_vote_event"),
+        UniqueConstraint(
+            "leg_period",
+            "bill_or_motion",
+            "bill_motion_id",
+            "date",
+            name="uq_vote_event",
+        ),
         Index("ix_vote_event_bill_motion_id", "bill_motion_id"),
     )
 
@@ -211,7 +216,7 @@ class BillCommittees(Base):
 
     __tablename__ = "bill_committees"
 
-    id = Column(Integer, primary_key = True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     bill_id = Column(String, ForeignKey("bills.id"), nullable=False)
     committee_id = Column(Integer, ForeignKey("organizations.org_id"), nullable=False)
 
@@ -219,6 +224,7 @@ class BillCommittees(Base):
         UniqueConstraint("bill_id", "committee_id", name="bill_committee_uniq"),
         Index("ix_billcommittees_committee_id", "committee_id"),
     )
+
 
 class BillStep(Base):
     """
@@ -245,7 +251,7 @@ class BillStep(Base):
 
 class BillDocument(Base):
     """
-    Represents a bill document record.    
+    Represents a bill document record.
 
     Attributes:
         bill_id (str): The identifier of the bill associated with this step.
@@ -255,8 +261,9 @@ class BillDocument(Base):
         text (str): Extracted text from the file
         vote_doc (bool): Records if the step is a vote or not.
     """
+
     __tablename__ = "bill_documents"
-    
+
     bill_id = Column(String, ForeignKey("bills.id"), nullable=False)
     step_id = Column(Integer, ForeignKey("bill_steps.id"), nullable=False)
     archivo_id = Column(Integer, primary_key=True, nullable=False)
@@ -264,8 +271,10 @@ class BillDocument(Base):
     text = Column(String, nullable=False)
     vote_doc = Column(Boolean, nullable=False)
 
-    __table_args__ = (Index("ix_billdocument_archivo_id", "archivo_id"),
-                      UniqueConstraint("bill_id","step_id", "archivo_id", name="bill_document_uniq"))
+    __table_args__ = (
+        Index("ix_billdocument_archivo_id", "archivo_id"),
+        UniqueConstraint("bill_id", "step_id", "archivo_id", name="bill_document_uniq"),
+    )
 
 
 class Congresista(Base):
@@ -343,8 +352,11 @@ class Organization(Base):
     comm_type = Column(Enum(TypeCommittee, name="type_committee"), nullable=True)
     org_link = Column(String, nullable=False)
 
-    __table_args__ = (UniqueConstraint("leg_period", "leg_year", "org_name", "org_type", name="org_uniq"),)
-
+    __table_args__ = (
+        UniqueConstraint(
+            "leg_period", "leg_year", "org_name", "org_type", name="org_uniq"
+        ),
+    )
 
 
 class Membership(Base):
@@ -408,6 +420,7 @@ class Motion(Base):
         author_id (str): Unique identifier for the author of the motion.
         motion_approved (bool): Boolean indicating if the motion has been published
     """
+
     __tablename__ = "motions"
 
     id = Column(String, primary_key=True)
@@ -420,7 +433,7 @@ class Motion(Base):
     complete_text = Column(String, nullable=False)
     status = Column(String, nullable=False)
     author_id = Column(Integer, ForeignKey("congresistas.id"), nullable=True)
-    motion_approved= Column(Boolean, nullable = False, default=False)
+    motion_approved = Column(Boolean, nullable=False, default=False)
 
 
 class MotionCongresistas(Base):
@@ -434,6 +447,7 @@ class MotionCongresistas(Base):
         leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the motion (e.g. author, coauthor, adherente, etc)
     """
+
     __tablename__ = "motions_congresistas"
 
     motion_id = Column(String, ForeignKey("motions.id"), nullable=False)
@@ -444,6 +458,7 @@ class MotionCongresistas(Base):
         PrimaryKeyConstraint("motion_id", "person_id"),
         Index("ix_motioncongresistas_person_id", "person_id"),
     )
+
 
 class MotionStep(Base):
     """
@@ -481,8 +496,9 @@ class MotionDocument(Base):
         text (str): Extracted text from the file
         vote_doc (bool): Records if the step is a vote or not.
     """
+
     __tablename__ = "motion_documents"
-    
+
     motion_id = Column(String, ForeignKey("motions.id"), nullable=False)
     step_id = Column(Integer, ForeignKey("motion_steps.id"), nullable=False)
     archivo_id = Column(Integer, primary_key=True, nullable=False)
@@ -490,6 +506,9 @@ class MotionDocument(Base):
     text = Column(String, nullable=False)
     vote_doc = Column(Boolean, nullable=False)
 
-    __table_args__ = (Index("ix_motiondocument_archivo_id", "archivo_id"),
-                      UniqueConstraint("motion_id","step_id", "archivo_id", name="motion_document_uniq"))
-
+    __table_args__ = (
+        Index("ix_motiondocument_archivo_id", "archivo_id"),
+        UniqueConstraint(
+            "motion_id", "step_id", "archivo_id", name="motion_document_uniq"
+        ),
+    )

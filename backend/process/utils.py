@@ -7,6 +7,7 @@ from backend.config import directories
 from sqlalchemy.orm import Session
 from backend.database.raw_models import RawBill, RawMotion
 
+
 def extract_text(text: str, initial: str = None, final: str = None) -> str:
     """
     Extracts the text between an specified initial and final texts. The initial
@@ -39,8 +40,8 @@ def normalize_party_name(name: str) -> str:
         return canonical_name
     return name
 
+
 def gen_congresistas_df(session: Session) -> None:
-    
     bills_congresistas = session.query(RawBill.congresistas).distinct().all()
     motions_congresistas = session.query(RawMotion.congresistas).distinct().all()
 
@@ -55,28 +56,28 @@ def gen_congresistas_df(session: Session) -> None:
             continue
 
     unique_by_congresista = {
-        d["congresistaId"]: d
-        for d in all_cong
-        if "congresistaId" in d
+        d["congresistaId"]: d for d in all_cong if "congresistaId" in d
     }
 
     df = pl.DataFrame(list(unique_by_congresista.values()))
 
-    df.write_json(directories.PROCESSED_DATA / 'cong_info_2021_2026.json')
+    df.write_json(directories.PROCESSED_DATA / "cong_info_2021_2026.json")
 
     return None
 
+
 from datetime import datetime
 from backend import LegislativeYear
-def get_current_leg_year(timestamp: str) -> LegislativeYear:
 
+
+def get_current_leg_year(timestamp: str) -> LegislativeYear:
     dt = datetime.fromisoformat(timestamp)
     year = dt.year
 
     cutoff = datetime(year, 7, 28)
     if dt < cutoff:
         # Before 28th July
-        return LegislativeYear(str(year-1))
+        return LegislativeYear(str(year - 1))
     else:
-        # After 28th July 
+        # After 28th July
         return LegislativeYear(str(year))

@@ -58,6 +58,7 @@ def test_get_options_parses_select(monkeypatch):
 
 # ---------- get_html_with_selections ----------
 
+
 def test_get_html_with_selections_success(monkeypatch):
     scraper = RawCommitteeScraper()
 
@@ -135,7 +136,6 @@ def test_get_html_with_selections_success(monkeypatch):
 
 
 def test_get_html_with_selections_handles_no_such_element(monkeypatch):
-
     scraper = RawCommitteeScraper()
 
     class FakeElement:
@@ -204,6 +204,7 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
 
 # ---------- get_raw_committees ----------
 
+
 def test_get_raw_committees_builds_committee_list(monkeypatch):
     scraper = RawCommitteeScraper()
 
@@ -220,22 +221,37 @@ def test_get_raw_committees_builds_committee_list(monkeypatch):
             return None
         return f"<html>Year={year_value},Type={committee_value}</html>"
 
-    monkeypatch.setattr(scraper, "get_html_with_selections", fake_get_html_with_selections)
-    
+    monkeypatch.setattr(
+        scraper, "get_html_with_selections", fake_get_html_with_selections
+    )
+
     # If your code constructs a driver/wait, just stub them to simple objects
     class DummyWait:
         def until(self, condition):
             return True
 
     class DummyDriver:
-        def get(self, url): pass
-        def set_page_load_timeout(self, seconds): pass
-        def set_script_timeout(self, seconds): pass
-        def implicitly_wait(self, seconds): pass
-        def quit(self): pass
+        def get(self, url):
+            pass
 
-    monkeypatch.setattr("backend.scrapers.committees.webdriver.Chrome", lambda *a, **k: DummyDriver())
-    monkeypatch.setattr("backend.scrapers.committees.WebDriverWait", lambda driver, t: DummyWait())
+        def set_page_load_timeout(self, seconds):
+            pass
+
+        def set_script_timeout(self, seconds):
+            pass
+
+        def implicitly_wait(self, seconds):
+            pass
+
+        def quit(self):
+            pass
+
+    monkeypatch.setattr(
+        "backend.scrapers.committees.webdriver.Chrome", lambda *a, **k: DummyDriver()
+    )
+    monkeypatch.setattr(
+        "backend.scrapers.committees.WebDriverWait", lambda driver, t: DummyWait()
+    )
 
     # bypass selenium-dependent helpers
     monkeypatch.setattr(scraper, "_select_year", lambda driver, wait, year_value: None)
@@ -248,6 +264,7 @@ def test_get_raw_committees_builds_committee_list(monkeypatch):
 
     assert hasattr(scraper, "committee_list")
     assert len(scraper.committee_list) == 3
+
 
 # ---------- add_committees_to_db ----------
 

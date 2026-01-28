@@ -39,19 +39,17 @@ class RawMotionDocumentScraper:
         self.documents = []
 
     def get_motions_pending_documents(self) -> list[str]:
-
         with self.Session() as session:
             stmt = (
                 select(RawMotion.id)
                 .outerjoin(
-                    RawMotionDocument,
-                    RawMotion.id == RawMotionDocument.motion_id
+                    RawMotionDocument, RawMotion.id == RawMotionDocument.motion_id
                 )
                 .where(RawMotionDocument.motion_id.is_(None))
             )
-            
+
             return session.scalars(stmt).all()
-        
+
     def filter_steps(self, extracted_steps: list[dict], motion_id: str):
         """
         Filter steps that are already loaded in the DB
@@ -87,7 +85,9 @@ class RawMotionDocumentScraper:
                 .first()
             )
 
-            assert motion is not None, f"Moition with id {motion_id} has not been scraped yet"
+            assert motion is not None, (
+                f"Moition with id {motion_id} has not been scraped yet"
+            )
 
             steps: list[dict] = json.loads(motion.steps)
 
@@ -96,7 +96,9 @@ class RawMotionDocumentScraper:
 
         if prioritize:
             logger.info(f"Total number of steps: {len(steps)}")
-            steps = [step for step in steps if step.get("desEstadoMocion") in PRIORITIES]
+            steps = [
+                step for step in steps if step.get("desEstadoMocion") in PRIORITIES
+            ]
 
         if len(steps) == 0:
             logger.info(f"No steps found for motion {motion_id}")
@@ -207,7 +209,8 @@ if __name__ == "__main__":
     for motion in pending_motions:
         try:
             scraper.get_motion_documents(
-                motion_id=motion, update=False, prioritize=True)
+                motion_id=motion, update=False, prioritize=True
+            )
             scraper.load_raw_documents()
         except TypeError as e:
             print(e)

@@ -6,6 +6,7 @@ from backend.database.raw_models import RawBill, RawBillDocument
 # Raw Bill CRUD Operations
 ########################################
 
+
 def get_bills_ids(session: Session) -> list[str]:
     """
     Gets all the bill's ids from the RawDB
@@ -60,11 +61,15 @@ def mark_raw_bill_processed(session: Session, bill_id: str) -> bool:
     session.commit()
     return updated == 1
 
+
 ########################################
 # RawBillDocuments CRUD Operations
 ########################################
 
-def get_documents_by_id(session: Session, bill_id: str, seguimiento_id: str) -> list[RawBillDocument]:
+
+def get_documents_by_id(
+    session: Session, bill_id: str, seguimiento_id: str
+) -> list[RawBillDocument]:
     """
     Gets all the RawBillDocuments from the DB by querying for bill and step
 
@@ -76,12 +81,20 @@ def get_documents_by_id(session: Session, bill_id: str, seguimiento_id: str) -> 
     Returns:
         list[RawBillDocument]: list of RawBillDocuments associated with the bill and step
     """
-    return session.query(RawBillDocument).filter(
-        RawBillDocument.bill_id == bill_id, 
-        RawBillDocument.seguimiento_id == seguimiento_id,
-        RawBillDocument.last_update == True).all()
+    return (
+        session.query(RawBillDocument)
+        .filter(
+            RawBillDocument.bill_id == bill_id,
+            RawBillDocument.seguimiento_id == seguimiento_id,
+            RawBillDocument.last_update == True,
+        )
+        .all()
+    )
 
-def mark_raw_bill_document_processed(session: Session, bill_id: str, seguimiento_id: str, archivo_id: str) -> bool:
+
+def mark_raw_bill_document_processed(
+    session: Session, bill_id: str, seguimiento_id: str, archivo_id: str
+) -> bool:
     """
     Utility funtion to update the processed attribute in the RawDB
 
@@ -96,8 +109,8 @@ def mark_raw_bill_document_processed(session: Session, bill_id: str, seguimiento
         .filter(
             RawBillDocument.bill_id == bill_id,
             RawBillDocument.seguimiento_id == seguimiento_id,
-            RawBillDocument.archivo_id == archivo_id
-            )
+            RawBillDocument.archivo_id == archivo_id,
+        )
         .scalar()
     )
     if max_ts is None:
@@ -108,18 +121,18 @@ def mark_raw_bill_document_processed(session: Session, bill_id: str, seguimiento
         .filter(
             RawBillDocument.bill_id == bill_id,
             RawBillDocument.seguimiento_id == seguimiento_id,
-            RawBillDocument.archivo_id == archivo_id,        
-            RawBillDocument.timestamp == max_ts
-            )
+            RawBillDocument.archivo_id == archivo_id,
+            RawBillDocument.timestamp == max_ts,
+        )
         .update({RawBillDocument.processed: True}, synchronize_session=False)
     )
     session.commit()
     return updated == 1
 
+
 ########################################
 # Bill CRUD Operations
 ########################################
-
 
 
 ########################################
@@ -137,4 +150,3 @@ def mark_raw_bill_document_processed(session: Session, bill_id: str, seguimiento
 ########################################
 # BillStep CRUD Operations
 ########################################
-

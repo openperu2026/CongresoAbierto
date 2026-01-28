@@ -11,9 +11,7 @@ from backend.scrapers.congresistas import (
     API_MEMBERSHIP,
 )
 from backend.database.raw_models import Base, RawCongresista
-from backend.scrapers.utils import (
-    get_cong_website
-)
+from backend.scrapers.utils import get_cong_website
 
 # ---------- helpers for DB tests ----------
 
@@ -142,6 +140,7 @@ def test_create_raw_congresista_old_period(monkeypatch):
 
 # ---------- create_raw_congresista (modern period, success path) ----------
 
+
 def test_create_raw_congresista_modern_success(monkeypatch):
     s = RawCongresistasScraper()
 
@@ -193,6 +192,7 @@ def test_create_raw_congresista_modern_success(monkeypatch):
 
 # ---------- create_raw_congresista (partial failure -> no iframe) ----------
 
+
 def test_create_raw_congresista_partial_failure(monkeypatch):
     s = RawCongresistasScraper()
 
@@ -227,14 +227,19 @@ def test_create_raw_congresista_partial_failure(monkeypatch):
     # and because it fails to find the iframe / membership:
     assert raw.memberships_content is None
 
+
 # ---------- extract_cong_from_period ----------
 
 
 def test_extract_cong_from_period_uses_links_and_creator(monkeypatch):
     s = RawCongresistasScraper()
 
-    monkeypatch.setattr(s, "get_urls_from_table", lambda value: ["/perfil/1", "/perfil/2"])
-    monkeypatch.setattr(s, "create_raw_congresista", lambda period, link: f"raw-{period}-{link}")
+    monkeypatch.setattr(
+        s, "get_urls_from_table", lambda value: ["/perfil/1", "/perfil/2"]
+    )
+    monkeypatch.setattr(
+        s, "create_raw_congresista", lambda period, link: f"raw-{period}-{link}"
+    )
 
     # avoid DB + object-shape requirements
     monkeypatch.setattr(s, "update_tracking", lambda x: x)

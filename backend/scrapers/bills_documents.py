@@ -39,17 +39,13 @@ class RawBillDocumentScraper:
         self.documents = []
 
     def get_bills_pending_documents(self) -> list[str]:
-
         with self.Session() as session:
             stmt = (
                 select(RawBill.id)
-                .outerjoin(
-                    RawBillDocument,
-                    RawBill.id == RawBillDocument.bill_id
-                )
+                .outerjoin(RawBillDocument, RawBill.id == RawBillDocument.bill_id)
                 .where(RawBillDocument.bill_id.is_(None))
             )
-            
+
             return session.scalars(stmt).all()
 
     def filter_steps(self, extracted_steps: list[dict], bill_id: str):
@@ -185,7 +181,6 @@ class RawBillDocumentScraper:
                 prev.last_update = False
                 session.add(prev)  # stage update of old latest
 
-
     def add_documents_to_db(self) -> bool:
         """
         Add the documents to the database.
@@ -203,14 +198,17 @@ class RawBillDocumentScraper:
                 session.add_all(self.documents)
 
                 session.commit()
-                logger.success(f"Added {len(self.documents)} documents to Raw Bill Documents table")
+                logger.success(
+                    f"Added {len(self.documents)} documents to Raw Bill Documents table"
+                )
                 return True
 
             except SQLAlchemyError as e:
-                logger.error(f"Failed to add documents from bill {self.documents[0].bill_id}: {e}")
+                logger.error(
+                    f"Failed to add documents from bill {self.documents[0].bill_id}: {e}"
+                )
                 session.rollback()
                 return False
-
 
     def load_raw_documents(self):
         if self.documents:
@@ -232,9 +230,7 @@ if __name__ == "__main__":
     stop_logging_to_console(filename=directories.LOGS / "scrape_bills_documents.log")
     for bill in pending_bills:
         try:
-            scraper.get_bill_documents(
-                bill_id=bill, update=False, prioritize=True
-            )
+            scraper.get_bill_documents(bill_id=bill, update=False, prioritize=True)
             scraper.load_raw_documents()
         except TypeError as e:
             print(e)

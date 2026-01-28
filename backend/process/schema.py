@@ -15,7 +15,7 @@ from backend import (
     MotionType,
     parse_leg_period,
     parse_legislature,
-    parse_role_bill
+    parse_role_bill,
 )
 from typing import Optional
 from datetime import datetime
@@ -146,6 +146,7 @@ class VoteCount(PrintableModel):
 
     model_config = ConfigDict(use_enum_values=False)
 
+
 class Bill(PrintableModel):
     """
     Represents a bill in the peruvian parliament.
@@ -267,6 +268,7 @@ class BillStep(PrintableModel):
 
     model_config = ConfigDict(use_enum_values=False)
 
+
 class BillDocument(PrintableModel):
     """
     Represents a document object related to a Bill and to a specific BillStep
@@ -279,6 +281,7 @@ class BillDocument(PrintableModel):
         text (str): Extracted text from the file
         vote_doc (bool): Records if the step is a vote or not.
     """
+
     bill_id: str
     step_id: int
     archivo_id: int
@@ -287,6 +290,7 @@ class BillDocument(PrintableModel):
     vote_doc: bool
 
     model_config = ConfigDict(use_enum_values=False)
+
 
 class Motion(PrintableModel):
     """
@@ -408,6 +412,7 @@ class MotionDocument(PrintableModel):
         text (str): Extracted text from the file
         vote_doc (bool): Records if the step is a vote or not.
     """
+
     motion_id: str
     step_id: int
     archivo_id: int
@@ -416,6 +421,7 @@ class MotionDocument(PrintableModel):
     vote_doc: bool
 
     model_config = ConfigDict(use_enum_values=False)
+
 
 class Congresista(PrintableModel):
     """
@@ -451,6 +457,7 @@ class Congresista(PrintableModel):
 
     model_config = ConfigDict(use_enum_values=False)
 
+
 class Bancada(PrintableModel):
     """
     Represent a Bancada in the peruvian government
@@ -464,6 +471,7 @@ class Bancada(PrintableModel):
     bancada_name: str
 
     model_config = ConfigDict(use_enum_values=False)
+
 
 class Organization(PrintableModel):
     """

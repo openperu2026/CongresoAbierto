@@ -4,6 +4,7 @@ import pytest
 import backend.process.congresistas as mod
 from datetime import datetime
 
+
 @pytest.fixture
 def profile_html():
     # Must match the xpaths used in process_profile_content
@@ -67,7 +68,9 @@ def test_process_profile_content_parses_fields_and_votes_int(profile_html):
 
 def test_process_memberships_all_branches(monkeypatch):
     # Normalize role is external logic: mock it for deterministic tests
-    monkeypatch.setattr(mod, "normalize_membership_role", lambda s: (s or "").strip().lower())
+    monkeypatch.setattr(
+        mod, "normalize_membership_role", lambda s: (s or "").strip().lower()
+    )
 
     memberships_payload = {
         "data": [

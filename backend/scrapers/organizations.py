@@ -8,7 +8,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    TimeoutException,
+    WebDriverException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
@@ -16,7 +20,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-from backend.config import settings, directories, stop_logging_to_console, resume_logging_to_console
+from backend.config import (
+    settings,
+    directories,
+    stop_logging_to_console,
+    resume_logging_to_console,
+)
 from backend.database.raw_models import RawOrganization
 from backend.scrapers.utils import parse_url
 
@@ -29,6 +38,7 @@ BASE_URLS = {
 }
 
 RAW_DB_PATH = settings.RAW_DB_URL
+
 
 class RawOrganizationScraper:
     """
@@ -69,7 +79,7 @@ class RawOrganizationScraper:
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
         # Key: don't wait for every resource to load
-        options.page_load_strategy = "eager"   # consider "none" if needed
+        options.page_load_strategy = "eager"  # consider "none" if needed
 
         service = Service(log_path=os.devnull)
         driver = webdriver.Chrome(service=service, options=options)
@@ -81,8 +91,14 @@ class RawOrganizationScraper:
 
         return driver
 
-
-    def _safe_get(self, driver: webdriver.Chrome, url: str, *, retries: int = 2, sleep_s: float = 2.0) -> None:
+    def _safe_get(
+        self,
+        driver: webdriver.Chrome,
+        url: str,
+        *,
+        retries: int = 2,
+        sleep_s: float = 2.0,
+    ) -> None:
         for attempt in range(retries + 1):
             try:
                 driver.get(url)
@@ -96,7 +112,7 @@ class RawOrganizationScraper:
 
                 if attempt == retries:
                     raise
-                time.sleep(sleep_s)    
+                time.sleep(sleep_s)
 
     def get_html_with_selections(self, url: str, period_value: str) -> str | None:
         driver = self._build_driver()
@@ -111,8 +127,13 @@ class RawOrganizationScraper:
 
             # Select the period
             select_year.select_by_value(period_value)
-            
-            wait.until(lambda d: Select(d.find_element(By.NAME, "idRegistroPadre")).first_selected_option.get_attribute("value") == period_value)
+
+            wait.until(
+                lambda d: Select(
+                    d.find_element(By.NAME, "idRegistroPadre")
+                ).first_selected_option.get_attribute("value")
+                == period_value
+            )
 
             # Strategy 2 (better if you know what changes): wait for a specific container/table to appear/update
             # wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.your-results-container")))
@@ -120,7 +141,9 @@ class RawOrganizationScraper:
             return driver.page_source
 
         except TimeoutException as e:
-            logger.warning(f"Selenium timeout loading {url} (period={period_value}): {e}")
+            logger.warning(
+                f"Selenium timeout loading {url} (period={period_value}): {e}"
+            )
             return None
         except NoSuchElementException as e:
             logger.error(f"Element not found on {url} (period={period_value}): {e}")
@@ -133,7 +156,6 @@ class RawOrganizationScraper:
                 driver.quit()
             except Exception:
                 pass
-
 
     def get_raw_organizations(self, only_current: bool = True) -> None:
         final_lst = []
@@ -228,8 +250,7 @@ class RawOrganizationScraper:
 
 
 if __name__ == "__main__":
-
-    stop_logging_to_console(filename=directories.LOGS / "scrape_organizations.log")    
+    stop_logging_to_console(filename=directories.LOGS / "scrape_organizations.log")
     scraper = RawOrganizationScraper()
     scraper.get_raw_organizations(only_current=True)
     scraper.add_organizations_to_db()

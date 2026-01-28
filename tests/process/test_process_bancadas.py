@@ -51,7 +51,9 @@ def html_two_bancadas_two_members():
     """
 
 
-def _raw_bancada(raw_html: str, timestamp="2026-01-01T00:00:00", legislative_period="2025-2026"):
+def _raw_bancada(
+    raw_html: str, timestamp="2026-01-01T00:00:00", legislative_period="2025-2026"
+):
     """
     Minimal stand-in for RawBancada.
     We only need attributes used by process_bancada:
@@ -66,7 +68,9 @@ def _raw_bancada(raw_html: str, timestamp="2026-01-01T00:00:00", legislative_per
     )
 
 
-def test_process_bancada_current_period_no_override(monkeypatch, html_one_bancada_one_member):
+def test_process_bancada_current_period_no_override(
+    monkeypatch, html_one_bancada_one_member
+):
     # Arrange
     rb = _raw_bancada(
         raw_html=html_one_bancada_one_member,
@@ -89,7 +93,9 @@ def test_process_bancada_current_period_no_override(monkeypatch, html_one_bancad
         return "<html>profile page</html>"
 
     monkeypatch.setattr(mod, "get_url_text", fake_get_url_text)
-    monkeypatch.setattr(mod, "get_cong_website", lambda parsed: "https://example.com/cong/juan-perez")
+    monkeypatch.setattr(
+        mod, "get_cong_website", lambda parsed: "https://example.com/cong/juan-perez"
+    )
 
     # Act
     bancadas, memberships = mod.process_bancada(rb)
@@ -112,7 +118,9 @@ def test_process_bancada_current_period_no_override(monkeypatch, html_one_bancad
     assert seen_urls == ["https://www.congreso.gob.pe/congresista/1"]
 
 
-def test_process_bancada_past_period_overrides_leg_year(monkeypatch, html_one_bancada_one_member):
+def test_process_bancada_past_period_overrides_leg_year(
+    monkeypatch, html_one_bancada_one_member
+):
     # Arrange
     # Force mismatch: current_leg_period != raw_bancada.legislative_period
     # and raw_bancada.legislative_period ends with 2024 -> override year becomes 2023
@@ -123,11 +131,17 @@ def test_process_bancada_past_period_overrides_leg_year(monkeypatch, html_one_ba
     )
 
     # Mock: would normally say current year is 2025, but should be overridden for past periods
-    monkeypatch.setattr(mod, "get_current_leg_year", lambda ts: mod.LegislativeYear("2025"))
-    monkeypatch.setattr(mod, "find_leg_period", lambda leg_year: "2025-2026")  # mismatch -> override
+    monkeypatch.setattr(
+        mod, "get_current_leg_year", lambda ts: mod.LegislativeYear("2025")
+    )
+    monkeypatch.setattr(
+        mod, "find_leg_period", lambda leg_year: "2025-2026"
+    )  # mismatch -> override
 
     monkeypatch.setattr(mod, "get_url_text", lambda url: "<html/>")
-    monkeypatch.setattr(mod, "get_cong_website", lambda parsed: "https://example.com/cong/juan-perez")
+    monkeypatch.setattr(
+        mod, "get_cong_website", lambda parsed: "https://example.com/cong/juan-perez"
+    )
 
     # Act
     bancadas, memberships = mod.process_bancada(rb)
@@ -142,7 +156,9 @@ def test_process_bancada_past_period_overrides_leg_year(monkeypatch, html_one_ba
     assert memberships[0].leg_year == expected_overridden
 
 
-def test_process_bancada_multiple_bancadas_updates_state(monkeypatch, html_two_bancadas_two_members):
+def test_process_bancada_multiple_bancadas_updates_state(
+    monkeypatch, html_two_bancadas_two_members
+):
     # Arrange
     rb = _raw_bancada(
         raw_html=html_two_bancadas_two_members,

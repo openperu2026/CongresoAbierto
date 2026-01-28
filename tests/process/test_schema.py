@@ -24,7 +24,7 @@ from backend import (
     RoleOrganization,
     VoteResult,
     MajorityType,
-    TypeCommittee
+    TypeCommittee,
 )
 
 
@@ -51,6 +51,7 @@ def sample_attendance():
         ),
     ]
 
+
 @pytest.fixture
 def sample_vote_event(sample_votes, sample_attendance):
     return VoteEvent(
@@ -60,9 +61,10 @@ def sample_vote_event(sample_votes, sample_attendance):
         date=datetime.now(),
         result=VoteResult.APPROVED,
         majority_type=MajorityType.SIMPLE,
-        votes = sample_votes,
-        attendance=sample_attendance
+        votes=sample_votes,
+        attendance=sample_attendance,
     )
+
 
 @pytest.fixture
 def sample_bill():
@@ -81,6 +83,7 @@ def sample_bill():
         author_web=None,
         bill_approved=True,
     )
+
 
 def test_vote_event_counts(sample_vote_event):
     vote_event = sample_vote_event
@@ -115,10 +118,10 @@ def test_membership_date_validation():
         Membership(
             role=RoleOrganization.MIEMBRO,
             nombre="Jaime",
-            leg_period = LegPeriod.PERIODO_2021_2026,
+            leg_period=LegPeriod.PERIODO_2021_2026,
             org_name="Committee",
-            org_type= "Comision",
-            comm_type= TypeCommittee.COM_INVESTIGADORA,
+            org_type="Comision",
+            comm_type=TypeCommittee.COM_INVESTIGADORA,
             start_date=datetime.now(),
             end_date=datetime.now() - timedelta(days=1),
         )
@@ -145,18 +148,20 @@ def test_organization_creation():
         org_name="Comisión de Justicia",
         org_type=TypeOrganization.COMISON,
         comm_type=TypeCommittee.COM_INVESTIGADORA,
-        org_link="http://congreso.gob.pe/comision_investigadora"
+        org_link="http://congreso.gob.pe/comision_investigadora",
     )
     assert org.org_name == "Comisión de Justicia"
 
+
 def test_bill_congresistas_creation():
     relation = BillCongresistas(
-        bill_id="b001", 
-        nombre="Juan Perez", 
-        leg_period= LegPeriod.PERIODO_2021_2026,
-        role_type=RoleTypeBill.ADHERENTE
+        bill_id="b001",
+        nombre="Juan Perez",
+        leg_period=LegPeriod.PERIODO_2021_2026,
+        role_type=RoleTypeBill.ADHERENTE,
     )
     assert relation.role_type == RoleTypeBill.ADHERENTE
+
 
 def test_bill_committees_creation():
     relation = BillCommittees(bill_id="b001", committee_name="Comision de Justicia")
@@ -171,6 +176,6 @@ def test_bill_step_creation():
         vote_id="b001_1",
         step_date=datetime.now(),
         step_detail="Se presentó el proyecto",
-        step_files=[1,2,3,4],
+        step_files=[1, 2, 3, 4],
     )
     assert step.step_detail == "Se presentó el proyecto"

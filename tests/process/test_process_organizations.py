@@ -5,11 +5,18 @@ import backend.process.organizations as mod
 from backend import find_leg_period
 from datetime import datetime
 
+
 def _raw_committee(*, raw_html: str, legislative_year: str = "2025"):
     return SimpleNamespace(raw_html=raw_html, legislative_year=legislative_year)
 
 
-def _raw_org(*, raw_html: str, legislative_year: str = "2025", type_org: str = "Mesa Directiva", org_link: str = "/org/mesa"):
+def _raw_org(
+    *,
+    raw_html: str,
+    legislative_year: str = "2025",
+    type_org: str = "Mesa Directiva",
+    org_link: str = "/org/mesa",
+):
     return SimpleNamespace(
         raw_html=raw_html,
         legislative_year=legislative_year,
@@ -20,7 +27,6 @@ def _raw_org(*, raw_html: str, legislative_year: str = "2025", type_org: str = "
 
 @pytest.fixture
 def committee_html_two_rows():
-
     return """
     <table class="congresistas">
       <tbody>
@@ -39,7 +45,6 @@ def committee_html_two_rows():
 
 @pytest.fixture
 def org_membership_html():
-
     return """
     <table class="congresistas">
       <tbody>
@@ -66,7 +71,6 @@ def org_membership_html():
 
 
 def test_process_committee_builds_organizations(monkeypatch, committee_html_two_rows):
-
     raw = _raw_committee(raw_html=committee_html_two_rows, legislative_year="2025")
 
     out = mod.process_committee(raw)
@@ -86,8 +90,12 @@ def test_process_committee_builds_organizations(monkeypatch, committee_html_two_
 
 
 def test_process_org_maps_fields(monkeypatch):
-
-    raw = _raw_org(raw_html="<table/>", legislative_year="2024", type_org="Mesa Directiva", org_link="/org/mesa")
+    raw = _raw_org(
+        raw_html="<table/>",
+        legislative_year="2024",
+        type_org="Mesa Directiva",
+        org_link="/org/mesa",
+    )
 
     org = mod.process_org(raw)
 
@@ -99,7 +107,9 @@ def test_process_org_maps_fields(monkeypatch):
     assert org.org_link == "/org/mesa"
 
 
-def test_process_org_membership_creates_memberships_with_year_window(monkeypatch, org_membership_html):
+def test_process_org_membership_creates_memberships_with_year_window(
+    monkeypatch, org_membership_html
+):
     """
     NOTE: Your code currently does `datetime.date(...)` but you imported `datetime` as a class:
       from datetime import datetime
@@ -111,7 +121,12 @@ def test_process_org_membership_creates_memberships_with_year_window(monkeypatch
       end_date = date(year + 1, 7, 28)
     (or import datetime module instead).
     """
-    raw_org = _raw_org(raw_html=org_membership_html, legislative_year="2025", type_org="Mesa Directiva", org_link="/org/mesa")
+    raw_org = _raw_org(
+        raw_html=org_membership_html,
+        legislative_year="2025",
+        type_org="Mesa Directiva",
+        org_link="/org/mesa",
+    )
 
     org = mod.process_org(raw_org)
 
@@ -133,7 +148,9 @@ def test_process_org_membership_creates_memberships_with_year_window(monkeypatch
     assert out[1].role == "miembro"
 
 
-def test_process_org_membership_creates_memberships_with_year_window(monkeypatch, org_membership_html):
+def test_process_org_membership_creates_memberships_with_year_window(
+    monkeypatch, org_membership_html
+):
     raw_org = _raw_org(
         raw_html=org_membership_html,
         legislative_year="2025",

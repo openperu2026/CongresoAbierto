@@ -4,17 +4,20 @@ from sqlalchemy.orm import Session
 
 from backend.database.raw_models import RawCongresista
 from backend.database.models import Congresista, Membership, Organization
-from backend.process.schema import Congresista as CongresistaSchema, Membership as MembershipSchema
+from backend.process.schema import (
+    Congresista as CongresistaSchema,
+    Membership as MembershipSchema,
+)
 
 ########################################
 # Raw Congresista CRUD Operations
 ########################################
 
+
 def get_last_congresistas_by_period(
     session: Session,
     leg_period: str,
 ) -> list[RawCongresista]:
-
     subq = (
         session.query(
             RawCongresista.url,
@@ -38,6 +41,7 @@ def get_last_congresistas_by_period(
         .all()
     )
 
+
 def mark_raw_cong_processed(session: Session, id: int) -> bool:
     """
     Utility funtion to update the processed attribute in the RawDB
@@ -54,20 +58,28 @@ def mark_raw_cong_processed(session: Session, id: int) -> bool:
     session.commit()
     return True
 
+
 ########################################
 # Congresistas CRUD Operations
 ########################################
 
-def get_cong_by_web_name(session: Session, name: str, leg_period: str, web: str | None = None) -> Congresista:
 
+def get_cong_by_web_name(
+    session: Session, name: str, leg_period: str, web: str | None = None
+) -> Congresista:
     cong = session.query(Congresista).filter(Congresista.website == web).first()
 
     if cong:
         return cong
-    
-    return session.query(Congresista).filter(Congresista.nombre == name, Congresista.leg_period == leg_period).first()
 
-#TODO: ALL THIS FUNCTION
+    return (
+        session.query(Congresista)
+        .filter(Congresista.nombre == name, Congresista.leg_period == leg_period)
+        .first()
+    )
+
+
+# TODO: ALL THIS FUNCTION
 def bulk_load_congresistas(
     db: Session, congs_lst: list[CongresistaSchema]
 ) -> list[Congresista]:
@@ -77,9 +89,9 @@ def bulk_load_congresistas(
 
         existing_congs_map = {
             (c.website): c
-            for c in db.query(Congresista).filter(
-                 Congresista.website.in_([c.website for c in congs_lst])
-            ).all()
+            for c in db.query(Congresista)
+            .filter(Congresista.website.in_([c.website for c in congs_lst]))
+            .all()
         }
 
         to_insert = []
@@ -87,7 +99,7 @@ def bulk_load_congresistas(
 
         for cong in congs_lst:
             cong_dict = cong.model_dump(by_alias=False)
-            key = (cong.website)
+            key = cong.website
             exist_cong = existing_congs_map.get(key)
 
             if exist_cong is None:
@@ -114,9 +126,11 @@ def bulk_load_congresistas(
         db.rollback()
         logger.error(f"Bulk load congresistas failed: {e}")
 
+
 ########################################
 # Membership CRUD Operations
 ########################################
+
 
 def get_membership_by_name(db: Session, cong_name: str, org_name: str, leg_period: str):
     """Query membership objects by names and leg_period"""
@@ -145,6 +159,7 @@ def get_membership_by_name(db: Session, cong_name: str, org_name: str, leg_perio
     )
 
     return db.execute(stmt).first()
+
 
 def bulk_load_membership(
     db: Session, membership_lst: list[MembershipSchema]

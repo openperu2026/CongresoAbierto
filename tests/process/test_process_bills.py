@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 import backend.process.bills as mod
 
+
 def _raw_bill(
     *,
     id="PL_123",
@@ -62,8 +63,16 @@ def _raw_bill_document(
 
 def test_process_bill_with_firmantes_sets_author_and_cong_list():
     firmantes = [
-        {"nombre": "Juan Perez", "pagWeb": "https://example.com/juan", "tipoFirmanteId": 1},
-        {"nombre": "Maria Lopez", "pagWeb": "https://example.com/maria", "tipoFirmanteId": 2},
+        {
+            "nombre": "Juan Perez",
+            "pagWeb": "https://example.com/juan",
+            "tipoFirmanteId": 1,
+        },
+        {
+            "nombre": "Maria Lopez",
+            "pagWeb": "https://example.com/maria",
+            "tipoFirmanteId": 2,
+        },
     ]
     rb = _raw_bill(id="PL_999", congresistas=firmantes)
 
@@ -215,7 +224,10 @@ def test_get_committees_none_when_empty():
 
 
 def test_get_committees_returns_list_with_names():
-    committees = [{"nombre": "Comisión de Economía"}, {"nombre": "Comisión de Justicia"}]
+    committees = [
+        {"nombre": "Comisión de Economía"},
+        {"nombre": "Comisión de Justicia"},
+    ]
     rb = _raw_bill(id="PL_111", committees=committees)
 
     out = mod.get_committees(rb)

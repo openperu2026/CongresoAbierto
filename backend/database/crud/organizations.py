@@ -8,17 +8,19 @@ from backend.process.schema import Organization as OrgSchema
 # Raw Committee CRUD Operations
 ########################################
 
+
 def get_last_committees_by_year(
     session: Session,
     leg_year: str,
 ) -> list[RawCommittee]:
-
     return (
         session.query(RawCommittee)
-        .filter(RawCommittee.legislative_year == leg_year,
-                RawCommittee.last_update == True)
+        .filter(
+            RawCommittee.legislative_year == leg_year, RawCommittee.last_update == True
+        )
         .all()
     )
+
 
 def mark_raw_committee_processed(session: Session, id: int) -> bool:
     """
@@ -34,21 +36,25 @@ def mark_raw_committee_processed(session: Session, id: int) -> bool:
     session.commit()
     return True
 
+
 ########################################
 # Raw Organizations CRUD Operations
 ########################################
+
 
 def get_last_organizations_by_year(
     session: Session,
     leg_year: str,
 ) -> list[RawOrganization]:
-
     return (
         session.query(RawOrganization)
-        .filter(RawOrganization.legislative_year == leg_year,
-                RawOrganization.last_update == True)
+        .filter(
+            RawOrganization.legislative_year == leg_year,
+            RawOrganization.last_update == True,
+        )
         .all()
     )
+
 
 def mark_raw_organization_processed(session: Session, id: int) -> bool:
     """
@@ -66,13 +72,21 @@ def mark_raw_organization_processed(session: Session, id: int) -> bool:
     session.commit()
     return True
 
+
 ########################################
 # Organizations CRUD Operations
 ########################################
 
-def get_organization_by_name_year(session: Session, org_name: str, year: str) -> Organization | None:
-    
-    return session.query(Organization).filter(Organization.org_name == org_name, Organization.leg_year == year).first()
+
+def get_organization_by_name_year(
+    session: Session, org_name: str, year: str
+) -> Organization | None:
+    return (
+        session.query(Organization)
+        .filter(Organization.org_name == org_name, Organization.leg_year == year)
+        .first()
+    )
+
 
 def bulk_load_organizations(
     db: Session, orgs_lst: list[OrgSchema]
@@ -83,9 +97,9 @@ def bulk_load_organizations(
 
         existing_orgs_map = {
             (o.leg_period, o.leg_year, o.org_name, o.org_type): o
-            for o in db.query(Organization).filter(
-                 Organization.org_name.in_([c.org_name for c in orgs_lst])
-            ).all()
+            for o in db.query(Organization)
+            .filter(Organization.org_name.in_([c.org_name for c in orgs_lst]))
+            .all()
         }
 
         to_insert = []

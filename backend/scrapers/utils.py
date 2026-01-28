@@ -159,10 +159,12 @@ def get_url(
         logger.warning(f"Request error for {url}: {e}")
         return None
 
+
 def get_cong_website(profile_content: str) -> str | None:
     parse = fromstring(profile_content)
     website = parse.xpath('//*[@class="web"]/span[2]/a/@href')
     return website[0] if website else None
+
 
 def get_url_text(url: str, data: str | None = None) -> str | None:
     try:

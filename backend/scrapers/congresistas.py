@@ -15,7 +15,7 @@ from backend.scrapers.utils import (
     parse_url,
     get_url_text,
     normalize_text,
-    get_cong_website
+    get_cong_website,
 )
 
 BASE_URL = "https://www.congreso.gob.pe/pleno/congresistas/"

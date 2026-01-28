@@ -6,13 +6,13 @@ from backend import find_leg_period, normalize_membership_role
 from lxml.html import fromstring
 from datetime import datetime
 
-def process_committee(raw_comm: RawCommittee) -> list[Organization]:
 
+def process_committee(raw_comm: RawCommittee) -> list[Organization]:
     final_lst = []
     html = fromstring(raw_comm.raw_html)
 
     raw_lst = html.xpath('//*[@class="congresistas"]/tbody/tr')
-    
+
     for comm in raw_lst:
         name_elem, content = comm.getchildren()
 
@@ -25,29 +25,32 @@ def process_committee(raw_comm: RawCommittee) -> list[Organization]:
 
             final_lst.append(
                 Organization(
-                    leg_period = find_leg_period(raw_comm.legislative_year),
-                    leg_year = raw_comm.legislative_year,
-                    org_name = name_comm,
-                    org_type = "Comisión",
-                    comm_type = type_comm,
-                    org_link = link,
+                    leg_period=find_leg_period(raw_comm.legislative_year),
+                    leg_year=raw_comm.legislative_year,
+                    org_name=name_comm,
+                    org_type="Comisión",
+                    comm_type=type_comm,
+                    org_link=link,
                 )
             )
 
     return final_lst
 
+
 def process_org(raw_org: RawOrganization) -> Organization:
     return Organization(
-        leg_period = find_leg_period(raw_org.legislative_year),
-        leg_year = raw_org.legislative_year,
-        org_name = raw_org.type_org,
-        org_type = raw_org.type_org,
-        comm_type= None,
-        org_link = raw_org.org_link
+        leg_period=find_leg_period(raw_org.legislative_year),
+        leg_year=raw_org.legislative_year,
+        org_name=raw_org.type_org,
+        org_type=raw_org.type_org,
+        comm_type=None,
+        org_link=raw_org.org_link,
     )
 
-def process_org_membership(raw_org: RawOrganization, org: Organization) -> list[Membership]:
 
+def process_org_membership(
+    raw_org: RawOrganization, org: Organization
+) -> list[Membership]:
     final_lst = []
     html = fromstring(raw_org.raw_html)
 
@@ -58,15 +61,17 @@ def process_org_membership(raw_org: RawOrganization, org: Organization) -> list[
 
         year = int(org.leg_year)
 
-        final_lst.append(Membership(
-            role = normalize_membership_role(cargo.text),
-            nombre = name.text_content(),
-            leg_period=org.leg_period,
-            org_name = org.org_name,
-            org_type = org.org_type,
-            comm_type = org.comm_type,
-            start_date = datetime(year, 7, 28, 0, 0, 0),
-            end_date = datetime(year + 1, 7, 28, 0, 0, 0)
-            ))
+        final_lst.append(
+            Membership(
+                role=normalize_membership_role(cargo.text),
+                nombre=name.text_content(),
+                leg_period=org.leg_period,
+                org_name=org.org_name,
+                org_type=org.org_type,
+                comm_type=org.comm_type,
+                start_date=datetime(year, 7, 28, 0, 0, 0),
+                end_date=datetime(year + 1, 7, 28, 0, 0, 0),
+            )
+        )
 
     return final_lst

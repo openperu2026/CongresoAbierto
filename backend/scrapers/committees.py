@@ -8,7 +8,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    TimeoutException,
+    WebDriverException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
@@ -35,17 +39,27 @@ class RawCommitteeScraper:
         self.url = BASE_URL
         self.Session = sessionmaker(bind=self.engine)
 
-    def _select_year(self, driver: webdriver.Chrome, wait: WebDriverWait, year_value: str) -> None:
+    def _select_year(
+        self, driver: webdriver.Chrome, wait: WebDriverWait, year_value: str
+    ) -> None:
         wait.until(EC.presence_of_element_located((By.NAME, "idRegistroPadre")))
-        Select(driver.find_element(By.NAME, "idRegistroPadre")).select_by_value(year_value)
+        Select(driver.find_element(By.NAME, "idRegistroPadre")).select_by_value(
+            year_value
+        )
         wait.until(
-            lambda d: Select(d.find_element(By.NAME, "idRegistroPadre"))
-            .first_selected_option.get_attribute("value") == year_value
+            lambda d: Select(
+                d.find_element(By.NAME, "idRegistroPadre")
+            ).first_selected_option.get_attribute("value")
+            == year_value
         )
 
-    def _get_committee_options_current_page(self, driver: webdriver.Chrome, wait: WebDriverWait) -> dict[str, str]:
+    def _get_committee_options_current_page(
+        self, driver: webdriver.Chrome, wait: WebDriverWait
+    ) -> dict[str, str]:
         wait.until(EC.presence_of_element_located((By.NAME, "fld_78_Comision")))
-        opts = driver.find_elements(By.CSS_SELECTOR, 'select[name="fld_78_Comision"] option')
+        opts = driver.find_elements(
+            By.CSS_SELECTOR, 'select[name="fld_78_Comision"] option'
+        )
 
         out: dict[str, str] = {}
         for opt in opts:
@@ -54,7 +68,6 @@ class RawCommitteeScraper:
             if txt and val:
                 out[txt] = val
         return out
-
 
     def get_options(
         self,
@@ -86,7 +99,7 @@ class RawCommitteeScraper:
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
         # Key: don't wait for every resource to load
-        options.page_load_strategy = "eager"   # consider "none" if needed
+        options.page_load_strategy = "eager"  # consider "none" if needed
 
         service = Service(log_path=os.devnull)
         driver = webdriver.Chrome(service=service, options=options)
@@ -98,8 +111,14 @@ class RawCommitteeScraper:
 
         return driver
 
-
-    def _safe_get(self, driver: webdriver.Chrome, url: str, *, retries: int = 2, sleep_s: float = 2.0) -> None:
+    def _safe_get(
+        self,
+        driver: webdriver.Chrome,
+        url: str,
+        *,
+        retries: int = 2,
+        sleep_s: float = 2.0,
+    ) -> None:
         for attempt in range(retries + 1):
             try:
                 driver.get(url)
@@ -113,14 +132,14 @@ class RawCommitteeScraper:
 
                 if attempt == retries:
                     raise
-                time.sleep(sleep_s)    
-    
+                time.sleep(sleep_s)
+
     def get_html_with_selections(
-        self, 
+        self,
         driver: webdriver.Chrome,
-        wait: WebDriverWait, 
-        year_value: str, 
-        committee_value: str
+        wait: WebDriverWait,
+        year_value: str,
+        committee_value: str,
     ) -> str | None:
         try:
             self._select_year(driver, wait, year_value)
@@ -129,11 +148,15 @@ class RawCommitteeScraper:
             before = driver.page_source
 
             wait.until(EC.presence_of_element_located((By.NAME, "fld_78_Comision")))
-            Select(driver.find_element(By.NAME, "fld_78_Comision")).select_by_value(committee_value)
+            Select(driver.find_element(By.NAME, "fld_78_Comision")).select_by_value(
+                committee_value
+            )
 
             wait.until(
-                lambda d: Select(d.find_element(By.NAME, "fld_78_Comision"))
-                .first_selected_option.get_attribute("value") == committee_value
+                lambda d: Select(
+                    d.find_element(By.NAME, "fld_78_Comision")
+                ).first_selected_option.get_attribute("value")
+                == committee_value
             )
 
             # best-effort: wait for page_source to change
@@ -142,13 +165,19 @@ class RawCommitteeScraper:
             return driver.page_source
 
         except TimeoutException as e:
-            logger.warning(f"Selenium timeout (year={year_value}, committee={committee_value}): {e}")
+            logger.warning(
+                f"Selenium timeout (year={year_value}, committee={committee_value}): {e}"
+            )
             return None
         except NoSuchElementException as e:
-            logger.error(f"Element not found (year={year_value}, committee={committee_value}): {e}")
+            logger.error(
+                f"Element not found (year={year_value}, committee={committee_value}): {e}"
+            )
             return None
         except WebDriverException as e:
-            logger.error(f"WebDriver error (year={year_value}, committee={committee_value}): {e}")
+            logger.error(
+                f"WebDriver error (year={year_value}, committee={committee_value}): {e}"
+            )
             return None
 
     def get_raw_committees(self) -> None:
@@ -172,13 +201,17 @@ class RawCommitteeScraper:
                 self._select_year(driver, wait, year_value)
 
                 # committee options depend on year, so read them now
-                committees_for_year = self._get_committee_options_current_page(driver, wait)
+                committees_for_year = self._get_committee_options_current_page(
+                    driver, wait
+                )
                 if not committees_for_year:
                     logger.warning(f"No committee options found for year {year_label}")
                     continue
 
                 for committee_label, committee_value in committees_for_year.items():
-                    logger.info(f"Scraping committee year={year_label}, type={committee_label}")
+                    logger.info(
+                        f"Scraping committee year={year_label}, type={committee_label}"
+                    )
 
                     html = self.get_html_with_selections(
                         driver=driver,
@@ -206,8 +239,9 @@ class RawCommitteeScraper:
                     pass
 
         self.committee_list = final_lst
-        logger.success(f"Successfully extracted {len(self.committee_list)} raw html committees")
-
+        logger.success(
+            f"Successfully extracted {len(self.committee_list)} raw html committees"
+        )
 
     def update_tracking(self, committee: RawCommittee) -> RawCommittee:
         """Update the tracking columns of a RawCommittee object"""

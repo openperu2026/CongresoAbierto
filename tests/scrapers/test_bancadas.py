@@ -160,7 +160,9 @@ def test_get_html_with_selections_handles_no_such_element(monkeypatch):
 
 
 class _DummyRawBancada:
-    def __init__(self, timestamp, legislative_period, raw_html, last_update, changed, processed):
+    def __init__(
+        self, timestamp, legislative_period, raw_html, last_update, changed, processed
+    ):
         self.timestamp = timestamp
         self.legislative_period = legislative_period
         self.raw_html = raw_html
@@ -191,10 +193,13 @@ def test_get_raw_bancadas_only_current(monkeypatch):
     # Patch instance method get_options
     scraper = RawBancadaScraper()
     monkeypatch.setattr(scraper, "get_options", fake_get_options)
-    monkeypatch.setattr(scraper, "get_html_with_selections",
-                        lambda url, period, cond: f"<html>{period}-{cond}</html>")
+    monkeypatch.setattr(
+        scraper,
+        "get_html_with_selections",
+        lambda url, period, cond: f"<html>{period}-{cond}</html>",
+    )
     monkeypatch.setattr(scraper, "update_tracking", lambda b: b)
-    
+
     # Patch get_html_with_selections to avoid Selenium
     monkeypatch.setattr(
         scraper,

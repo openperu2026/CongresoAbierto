@@ -28,7 +28,7 @@ from backend.database.models import (
     RoleOrganization,
     TypeCommittee,
     VoteResult,
-    MajorityType
+    MajorityType,
 )
 
 
@@ -51,8 +51,8 @@ def test_create_organization(session):
         leg_year=LegislativeYear.YEAR_2021_2022,
         org_name="Congreso del Perú",
         org_type=TypeOrganization.COMISON,
-        comm_type = TypeCommittee.COM_ETICA,
-        org_link = "www.congreso.gob.pe/comision"
+        comm_type=TypeCommittee.COM_ETICA,
+        org_link="www.congreso.gob.pe/comision",
     )
     session.add(org)
     session.commit()
@@ -102,8 +102,8 @@ def test_create_vote_event_and_vote(session):
         bill_or_motion="Bill",
         bill_motion_id="B001",
         date=datetime.now(),
-        result= VoteResult.APPROVED,
-        majority_type = MajorityType.SIMPLE
+        result=VoteResult.APPROVED,
+        majority_type=MajorityType.SIMPLE,
     )
     session.add(vote_event)
     vote = Vote(vote_event_id="VOT123", voter_id=1, option=VoteOption.SI, bancada_id=10)
@@ -113,11 +113,7 @@ def test_create_vote_event_and_vote(session):
 
 
 def test_attendance(session):
-    attendance = Attendance(
-        event_id=1, 
-        attendee_id=1, 
-        status=AttendanceStatus.PRESENTE
-    )
+    attendance = Attendance(event_id=1, attendee_id=1, status=AttendanceStatus.PRESENTE)
     session.add(attendance)
     session.commit()
     assert attendance.status == AttendanceStatus.PRESENTE
@@ -152,7 +148,9 @@ def test_membership_validation(session):
 
 def test_unique_vote_constraint(session):
     v1 = Vote(vote_event_id="VOT123", voter_id="1", option=VoteOption.NO, bancada_id=10)
-    v2 = Vote(vote_event_id="VOT123", voter_id="1", option=VoteOption.SI, bancada_id=10)  # same unique key
+    v2 = Vote(
+        vote_event_id="VOT123", voter_id="1", option=VoteOption.SI, bancada_id=10
+    )  # same unique key
 
     session.add_all([v1, v2])
 
@@ -177,8 +175,8 @@ def test_bill_committees(session):
         leg_year=LegislativeYear.YEAR_2021_2022,
         org_name="Congreso del Perú",
         org_type=TypeOrganization.COMISON,
-        comm_type = TypeCommittee.COM_ETICA,
-        org_link = "www.congreso.gob.pe/comision"
+        comm_type=TypeCommittee.COM_ETICA,
+        org_link="www.congreso.gob.pe/comision",
     )
     session.add(committee)
     session.commit()
