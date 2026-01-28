@@ -154,8 +154,9 @@ def test_add_motions_to_db_handles_sqlalchemy_error(monkeypatch):
 # ---------- scrape_motion ----------
 
 
-def test_scrape_motion_appends_raw_motion(monkeypatch):
+def test_scrape_motion_appends_raw_motion(monkeypatch, raw_session):
     scraper = RawMotionScraper()
+    scraper.session = raw_session
 
     def fake_get_url_text(url):
         # validate URL
