@@ -1,25 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from .schema import Vote
-from .schema import VoteEvent
 import pytesseract
-import os
 import fitz
 from io import BytesIO
-import httpx
 from PIL import Image
 import numpy as np
 import cv2
 from jellyfish import jaro_winkler_similarity as jws
-from .. import PARTIES #VOTE_RESULTS VOTE RESULTS IS NOT IN THE MAIN
 import re
-import pytesseract
-from pathlib import Path
-import json
 
-from datetime import datetime
 import unicodedata
-import re
 
 
 pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
@@ -465,8 +455,6 @@ def format_jsn(congresistas):
 
 #############################
 
-import re
-from collections import Counter
 
 # --- Patterns (based on yours) ---
 SI_NO_PATTERN = re.compile(r"^(?:S[IÍ]\s*[\+\d]{0,4}|N[OÓ]\s*[-=\d]{0,4})$", re.IGNORECASE)
