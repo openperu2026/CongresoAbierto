@@ -1,4 +1,7 @@
-from backend.process.schema import Vote
+# -*- coding: utf-8 -*-
+
+from .schema import Vote
+from .schema import VoteEvent
 import pytesseract
 import os
 import fitz
@@ -8,159 +11,538 @@ from PIL import Image
 import numpy as np
 import cv2
 from jellyfish import jaro_winkler_similarity as jws
-from backend import PARTIES, VOTE_RESULTS
+from .. import PARTIES #VOTE_RESULTS VOTE RESULTS IS NOT IN THE MAIN
+import re
+import pytesseract
+from pathlib import Path
+import json
+
+from datetime import datetime
+import unicodedata
 import re
 
-TESSERACT_PATH = os.environ.get("TESSERACT_PATH")
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+
+pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
+
 
 
 def extract_text_from_page(page):
-    """
+    '''
     Extract text from a single PDF page using Tesseract OCR.
     Args:
-        page: A PyMuPDF page object.
-    """
-    pix = page.get_pixmap(dpi=300)
-    img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
-        pix.height, pix.width, pix.n
-    )
+        page: page of aA PyMuPDF page object. For example if PyMuPDF is doc. The page will be doc[0]
+    Returns:
+        str: Extracted text from the page.
+     '''
+    pix = page.get_pixmap(dpi = 300)
+    img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 180, 255, cv2.TRHES_BINARY)
+    _, thresh = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
     pil_img = Image.fromarray(thresh)
-    text = pytesseract.image_to_string(pil_img, lang="spa", config="--psm 6")
+    text = pytesseract.image_to_string(pil_img, lang = 'spa', config='--psm 6')
+    print('hello there')
     return text
 
+#If there is more pages we have to find the page with the votes.
 
-def render_pdf(pdf_url: str) -> str:
+
+def render_bill(pdf_path: str):
     """
-    Extract text from a PDF file using PyMuPDF and Tesseract OCR.
+    Extract text from a PDF file of a BILL using PyMuPDF and Tesseract OCR.
+    Args:
+        pdf_url (str): URL of the PDF file to be processed.
+        Note: Should consider using a pdf object as an argument instead of a URL. TO DISCUSS
+
+    Returns:
+        tuple: A tuple containing the attendance text and the votes text.
+
+    Assume that in the PDF the first two pages are:
+    - The first page contains the attendance information.
+    - The second page contains the votes information. (third)
+    If the PDF has a different structure, this function may need to be adjusted.
     """
-    response = httpx.get(pdf_url)
-    response.raise_for_status()  # Ensure we raise an error for bad responses
-    pdf_file = BytesIO(response.content)
+    #response = httpx.get(pdf_url)
+    #response.raise_for_status()  # Ensure we raise an error for bad responses
+    #pdf_file = BytesIO(response.content)
 
-    with fitz.open(pdf_file) as pdf:
-        if len(pdf) == 2:
-            # If the PDF has two pages, we assume that the first page is the attendance
-            # and the second page is the votes.
-            attendance_page = pdf[0]
-            votes_page = pdf[1]
 
-            attendance_text = extract_text_from_page(attendance_page)
-            votes_text = extract_text_from_page(votes_page)
+    with open(pdf_path, "rb") as f:
+        pdf_file = BytesIO(f.read())
+
+    with fitz.open(stream=pdf_file, filetype="pdf") as pdf:
+        attendance_page = pdf[0]
+        votes_page = pdf[2]
+        attendance_text = extract_text_from_page(attendance_page)
+        votes_text = extract_text_from_page(votes_page)
 
     return attendance_text, votes_text
 
 
-def extract_bancadas():
-    """ """
-    pass
+    #return attendance_text, votes_text
 
 
-def extract_text(text: str, initial: str = None, final: str = None) -> str:
-    """
-    Extracts the text between an specified initial and final texts. The initial
-    or the final text could be optional, but not both
+def extract_information(text: str, type=True) -> dict:
+    """Extracts attendance and botes from a bill voting."""
 
-    Args:
-        - text: original text
-        - initial: initial part of the text to start
-        - final: final part of the text to stop the extraction
-    """
-    assert initial or final, "Must specify either initial or final text"
 
-    if initial and final:
-        pattern = re.compile(f"{re.escape(initial)}(.*?){re.escape(final)}", re.DOTALL)
-    elif initial and not final:
-        pattern = re.compile(f"({re.escape(initial)})(.*)", re.DOTALL)
+    fecha_match = re.search(r'[Ff]echa[:\s]*([\d/]+)', text)
+    hora_match = re.search(r'[Hh]ora[:\s]*([\d:\samp]+)', text)
+
+    fecha = fecha_match.group(1) if fecha_match else "No found"
+    hora = hora_match.group(1) if hora_match else "No found"
+
+    if type==True:
+        #Attendance
+        estado_pattern = r"(?<![A-ZÁÉÍÓÚÑ])\s*(AUS|PRE|LE|LO|LP)\s*(?![A-ZÁÉÍÓÚÑ])"
+         # Regex
+        fila_pattern = re.compile(
+            rf"([A-ZÁÉÍÓÚÑ]{{2,5}})\s+([A-ZÁÉÍÓÚÑ ,.'-]+?)\s+{estado_pattern}",
+            re.IGNORECASE
+        )
+
     else:
-        pattern = re.compile(f"(.*?){re.escape(final)}", re.DOTALL)
-    result = re.search(pattern, text)
+        bancada = r"([A-ZÁÉÍÓÚÑ]{2,5})"
+        nombre  = r"([A-ZÁÉÍÓÚÑ ,.'-]+?)"
+        si_no_pattern = r"(?:S[IÍ]\s*[\+\d]{1,4}|N[OÓ]\s*[-=\d]{1,4})"
+        isolated =  r"(?<![A-ZÁÉÍÓÚÑ])(?:AUS|US|PRE|LE|LO|LP|ABST\.|SINRES|SINRRES|TT|TTT)(?![A-ZÁÉÍÓÚÑ])"
+        star_pattern = r"(?:\*{1,4})"
+        estado = rf"({si_no_pattern}|{isolated}|{star_pattern})"
 
-    if not final:
-        return result.group(2)
-    else:
-        return result.group(1)
+        fila_pattern = re.compile(
+            rf"{bancada}\s+{nombre}\s+{estado}",
+            re.IGNORECASE
+        )
+
+    resultados = []
+
+    # For Lines
+    for line in text.splitlines():
+        line = line.replace("5", "S").replace("0", "O")
+        line_upper = line.upper()
+
+        matches = fila_pattern.findall(line_upper)
+    
+        # For everymatch
+        for bancada, nombre, estado in matches:
+            resultados.append({
+                "bancada": bancada.strip().upper(),
+                "nombre": nombre.strip().title(),
+                "estado": estado.upper()
+            })
+
+    #Final Result
+    return {
+        "fecha": fecha,
+        "hora": hora,
+        "resultados": resultados
+
+ 
+    }
 
 
-def find_bill(pdf_file: BytesIO, bill_desc: str) -> str:
+def normalize_text(text: str) -> str:
     """
-    Extract the vote pages associated with a specific bill from the daily parliament
-    agenda.
+    Collapses all whitespace (newlines, tabs, multiple spaces) into single spaces.
     """
-    bill_page = 0
-    max_jws = 0
-
-    with fitz.open(pdf_file) as pdf:
-        for i, page in enumerate(pdf):
-            if i % 2 == 0:
-                text_page = extract_text_from_page(page)
-                asunto = extract_text(text_page, "Asunto:", "\nAPP")
-                similarity = jws(asunto, bill_desc)
-                if similarity > max_jws:
-                    max_jws = similarity
-                    bill_page = i
-        return pdf[bill_page - 1 : bill_page + 1]
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def text_to_votes(vote_page: str, bill_id: int) -> list[Vote]:
+def extract_congressmen(text: str) -> list[str]:
     """
-    Convert extracted text to a list of Vote objects.
+    Extracts congressmen names from attendance/vote records,
+    handling multiline text and final 'y Name' cases.
     """
-    vote_page = vote_page.replace("\n", " ")
+    text = normalize_text(text)
 
-    sorted_parties = sorted(PARTIES, key=len, reverse=True)
-    pattern = r"(?=" + "|".join(re.escape(party) for party in sorted_parties) + r")"
+    pattern = (
+        #r"deja constancia de la (?:asistencia| voto a favor) de los\s+congresistas\s+"
+        r"deja constancia del voto a favor de los\s+congresistas\s+"
+        r"(.+?)\."
+    )
 
-    politician_list = re.split(pattern, vote_page)
+    match = re.search(pattern, text, flags=re.IGNORECASE)
 
-    string_list = []
+    if not match:
+        return []
 
-    for string in politician_list:
-        if string[:4] or string[:5] in sorted_parties:
-            string_list.append(string[1:])
+    names_block = match.group(1)
 
-    string_list = string_list[1:131]
+    # Replace " y " with comma for consistent splitting
+    names_block = re.sub(r"\s+y\s+", ", ", names_block, flags=re.IGNORECASE)
 
-    # string_list[129] = string_list[129].split("¿")[0].strip()
+    # Split and clean
+    names = [
+        name.strip()
+        for name in names_block.split(",")
+        if name.strip()
+    ]
 
-    vote_list = []
-    for politician_vote in string_list:
-        vote_as_list = re.split(", | ", politician_vote)
+    return names
 
-        # Extracting the party
-        party = vote_as_list[0]
 
-        # Extracting politician name
-        potential_name = vote_as_list[1:5]
 
-        # Condition to deal with politicians without middle name
-        if len(potential_name[3]) > 3:
-            first = potential_name[:2]
-            last = potential_name[2:]
-            return_name = last + first
-            politician_name = " ".join(return_name)
+def name_swap(lst):
+    att=[]
+    for x in lst:
+        x2 = x.copy()
+
+        if "nombre" not in x2:
+            x2["nombre"] = "NO_NAME"
+
+        if "apellido" not in x2:
+            x2["apellido"] = "NO_NAME"
+
+        #x2["nombre_completo"] = f'{x2["nombre"]} {x2["nombre"]}'.strip()
+
+        att.append(x2)
+    
+
+
+    lst_2=att.copy()
+    for congresista in lst_2:
+        if congresista["votacion"]==None:
+            congresista["nombre_completo"]=congresista["apellido"]+ " "+ congresista["nombre"]
+    return lst_2
+
+
+
+def run_exceptions(lst_attendance):
+    for x in lst_attendance:
+        if "apellido" in x:
+            if x["apellido"]=="Echaíz De Núñez Izaga":
+                print("there is exceptions")
+
+                x["apellido"]="Echaíz Ramos vda de Núñez"
+    return lst_attendance
+
+
+def swap_names(lst_congress):
+    
+    lst_2=lst_congress.copy()
+    for congresista in lst_2:
+        if congresista["nombre_completo"]==congresista["nombre"]+ " "+ congresista["apellido"]:   
+            print("from first-last to last-first")
+            congresista["nombre_completo"]=congresista["apellido"]+ " "+ congresista["nombre"]
+        elif congresista["nombre_completo"]==congresista["apellido"]+ " "+ congresista["nombre"]:
+            print("from last-dirst to first-last")
+            congresista["nombre_completo"]=congresista["nombre"]+ " "+ congresista["apellido"]
         else:
-            first = potential_name[:2]
-            last = [potential_name[2]]
-            return_name = last + first
-            politician_name = " ".join(return_name)
+            print("no swap to perform")
+    return lst_2
 
-        # Extracting vote
-        for entry in vote_as_list[4:]:
-            if entry in VOTE_RESULTS:
-                option = entry
-                break
 
-        # vote_list.append(Vote(
-        #     vote_event_id,
-        #     voter_id,
-        #     option,
-        #     bancada_id
-        # ))
+def no_comma_readed(lst_attendance):
+    result = []
 
-        # vote_event = VoteEvent(
-        #     "Peruvian Parliament",
-        #     ""
-        # )
+    for x in lst_attendance:
+        x2 = x.copy()
+        if "nombre" in x2 and "apellido" not in x2:
+            x2["nombre_completo"] = x2["nombre"]
+        result.append(x2)
+
+    return result
+
+
+#'apellido': 'Echaíz Ramos vda de Núñez',
+#"apellido": "Echaíz De Núñez Izaga"
+
+
+###### el cambio se le hace en la fuente.
+#### luego de eso debe de haber una funcion para volverlo a usual
+
+
+def extraction_first_second(congresistas):
+    result = []
+
+    for c in congresistas:
+        c_new = c.copy()  # copy each dict
+
+        nombre = c_new.get("nombre")
+        if isinstance(nombre, str) and "," in nombre:
+            last_name, first_name = nombre.split(",", 1)
+            first_name = first_name.strip()
+            last_name = last_name.strip()
+
+            c_new["nombre"] = first_name
+            c_new["apellido"] = last_name
+            c_new["nombre_completo"] = f"{first_name} {last_name}"
+
+        result.append(c_new)
+
+    return result
+
+
+
+
+def matching_lists(lst_congres, lst_attendance, threshold=0.90):
+    """
+    Match congresistas to attendance/vote rows using Jaro-Winkler similarity
+    on nombre_completo. Enforces one-to-one matching (no reuse) and picks the
+    best match (highest score), not the first match.
+    """
+
+    # Ensure every attendance row has nombre_completo
+    att = []
+    for x in lst_attendance:
+        x2 = x.copy()
+        if "nombre_completo" not in x2 or not isinstance(x2["nombre_completo"], str):
+            x2["nombre_completo"] = "NO_NAME"
+        att.append(x2)
+
+    # Sort (optional, mostly for reproducibility)
+    sorted_congres = sorted(lst_congres, key=lambda x: x.get("nombre_completo", ""))
+    sorted_attendance = sorted(att, key=lambda x: x.get("nombre_completo", ""))
+
+    used = set()  # indices in sorted_attendance already matched
+
+    for congresista in sorted_congres:
+        # Only fill if still missing
+        if congresista.get("votacion") is not None:
+            continue
+
+        best_i = None
+        best_score = -1.0
+
+        c_name = congresista.get("nombre_completo") or ""
+        if not isinstance(c_name, str) or not c_name.strip():
+            continue
+
+        # Find best unused match
+        for i, row in enumerate(sorted_attendance):
+            if i in used:
+                continue
+            r_name = row.get("nombre_completo") or ""
+            if not isinstance(r_name, str) or not r_name.strip():
+                continue
+
+            score = jws(c_name, r_name)
+            if score > best_score:
+                best_score = score
+                best_i = i
+
+        # Assign if above threshold
+        if best_i is not None and best_score >= threshold:
+            congresista["votacion"] = sorted_attendance[best_i].get("estado")
+            used.add(best_i)
+        else:
+            congresista["votacion"] = None
+
+    return sorted_congres
+
+
+
+#def matching_lists(lst_congres, lst_attendance):
+    #swap_attendance = name_swap(lst_attendance)
+#    att = []
+
+#    for x in lst_attendance:
+#        x2 = x.copy()
+#        if "nombre_completo" not in x2:
+#            x2["nombre_completo"] = "NO_NAME"
+#            att.append(x2)
+#        else:
+#            att.append(x2)
+    
+#    sorted_congres = sorted(lst_congres, key=lambda x: x["nombre_completo"])
+#    sorted_attendance = sorted(att, key=lambda x: x["nombre_completo"])
+#    
+    
+
+#    for congresista in sorted_congres:
+#        counter = 0
+#        while (
+#            counter < len(sorted_attendance)
+#            and jws(congresista["nombre_completo"], sorted_attendance[counter]["nombre_completo"]) < 0.9
+#            and congresista["votacion"]==None
+#        ):
+#            counter += 1
+
+#        if counter < len(sorted_attendance):
+#            congresista["votacion"] = sorted_attendance[counter]["estado"]
+#        else:
+#            congresista["votacion"] = None  # no match found
+
+#    return sorted_congres
+
+
+
+def matching_last_name(lst_congres, lst_attendance):
+    
+    att = []
+
+    for x in lst_attendance:
+        x2 = x.copy()
+        if "apellido" not in x2:
+            x2["apellido"] = "NO_NAME"
+            att.append(x2)
+        else:
+            att.append(x2)
+    
+    
+    
+    sorted_congres = sorted(lst_congres, key=lambda x: x["apellido"])
+    sorted_attendance = sorted(att, key=lambda x: x["apellido"])
+    
+      
+
+    for congresista in sorted_congres:
+        if congresista["votacion"] == None:
+            ###Solo para los que aun no ha hecho match
+            ###Que pasa si los hermanos aun no han hecho match?
+            
+            counter = 0
+            while (
+                counter < len(sorted_attendance)
+                and jws(congresista["apellido"], sorted_attendance[counter]["apellido"]) < 0.950
+            ):
+                counter += 1
+
+            if counter < len(sorted_attendance):
+                congresista["votacion"] = sorted_attendance[counter]["estado"]
+            else:
+                congresista["votacion"] = None  # no match found
+
+    return sorted_congres
+
+
+######AUXILIAR FUNCTIONS FOR TESTING PURPOSES#####
+
+def count_votes(lst, key):
+    """
+    Counts the votes from the extracted text.
+    Args:
+        dict (dict): The dictionary containing the attendance and votes information.
+    Returns:
+        dict: A dictionary with the counts of each vote option.
+    """
+    conteo = {}
+
+    for fila in lst:
+        estado = fila.get(key)
+
+        estado = estado.strip() if isinstance(estado, str) else "SIN_VOTO"
+
+        conteo[estado] = conteo.get(estado, 0) + 1
+
+    return conteo
+
+
+
+
+
+def salute():
+    """
+    A simple function to print a greeting message, for testing purposes.
+    """
+    print('Hola Musnda')
+
+def format_jsn(congresistas):
+    #base = Path(base_dir) if base_dir else (Path(__file__).parent if "__file__" in globals() else Path.cwd())
+    #data_path = base / "data" / "congresistas.json"
+
+    #with data_path.open(encoding="utf-8") as f:
+    #   congresistas = json.load(f)
+    #print(f"Loaded {len(congresistas)} congresistas")
+
+    list_congreso=[]
+    #for dict in congresistas["Parlamentario 2021 - 2026"]:
+    for dict in congresistas:
+        dict_congresista={}
+        dict_congresista["id"]=dict["id"]
+        dict_congresista["nombre"]=dict["nombre"]
+        dict_congresista["apellido"]=dict["apellido"]
+        dict_congresista["nombre_completo"]=dict["nombre"] + " " + dict["apellido"]
+        dict_congresista["partido"] = dict["party_name"]
+        dict_congresista["bancada"]= dict["bancada_name"]
+        dict_congresista["condicion"]= dict["condicion"]
+        dict_congresista["votacion"]= None
+
+        list_congreso.append(dict_congresista)
+    
+    return list_congreso
+
+
+
+#############################
+
+import re
+from collections import Counter
+
+# --- Patterns (based on yours) ---
+SI_NO_PATTERN = re.compile(r"^(?:S[IÍ]\s*[\+\d]{0,4}|N[OÓ]\s*[-=\d]{0,4})$", re.IGNORECASE)
+
+ABST_PATTERN = re.compile(r"^ABST\.?$", re.IGNORECASE)
+
+AUS_PATTERN = re.compile(r"^(?:AUS|US)$", re.IGNORECASE)
+
+# Everything else you listed as "isolated" that isn't SI/NO/ABST/AUS.
+OTHER_ISOLATED_PATTERN = re.compile(
+    r"^(?:PRE|LE|LO|LP|SINRES|SINRRES|TT|TTT)$",
+    re.IGNORECASE
+)
+
+STAR_PATTERN = re.compile(r"^\*{1,4}$")
+
+
+def categorize_estado(estado: str) -> str:
+    """
+    Map raw OCR estado strings (e.g., 'SI +++', 'NO ---', 'ABST.', 'AUS', '*')
+    into: SI, NO, ABST, AUS, OTROS
+    """
+    if not isinstance(estado, str):
+        return "OTROS"
+
+    e = estado.strip().upper()
+    e = re.sub(r"\s+", " ", e)  # normalize spaces
+
+    # SI / NO
+    if SI_NO_PATTERN.match(e):
+        return "SI" if e.startswith("SI") or e.startswith("SÍ") else "NO"
+
+    # ABST
+    if ABST_PATTERN.match(e):
+        return "ABST"
+
+    # AUS (or US)
+    if AUS_PATTERN.match(e):
+        return "AUS"
+
+    # Other isolated tokens or stars -> OTROS
+    if OTHER_ISOLATED_PATTERN.match(e) or STAR_PATTERN.match(e):
+        return "OTROS"
+
+    return "OTROS"
+
+
+def normalize_votes_in_place(congresistas: list[dict], key: str = "votacion"):
+    """
+    Replace raw vote strings (e.g. 'SI +++', 'NO ---') with
+    normalized categories: SI, NO, ABST, AUS, OTROS.
+
+    Modifies the list IN PLACE and also returns it.
+    """
+    for c in congresistas:
+        raw = c.get(key)
+
+        if raw is None:
+            c[key] = None
+        else:
+            c[key] = categorize_estado(raw)
+
+    return congresistas
+
+
+
+
+
+
+def normalize_text(s: str) -> str:
+    if not s:
+        return ""
+
+    s = s.upper()
+    s = unicodedata.normalize("NFD", s)
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    s = re.sub(r"\s+", " ", s)
+
+    return s.strip()
