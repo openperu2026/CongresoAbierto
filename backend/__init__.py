@@ -103,6 +103,24 @@ class MotionType(str, Enum):
     OTRAS = "Otras"
 
 
+def parse_motion_type(value: str) -> MotionType:
+    if value is None:
+        raise ValueError("motion_type cannot be null")
+
+    v = " ".join(value.strip().split())
+
+    # Direct match for scalar enum values.
+    for item in MotionType:
+        if isinstance(item.value, str) and item.value == v:
+            return item
+
+    # Handle the multi-value case for COMISION_INVESTIGADORA.
+    if v in MotionType.COMISION_INVESTIGADORA.value:
+        return MotionType.COMISION_INVESTIGADORA
+
+    raise ValueError(f"Unknown motion_type: {value!r}")
+
+
 class MotionStepType(str, Enum):
     UNKNOWN = "unknown"
 
@@ -345,6 +363,28 @@ class Proponents(str, Enum):
     GOLOS = "Gobiernos Locales"
 
 
+def parse_proponent(value: str) -> Proponents:
+    if value is None:
+        raise ValueError("proponent cannot be null")
+
+    v = " ".join(value.strip().split())
+
+    try:
+        return Proponents(v)
+    except ValueError:
+        pass
+
+    # Handle suffixes like "Congreso-Actualización"
+    if "-" in v:
+        head = v.split("-", 1)[0].strip()
+        try:
+            return Proponents(head)
+        except ValueError:
+            pass
+
+    raise ValueError(f"Unknown proponent: {value!r}")
+
+
 class LegPeriod(str, Enum):
     PERIODO_2026_2031 = "2026-2031"
     PERIODO_2021_2026 = "2021-2026"
@@ -391,6 +431,8 @@ LEG_PERIOD_ALIASES = {
     "CCD 1992 -1995": "1992-1995",
     "CCD 1992 - 1995": "1992-1995",
     "1992-1995": "1992-1995",
+    "Parlamentario 1995-2000": "1995-2000",
+    "CCD 1992-1995": "1992-1995"
 }
 
 
