@@ -103,14 +103,18 @@ def process_motion_steps(raw_motion: RawMotion) -> list[MotionStep] | None:
             # Extracting information from each step
             id = step.get("seguimientoId")
             date = step.get("fecSeguimiento")
-            details = step.get("detalle")
-            files = step.get("adjuntos")
+            details = step.get("detalle") or ""
+            files = step.get("adjuntos") or []
             vote_step = any(
                 vote_word in details.lower() for vote_word in ["votacion", "votación"]
             )
             vote_id = None
 
-            file_ids = [file["proyectoArchivoId"] for file in files]
+            file_ids = [
+                file.get("seguimientoAdjuntoId")
+                for file in files
+                if file and file.get("seguimientoAdjuntoId") is not None
+            ]
 
             if vote_step:
                 vote_step_counter += 1

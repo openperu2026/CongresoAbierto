@@ -109,14 +109,18 @@ def process_bill_steps(raw_bill: RawBill) -> list[BillStep] | None:
             # Extracting information from each step
             id = step.get("seguimientoPleyId")
             date = step.get("fecha")
-            details = step.get("detalle")
+            details = step.get("detalle") or ""
             vote_step = any(
                 vote_word in details.lower() for vote_word in ["votacion", "votación"]
             )
             vote_id = None
 
-            files = step.get("archivos")
-            file_ids = [file["proyectoArchivoId"] for file in files]
+            files = step.get("archivos") or []
+            file_ids = [
+                file.get("proyectoArchivoId")
+                for file in files
+                if file and file.get("proyectoArchivoId") is not None
+            ]
 
             if vote_step:
                 vote_step_counter += 1

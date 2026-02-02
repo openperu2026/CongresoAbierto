@@ -16,6 +16,8 @@ from backend import (
     parse_leg_period,
     parse_legislature,
     parse_role_bill,
+    parse_proponent,
+    parse_motion_type,
 )
 from typing import Optional
 from datetime import datetime
@@ -198,6 +200,13 @@ class Bill(PrintableModel):
             return v
         return parse_legislature(v)
 
+    @field_validator("proponent", mode="before")
+    @classmethod
+    def validate_proponent(cls, v):
+        if isinstance(v, Proponents):
+            return v
+        return parse_proponent(v)
+
 
 class BillCongresistas(PrintableModel):
     """
@@ -340,6 +349,13 @@ class Motion(PrintableModel):
         if isinstance(v, Legislature):
             return v
         return parse_legislature(v)
+
+    @field_validator("motion_type", mode="before")
+    @classmethod
+    def validate_motion_type(cls, v):
+        if isinstance(v, MotionType):
+            return v
+        return parse_motion_type(v)
 
 
 class MotionCongresistas(PrintableModel):
