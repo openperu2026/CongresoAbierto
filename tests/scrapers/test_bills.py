@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from sqlalchemy import create_engine
@@ -158,3 +158,70 @@ def test_scrape_bill_appends_raw_bill(monkeypatch, raw_session):
     assert json.loads(bill.general)["titulo"] == "Ley de Prueba"
     assert json.loads(bill.committees)[0]["nombre"] == "Comisión Y"
     assert json.loads(bill.steps)[0]["evento"] == "ingreso"
+
+
+def test_get_ids_pending_weekly_refresh_filters_by_age_and_approval(raw_session):
+    scraper = RawBillScraper(session=raw_session)
+    now = datetime.now()
+
+    raw_session.add_all(
+        [
+            # stale + not approved => include
+            RawBill(
+                id="2021_1",
+                timestamp=now - timedelta(days=10),
+                general=json.dumps({"desEstado": "En Comisión"}),
+                last_update=True,
+            ),
+            # stale + approved => exclude
+            RawBill(
+                id="2021_2",
+                timestamp=now - timedelta(days=12),
+                general=json.dumps(
+                    {"desEstado": "Publicada en el Diario Oficial El Peruano"}
+                ),
+                last_update=True,
+            ),
+            # fresh + not approved => exclude
+            RawBill(
+                id="2021_3",
+                timestamp=now - timedelta(days=2),
+                general=json.dumps({"desEstado": "En Agenda del Pleno"}),
+                last_update=True,
+            ),
+        ]
+    )
+    raw_session.commit()
+
+    pending = scraper.get_ids_pending_weekly_refresh(max_age_days=7)
+    assert pending == ["2021_1"]
+
+
+def test_scrape_pending_weekly_uses_ids_without_number_ranges(monkeypatch):
+    scraper = RawBillScraper()
+
+    monkeypatch.setattr(
+        scraper,
+        "get_ids_pending_weekly_refresh",
+        lambda max_age_days: ["2021_10", "2022_45"],
+    )
+
+    calls = []
+    monkeypatch.setattr(
+        scraper,
+        "scrape_bill",
+        lambda year, number: calls.append((year, number)) or scraper.raw_bills.append(object()),
+    )
+
+    loads = {"n": 0}
+    monkeypatch.setattr(
+        scraper,
+        "load_raw_bills",
+        lambda: (loads.__setitem__("n", loads["n"] + 1), scraper.raw_bills.clear()),
+    )
+
+    ids = scraper.scrape_pending_weekly(max_age_days=7, flush_every=1)
+
+    assert ids == ["2021_10", "2022_45"]
+    assert calls == [("2021", "10"), ("2022", "45")]
+    assert loads["n"] == 2
