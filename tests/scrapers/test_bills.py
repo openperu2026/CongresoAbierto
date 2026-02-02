@@ -148,6 +148,7 @@ def test_scrape_bill_appends_raw_bill(monkeypatch, raw_session):
 
     # Patch get_url_text in the scraper module
     monkeypatch.setattr("backend.scrapers.bills.get_url_text", fake_get_url_text)
+    monkeypatch.setattr(scraper, "update_tracking", lambda bill: bill)
 
     scraper.scrape_bill("2021", "1234")
 

@@ -13,7 +13,7 @@ from backend.config import settings, directories, stop_logging_to_console
 from backend.scrapers.utils import render_pdf
 from backend.database.raw_models import RawMotionDocument, RawMotion
 
-BASE_URL = "https://wb2server.congreso.gob.pe/smociones-portal-service"
+BASE_URL = "https://api.congreso.gob.pe/smociones-portal-service"
 RAW_DB_PATH = settings.RAW_DB_URL
 PRIORITIES = set(
     [
@@ -33,7 +33,7 @@ class RawMotionDocumentScraper:
 
     def __init__(self):
         # Engine and session maker for DB
-        self.engine = create_engine(RAW_DB_PATH)
+        self.engine = create_engine(RAW_DB_PATH, pool_pre_ping=True)
         self.Session = sessionmaker(bind=self.engine)
 
         self.documents = []
@@ -54,20 +54,20 @@ class RawMotionDocumentScraper:
         """
         Filter steps that are already loaded in the DB
         """
-        session = self.Session()
-        n_steps_in_db = (
-            session.query(RawMotionDocument)
-            .filter(RawMotionDocument.motion_id == motion_id)
-            .all()
-        )
-        seguimiento_ids = set([int(step.seguimiento_id) for step in n_steps_in_db])
+        with self.Session() as session:
+            n_steps_in_db = (
+                session.query(RawMotionDocument)
+                .filter(RawMotionDocument.motion_id == motion_id)
+                .all()
+            )
+
+            seguimiento_ids = {int(step.seguimiento_id) for step in n_steps_in_db}
 
         filtered_steps = [
             step
             for step in extracted_steps
             if step["seguimientoId"] not in seguimiento_ids
         ]
-
         return filtered_steps
 
     def get_motion_documents(
@@ -142,7 +142,9 @@ class RawMotionDocumentScraper:
         with self.Session() as session:
             last_document = (
                 session.query(RawMotionDocument)
-                .filter(RawMotionDocument.id == document.id)
+                .filter(RawMotionDocument.motion_id == document.motion_id,
+                        RawMotionDocument.seguimiento_id == document.seguimiento_id,
+                        RawMotionDocument.archivo_id == document.archivo_id,)
                 .order_by(RawMotionDocument.timestamp.desc())
                 .first()
             )

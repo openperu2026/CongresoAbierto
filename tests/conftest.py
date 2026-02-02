@@ -13,17 +13,16 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-@pytest.fixture()
-def raw_engine():
-    engine = create_engine("sqlite:///:memory:")
-    RawBase.metadata.create_all(engine)
-    return engine
+
 
 @pytest.fixture()
-def raw_session(raw_engine):
-    SessionLocal = sessionmaker(bind=raw_engine)
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def raw_session(tmp_path):
+    db_path = tmp_path / "raw_test.db"
+    engine = create_engine(f"sqlite:///{db_path}")
+
+    RawBase.metadata.create_all(engine)  # <-- this prevents "no such table"
+
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        yield session
+        session.rollback()

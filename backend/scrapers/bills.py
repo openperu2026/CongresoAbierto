@@ -20,10 +20,16 @@ class RawBillScraper:
     Class to scrape and store raw bill information
     """
 
-    def __init__(self):
+    def __init__(self, session = None, engine = None):
         # Engine and session maker for DB
-        self.engine = create_engine(RAW_DB_PATH)
-        self.Session = sessionmaker(bind=self.engine)
+        if session is not None:
+            self.session = session
+            self.engine = session.get_bind()
+            self.Session = sessionmaker(bind=self.engine)  # safe default
+        else:
+            self.engine = engine or create_engine(RAW_DB_PATH)
+            self.Session = sessionmaker(bind=self.engine)
+            self.session = None
 
         # Mapping raw section name to RawBill attribute name
         self.section_mapping = {
@@ -80,7 +86,9 @@ class RawBillScraper:
     def update_tracking(self, bill: RawBill) -> RawBill:
         """Update the tracking columns of a RawBill object"""
 
-        with self.Session() as session:
+        # Create a new session
+        session = self.session or self.Session()
+        try:
             last_bill = (
                 session.query(RawBill)
                 .filter(RawBill.id == bill.id)
@@ -103,6 +111,15 @@ class RawBillScraper:
                 session.commit()
 
             return bill
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to add update tracking to Raw Bills table: {e}")
+            session.rollback()
+            return False
+
+        finally:
+            # Close Session
+            if self.session is None:
+                session.close()
 
     def add_bills_to_db(self) -> bool:
         """
@@ -114,7 +131,7 @@ class RawBillScraper:
         )
 
         # Create a new session
-        session = self.Session()
+        session = self.session or self.Session()
         try:
             # Add and commit raw bill
             session.bulk_save_objects(self.raw_bills)
@@ -129,7 +146,8 @@ class RawBillScraper:
 
         finally:
             # Close Session
-            session.close()
+            if self.session is None:
+                session.close()
 
     def load_raw_bills(self):
         self.add_bills_to_db()
