@@ -308,6 +308,7 @@ class OpenPeruOrchestrator:
             )
             for raw_comm in committees:
                 try:
+                    # TODO: Remove this range to process all years
                     if raw_comm.legislative_year not in range(2016, 2027):
                         raw_comm.processed = True
                         stats.skipped += 1
@@ -342,6 +343,7 @@ class OpenPeruOrchestrator:
             )
             for raw_org in organizations:
                 try:
+                    # TODO: Remove this range to process all years
                     if raw_org.legislative_year not in range(2016, 2027):
                         raw_org.processed = True
                         stats.skipped += 1
