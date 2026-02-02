@@ -210,6 +210,7 @@ def test_get_raw_committees_builds_committee_list(monkeypatch, raw_session):
     scraper.session = raw_session    
 
     monkeypatch.setattr(scraper, "_select_year", lambda driver, wait, year_value: None)
+    monkeypatch.setattr(scraper, "update_tracking", lambda committee: committee)
 
     def fake_get_options(self, url, select_name="idRegistroPadre"):
         assert select_name == "idRegistroPadre"
