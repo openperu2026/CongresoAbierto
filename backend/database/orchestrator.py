@@ -245,6 +245,7 @@ class OpenPeruOrchestrator:
             )
             for raw_cong in rows:
                 try:
+                    # TODO: Remove this range to process all years
                     if raw_cong.leg_period not in ["2021-2026", "2016-2021"]:
                         raw_cong.processed = True
                         stats.skipped += 1
