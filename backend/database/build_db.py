@@ -1,5 +1,15 @@
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.sql.schema import Column
+from sqlalchemy import (
+    Boolean,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    DateTime,
+    Enum as SAEnum,
+)
 from ..config import settings
 
 # Import all models from the models.py file
@@ -9,12 +19,21 @@ from .raw_models import Base as RawBase
 import os
 
 
-def _ensure_columns(
-    base, engine, cols: list[str] = ["last_update", "changed", "processed"]
-):
+def _default_for_non_nullable(col: Column):
+    """Return a safe SQLite default for NOT NULL columns with no explicit default."""
+    if isinstance(col.type, (Boolean, Integer, Numeric)):
+        return "0"
+    if isinstance(col.type, (String, Text, SAEnum)):
+        return "''"
+    if isinstance(col.type, DateTime):
+        return "'1970-01-01 00:00:00'"
+    return "''"
+
+
+def _ensure_columns(base, engine, cols: list[str] | None = None):
     """
-    For each table in `base`, if the SQLAlchemy model defines a 'processed'
-    column but the actual DB table does not have it yet, add it via ALTER TABLE.
+    For each table in `base`, if a model column does not exist in the actual DB
+    table yet, add it via ALTER TABLE.
 
     This is written for SQLite; adjust the ALTER TABLE statement if you move
     to Postgres/MySQL.
@@ -25,8 +44,10 @@ def _ensure_columns(
         for table in base.metadata.sorted_tables:
             table_name = table.name
 
-            for col_name in cols:
-                # Only act if the model defines a 'processed' column
+            target_cols = cols or [c.name for c in table.c]
+
+            for col_name in target_cols:
+                # Only act if the model defines the column
                 if col_name not in table.c:
                     continue
 
@@ -40,11 +61,20 @@ def _ensure_columns(
 
                 print(f"[MIGRATION] Adding '{col_name}' column to table '{table_name}'")
 
-                # SQLite: BOOLEAN is fine, stored as 0/1
+                model_col: Column = table.c[col_name]
+                col_type = model_col.type.compile(dialect=engine.dialect)
+
+                nullable_sql = "" if model_col.nullable else " NOT NULL"
+                default_sql = ""
+
+                # If NOT NULL column has no DB/model default, SQLite requires one in ALTER TABLE.
+                if not model_col.nullable:
+                    default_sql = f" DEFAULT {_default_for_non_nullable(model_col)}"
+
                 conn.execute(
                     text(
                         f"ALTER TABLE {table_name} "
-                        f"ADD COLUMN '{col_name}' BOOLEAN NOT NULL DEFAULT 0"
+                        f"ADD COLUMN '{col_name}' {col_type}{nullable_sql}{default_sql}"
                     )
                 )
 
