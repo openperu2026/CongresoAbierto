@@ -136,9 +136,17 @@ class RawCongresistasScraper:
         else:
             html_cong = parse_url(website)
             cargos_url = self.get_best_cargos_link(html_cong, website)
-
+            if not cargos_url:
+                return RawCongresista(
+                    timestamp=datetime.now(),
+                    leg_period=period,
+                    url=website,
+                    profile_content=profile_content,
+                    memberships_content=None,
+                )
         try:
             cargos = parse_url(cargos_url)
+            
             iframe = cargos.xpath('//*[@id="objContents"]/div[2]/p/iframe')
             if not iframe:
                 raise IndexError("No iframe found in cargos page")
@@ -147,7 +155,7 @@ class RawCongresistasScraper:
             if not match:
                 raise ValueError(f"Invalid iframe src pattern: {api_call}")
             api_id = match.group(2)
-        except (IndexError, ValueError, AttributeError) as e:
+        except (IndexError, ValueError, AttributeError, TypeError) as e:
             logger.warning(f"Failed to extract API ID for {cong_link}: {e}")
             logger.warning(f"Congresista partially extracted from {website}")
             return RawCongresista(
@@ -197,10 +205,12 @@ class RawCongresistasScraper:
             if last_congresista is None:
                 congresista.changed = True
                 congresista.last_update = True
+                congresista.processed = False
             else:
                 # Compare last vs new
                 congresista.changed = congresista != last_congresista
                 congresista.last_update = True
+                congresista.processed = not congresista.changed
 
                 # Update the old version AFTER comparison
                 last_congresista.last_update = False
@@ -209,12 +219,17 @@ class RawCongresistasScraper:
 
             return congresista
 
-    def extract_and_load_all(self) -> list[RawCongresista]:
+    def extract_and_load_all(self, only_current: bool = False) -> list[RawCongresista]:
         assert self.periods, (
             "You need to extract all the available periods before extracting the tables"
         )
 
-        for period, value in self.periods.items():
+        periods = self.periods
+        if only_current:
+            first = next(iter(self.periods.items()), None)
+            periods = dict([first]) if first else {}
+
+        for period, value in periods.items():
             self.raw_congresistas = self.extract_cong_from_period(period, value)
             self.add_congresistas_to_db()
 

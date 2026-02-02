@@ -153,10 +153,12 @@ class RawMotionDocumentScraper:
             if last_document is None:
                 document.changed = True
                 document.last_update = True
+                document.processed = False
             else:
                 # Compare last vs new
                 document.changed = document != last_document
                 document.last_update = True
+                document.processed = not document.changed
 
                 # Update the old version AFTER comparison
                 last_document.last_update = False

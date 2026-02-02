@@ -180,12 +180,16 @@ class RawCommitteeScraper:
             )
             return None
 
-    def get_raw_committees(self) -> None:
+    def get_raw_committees(self, only_current: bool = False) -> None:
         dict_years = self.get_options(url=self.url, select_name="idRegistroPadre")
         if not dict_years:
             logger.error("No year options found. Aborting.")
             self.committee_list = []
             return
+
+        if only_current:
+            first = next(iter(dict_years.items()), None)
+            dict_years = dict([first]) if first else {}
 
         final_lst: list[RawCommittee] = []
 
@@ -262,10 +266,12 @@ class RawCommitteeScraper:
             if last_committee is None:
                 committee.changed = True
                 committee.last_update = True
+                committee.processed = False
             else:
                 # Compare last vs new
                 committee.changed = committee != last_committee
                 committee.last_update = True
+                committee.processed = not committee.changed
 
                 # Update the old version AFTER comparison
                 last_committee.last_update = False

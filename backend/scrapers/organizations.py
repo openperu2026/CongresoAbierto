@@ -210,10 +210,12 @@ class RawOrganizationScraper:
             if last_org is None:
                 org.changed = True
                 org.last_update = True
+                org.processed = False
             else:
                 # Compare last vs new
                 org.changed = org != last_org
                 org.last_update = True
+                org.processed = not org.changed
 
                 # Update the old version AFTER comparison
                 last_org.last_update = False
