@@ -13,7 +13,6 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.process.extract_votes import (
-    extract_text_from_page,
     render_bill,
     extract_information,
     count_votes,
@@ -23,18 +22,18 @@ from backend.process.extract_votes import (
     no_comma_readed,
     run_exceptions,
     matching_last_name,
-    name_swap,
     extract_congressmen,
     swap_names, 
     normalize_votes_in_place,
-    normalize_text
+    normalize_text,
+    text_below_to_dict,
+    look_for_absent_brother
 )
 
 DATA_DIR = ROOT_DIR / "data"
 PDF_NAME = "Asis_y_vot_de_la_sesión_del_13-12-2024.pdf"
 pdf_path=DATA_DIR / PDF_NAME
 
-#votes_text = extract_text_from_page(votes_page)
 bill=render_bill(pdf_path)
 votes=extract_information(bill[1], False)["resultados"]
 
@@ -74,84 +73,44 @@ congresistas_swaped=swap_names(matched_votes2)
 
 matched_votes3=matching_lists(congresistas_swaped, vote_list)
 
-
+matched_votes3=swap_names(matched_votes3)
 #congresistas=last_name_swap(congresistas)
 #matched_votes=matching_lists(congresistas,vote_list)
 
-
-counter=0
-
-for congresista in matched_votes3:
-    if congresista["condicion"]=="en Ejercicio" and congresista["votacion"]!=None:
-        counter+=1
-#print(matched_votes)
-#print(votes)
-#print(type(votes))
-
-print(counter)
-
-list_faltan=[]
-for item in matched_votes3:
-    if item["votacion"]==None and item["condicion"]=="en Ejercicio":
-        list_faltan.append(item["nombre_completo"])
-
-print(list_faltan)
 
 #congresistas_added=extract_congressmen(bill[1])
 
 #print(count_votes(vote_list, "estado"))
 
+lst_below=text_below_to_dict(extract_congressmen(bill[1]))
 
+exception_lst_below=run_exceptions(lst_below)
 
-final_votes=[]
+normalized_votes=[]
 for congresista in matched_votes3:
     if congresista["condicion"]=="en Ejercicio":
-        final_votes.append(congresista)
+        normalized_votes.append(congresista)
 
 
 
+normalized_votes= normalize_votes_in_place(normalized_votes)
 
-print('matched3')
-
-final_votes = normalize_votes_in_place(final_votes)
-
-for vote in final_votes:
+for vote in normalized_votes:
     vote["nombre_completo"]=normalize_text(vote["nombre_completo"])
     vote["nombre"]=normalize_text(vote["nombre"])
     vote["apellido"]=normalize_text(vote["apellido"])
     vote["bancada"]=normalize_text(vote["bancada"])
+
+
+
+
+
 
 output_path = DATA_DIR / "seats.json"
 
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(final_votes, f, ensure_ascii=False, indent=2)
 
-print(f"Saved {len(final_votes)} seats to {output_path}")
 
-#print(count_votes(final_votes, "votacion"))
-
-#print(final_votes)
-
-#print(matched_votes3)
-#print(vote_list)
-#print(congresistas_raw)
-#print(congresistas_swaped)
-#print(count_votes(final_votes, "votacion"))
-
-#print(matched_votes3)
-#print(count_votes(matched_votes3, "votacion"))
-#print(bill[1])
-#print(congresistas_added)
-
-
-
-
-#############FALTA VER COMO ahcemos con los ultimos agregados al final
-#############Falta ver como hacemos el match_last_name con los congresistas hermanos
-#############Hacer una marca en congresistas, tiene eponimos: Si/ No
-#print(matched_votes3)
-#print(count_votes(votes["resultados"], "estado"))
-#print(votes["resultados"])
-
-#congresman_matched=matching_lists()
+print(count_votes(final_votes, "votacion"))
 

@@ -61,11 +61,6 @@ def render_bill(pdf_path: str):
     - The second page contains the votes information. (third)
     If the PDF has a different structure, this function may need to be adjusted.
     """
-    #response = httpx.get(pdf_url)
-    #response.raise_for_status()  # Ensure we raise an error for bad responses
-    #pdf_file = BytesIO(response.content)
-
-
     with open(pdf_path, "rb") as f:
         pdf_file = BytesIO(f.read())
 
@@ -76,10 +71,6 @@ def render_bill(pdf_path: str):
         votes_text = extract_text_from_page(votes_page)
 
     return attendance_text, votes_text
-
-
-    #return attendance_text, votes_text
-
 
 def extract_information(text: str, type=True) -> dict:
     """Extracts attendance and botes from a bill voting."""
@@ -140,12 +131,6 @@ def extract_information(text: str, type=True) -> dict:
     }
 
 
-def normalize_text(text: str) -> str:
-    """
-    Collapses all whitespace (newlines, tabs, multiple spaces) into single spaces.
-    """
-    return re.sub(r"\s+", " ", text).strip()
-
 
 def extract_congressmen(text: str) -> list[str]:
     """
@@ -180,29 +165,16 @@ def extract_congressmen(text: str) -> list[str]:
     return names
 
 
+def text_below_to_dict(lst:list)->list:
+    lst_final=[]
+    for congressman in lst:
+        dict_congress={}
+        dict_congress["apellido"]=congressman
+        dict_congress["nombre_completo"]=congressman
+        dict_congress["estado"]="SI"
+        lst_final.append(dict_congress) 
 
-def name_swap(lst):
-    att=[]
-    for x in lst:
-        x2 = x.copy()
-
-        if "nombre" not in x2:
-            x2["nombre"] = "NO_NAME"
-
-        if "apellido" not in x2:
-            x2["apellido"] = "NO_NAME"
-
-        #x2["nombre_completo"] = f'{x2["nombre"]} {x2["nombre"]}'.strip()
-
-        att.append(x2)
-    
-
-
-    lst_2=att.copy()
-    for congresista in lst_2:
-        if congresista["votacion"]==None:
-            congresista["nombre_completo"]=congresista["apellido"]+ " "+ congresista["nombre"]
-    return lst_2
+    return lst_final
 
 
 
@@ -211,8 +183,12 @@ def run_exceptions(lst_attendance):
         if "apellido" in x:
             if x["apellido"]=="Echaíz De Núñez Izaga":
                 print("there is exceptions")
-
                 x["apellido"]="Echaíz Ramos vda de Núñez"
+
+            if x["nombre_completo"]=="HECTOR ACUNA PERALTA":
+                print("there is exceptions")
+                x["nombre_completo"]="SEGUNDO HECTOR ACUNA PERALTA"
+
     return lst_attendance
 
 
@@ -221,10 +197,10 @@ def swap_names(lst_congress):
     lst_2=lst_congress.copy()
     for congresista in lst_2:
         if congresista["nombre_completo"]==congresista["nombre"]+ " "+ congresista["apellido"]:   
-            print("from first-last to last-first")
+            #print("from first-last to last-first")
             congresista["nombre_completo"]=congresista["apellido"]+ " "+ congresista["nombre"]
         elif congresista["nombre_completo"]==congresista["apellido"]+ " "+ congresista["nombre"]:
-            print("from last-dirst to first-last")
+            #print("from last-dirst to first-last")
             congresista["nombre_completo"]=congresista["nombre"]+ " "+ congresista["apellido"]
         else:
             print("no swap to perform")
@@ -242,13 +218,6 @@ def no_comma_readed(lst_attendance):
 
     return result
 
-
-#'apellido': 'Echaíz Ramos vda de Núñez',
-#"apellido": "Echaíz De Núñez Izaga"
-
-
-###### el cambio se le hace en la fuente.
-#### luego de eso debe de haber una funcion para volverlo a usual
 
 
 def extraction_first_second(congresistas):
@@ -331,42 +300,7 @@ def matching_lists(lst_congres, lst_attendance, threshold=0.90):
 
 
 
-#def matching_lists(lst_congres, lst_attendance):
-    #swap_attendance = name_swap(lst_attendance)
-#    att = []
-
-#    for x in lst_attendance:
-#        x2 = x.copy()
-#        if "nombre_completo" not in x2:
-#            x2["nombre_completo"] = "NO_NAME"
-#            att.append(x2)
-#        else:
-#            att.append(x2)
-    
-#    sorted_congres = sorted(lst_congres, key=lambda x: x["nombre_completo"])
-#    sorted_attendance = sorted(att, key=lambda x: x["nombre_completo"])
-#    
-    
-
-#    for congresista in sorted_congres:
-#        counter = 0
-#        while (
-#            counter < len(sorted_attendance)
-#            and jws(congresista["nombre_completo"], sorted_attendance[counter]["nombre_completo"]) < 0.9
-#            and congresista["votacion"]==None
-#        ):
-#            counter += 1
-
-#        if counter < len(sorted_attendance):
-#            congresista["votacion"] = sorted_attendance[counter]["estado"]
-#        else:
-#            congresista["votacion"] = None  # no match found
-
-#    return sorted_congres
-
-
-
-def matching_last_name(lst_congres, lst_attendance):
+def matching_last_name(lst_congres, lst_attendance, text_below=False):
     
     att = []
 
@@ -386,21 +320,33 @@ def matching_last_name(lst_congres, lst_attendance):
       
 
     for congresista in sorted_congres:
-        if congresista["votacion"] == None:
-            ###Solo para los que aun no ha hecho match
-            ###Que pasa si los hermanos aun no han hecho match?
-            
-            counter = 0
-            while (
-                counter < len(sorted_attendance)
-                and jws(congresista["apellido"], sorted_attendance[counter]["apellido"]) < 0.950
-            ):
-                counter += 1
+        if text_below==False:
+            if congresista["votacion"] == None:
+                ###Solo para los que aun no ha hecho match
+                ###Que pasa si los hermanos aun no han hecho match?
+                
+                counter = 0
+                while (
+                    counter < len(sorted_attendance)
+                    and jws(congresista["apellido"], sorted_attendance[counter]["apellido"]) < 0.950
+                ):
+                    counter += 1
 
-            if counter < len(sorted_attendance):
-                congresista["votacion"] = sorted_attendance[counter]["estado"]
-            else:
-                congresista["votacion"] = None  # no match found
+                if counter < len(sorted_attendance):
+                    congresista["votacion"] = sorted_attendance[counter]["estado"]
+                else:
+                    congresista["votacion"] = None  # no match found
+
+        if text_below==True:
+                counter = 0
+                while (
+                    counter < len(sorted_attendance)
+                    and jws(congresista["apellido"], sorted_attendance[counter]["apellido"]) < 0.950
+                ):
+                    counter += 1
+
+                if counter < len(sorted_attendance):
+                    congresista["votacion"] = sorted_attendance[counter]["estado"]
 
     return sorted_congres
 
@@ -428,13 +374,6 @@ def count_votes(lst, key):
 
 
 
-
-
-def salute():
-    """
-    A simple function to print a greeting message, for testing purposes.
-    """
-    print('Hola Musnda')
 
 def format_jsn(congresistas):
     #base = Path(base_dir) if base_dir else (Path(__file__).parent if "__file__" in globals() else Path.cwd())
@@ -546,3 +485,65 @@ def normalize_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s)
 
     return s.strip()
+
+
+def look_for_absent_brother(lst_congress, lst_text_below):
+    
+    for brother in lst_text_below:
+        for congressman in lst_congress:
+            if congressman["votacion"]=="AUS" :
+                if brother["nombre_completo"]==congressman["nombre_completo"]:
+                    congressman["votacion"]=None
+    
+    return lst_congress
+
+
+def transformation_final(votacion, congresistas_jsn):
+    # Formating the votation
+    a=extract_information(votacion, False)["resultados"]
+    b=extraction_first_second(a)
+    c=no_comma_readed(b)
+    d=run_exceptions(c)
+
+    #Formating the base of congresistas
+    congresistas=format_jsn(congresistas_jsn)
+
+    #First matching between lists
+    e=matching_lists(congresistas,d)
+    f=matching_last_name(e,d)
+
+    #match when there is no comma
+    g=swap_names(f)
+    h=matching_lists(g, d)
+    i=swap_names(h)
+
+
+    #Adding the congressmen at the base
+    below=text_below_to_dict(extract_congressmen(votacion))
+    below_brothers=run_exceptions(below)
+
+    #Formating the matchin (normalize)
+    j=[]
+    for congresista in i:
+        if congresista["condicion"]=="en Ejercicio":
+            j.append(congresista)
+
+    j= normalize_votes_in_place(j)
+
+    for vote in j:
+        vote["nombre_completo"]=normalize_text(vote["nombre_completo"])
+        vote["nombre"]=normalize_text(vote["nombre"])
+        vote["apellido"]=normalize_text(vote["apellido"])
+        vote["bancada"]=normalize_text(vote["bancada"])
+    
+    #second round of match (with the one below):
+    k=matching_last_name(j,below, True)
+
+    # we eliminate the absense for the brother in the below
+    l=look_for_absent_brother(k, below_brothers)
+
+
+    final_votes=matching_lists(l, below_brothers)
+
+    return final_votes
+
