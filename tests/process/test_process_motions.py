@@ -138,13 +138,13 @@ def test_process_motion_steps_vote_detection_and_vote_id_increment():
             "seguimientoId": 123,
             "fecSeguimiento": "2026-01-01",
             "detalle": "Pasa a comisión",
-            "adjuntos": [{"proyectoArchivoId": 1}],
+            "adjuntos": [{"seguimientoAdjuntoId": 1}],
         },
         {
             "seguimientoId": 234,
             "fecSeguimiento": "2026-01-02",
             "detalle": "Se realiza VOTACIÓN en el pleno",
-            "adjuntos": [{"proyectoArchivoId": 2}, {"proyectoArchivoId": 3}],
+            "adjuntos": [{"seguimientoAdjuntoId": 2}, {"seguimientoAdjuntoId": 3}],
         },
         {
             "seguimientoId": 345,
