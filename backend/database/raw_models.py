@@ -320,3 +320,30 @@ class RawOrganization(RawBase):
     processed = Column(
         Boolean, nullable=False, server_default=expression.false(), default=False
     )
+
+class RawLey(RawBase):
+    """
+    Represents a raw law extracted from the Peruvian congress web page.
+
+    Attributes:
+        id (str): Unique identifier for the organization.
+        timestamp (datetime): timestamp of the scraping task
+        data (str): raw data xml information related to the law
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
+    """
+    __tablename__ = "raw_leyes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    data = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
