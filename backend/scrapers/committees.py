@@ -47,10 +47,12 @@ class RawCommitteeScraper:
             year_value
         )
         wait.until(
-            lambda d: Select(
-                d.find_element(By.NAME, "idRegistroPadre")
-            ).first_selected_option.get_attribute("value")
-            == year_value
+            lambda d: (
+                Select(
+                    d.find_element(By.NAME, "idRegistroPadre")
+                ).first_selected_option.get_attribute("value")
+                == year_value
+            )
         )
 
     def _get_committee_options_current_page(
@@ -153,10 +155,12 @@ class RawCommitteeScraper:
             )
 
             wait.until(
-                lambda d: Select(
-                    d.find_element(By.NAME, "fld_78_Comision")
-                ).first_selected_option.get_attribute("value")
-                == committee_value
+                lambda d: (
+                    Select(
+                        d.find_element(By.NAME, "fld_78_Comision")
+                    ).first_selected_option.get_attribute("value")
+                    == committee_value
+                )
             )
 
             # best-effort: wait for page_source to change

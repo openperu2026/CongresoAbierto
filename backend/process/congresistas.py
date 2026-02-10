@@ -58,7 +58,9 @@ def process_memberships(
                 return None
         return None
 
-    def map_org_fields(type_org: str | None, org_name: str | None) -> tuple[str, str | None]:
+    def map_org_fields(
+        type_org: str | None, org_name: str | None
+    ) -> tuple[str, str | None]:
         type_org = (type_org or "").strip()
         org_name = (org_name or "").strip()
         upper = org_name.upper()

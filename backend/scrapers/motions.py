@@ -190,7 +190,9 @@ class RawMotionScraper:
             if self.session is None:
                 session.close()
 
-    def scrape_pending_weekly(self, max_age_days: int = 7, flush_every: int = 100) -> list[str]:
+    def scrape_pending_weekly(
+        self, max_age_days: int = 7, flush_every: int = 100
+    ) -> list[str]:
         """
         Re-scrape pending, non-approved motion ids that are stale.
         """

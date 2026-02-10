@@ -68,11 +68,17 @@ class OpenPeruOrchestrator:
       3) load SQLAlchemy models into the clean DB
     """
 
-    def __init__(self, raw_db_url: str = settings.RAW_DB_URL, db_url: str = settings.DB_URL):
+    def __init__(
+        self, raw_db_url: str = settings.RAW_DB_URL, db_url: str = settings.DB_URL
+    ):
         self.raw_engine = create_engine(raw_db_url, pool_pre_ping=True)
         self.db_engine = create_engine(db_url, pool_pre_ping=True)
-        self.RawSession = sessionmaker(bind=self.raw_engine, autocommit=False, autoflush=False)
-        self.DBSession = sessionmaker(bind=self.db_engine, autocommit=False, autoflush=False)
+        self.RawSession = sessionmaker(
+            bind=self.raw_engine, autocommit=False, autoflush=False
+        )
+        self.DBSession = sessionmaker(
+            bind=self.db_engine, autocommit=False, autoflush=False
+        )
 
         # Ensure schemas exist before the pipeline runs.
         RawBase.metadata.create_all(self.raw_engine)
@@ -108,7 +114,9 @@ class OpenPeruOrchestrator:
         Run raw scrapers. Bills/motions scraping requires explicit ranges.
         """
         if scrape_others:
-            logger.info("Running reference scrapers (congresistas, bancadas, committees, organizations)")
+            logger.info(
+                "Running reference scrapers (congresistas, bancadas, committees, organizations)"
+            )
 
             if self._recent_raw_exists(RawCongresista, days=others_days):
                 logger.info(
@@ -150,13 +158,19 @@ class OpenPeruOrchestrator:
             if all(v is not None for v in [bill_year, bill_start, bill_end]):
                 self._scrape_bill_range(int(bill_year), int(bill_start), int(bill_end))
             else:
-                RawBillScraper().scrape_pending_weekly(max_age_days=weekly_days, flush_every=100)
+                RawBillScraper().scrape_pending_weekly(
+                    max_age_days=weekly_days, flush_every=100
+                )
 
         if scrape_motions:
             if all(v is not None for v in [motion_year, motion_start, motion_end]):
-                self._scrape_motion_range(int(motion_year), int(motion_start), int(motion_end))
+                self._scrape_motion_range(
+                    int(motion_year), int(motion_start), int(motion_end)
+                )
             else:
-                RawMotionScraper().scrape_pending_weekly(max_age_days=weekly_days, flush_every=100)
+                RawMotionScraper().scrape_pending_weekly(
+                    max_age_days=weekly_days, flush_every=100
+                )
 
         if scrape_documents and (scrape_bills or scrape_motions):
             self._scrape_pending_documents()
@@ -197,7 +211,9 @@ class OpenPeruOrchestrator:
     # -----------------------------
     # Scraping internals
     # -----------------------------
-    def _scrape_bill_range(self, year: int, start: int, end: int, flush_every: int = 100) -> None:
+    def _scrape_bill_range(
+        self, year: int, start: int, end: int, flush_every: int = 100
+    ) -> None:
         logger.info(f"Scraping bills in range {year}_{start}..{year}_{end}")
         scraper = RawBillScraper()
         for bill_number in range(start, end + 1):
@@ -207,7 +223,9 @@ class OpenPeruOrchestrator:
         if scraper.raw_bills:
             scraper.load_raw_bills()
 
-    def _scrape_motion_range(self, year: int, start: int, end: int, flush_every: int = 100) -> None:
+    def _scrape_motion_range(
+        self, year: int, start: int, end: int, flush_every: int = 100
+    ) -> None:
         logger.info(f"Scraping motions in range {year}_{start}..{year}_{end}")
         scraper = RawMotionScraper()
         for motion_number in range(start, end + 1):
@@ -227,7 +245,9 @@ class OpenPeruOrchestrator:
 
         motion_docs = RawMotionDocumentScraper()
         for motion_id in motion_docs.get_motions_pending_documents():
-            motion_docs.get_motion_documents(motion_id=motion_id, update=False, prioritize=True)
+            motion_docs.get_motion_documents(
+                motion_id=motion_id, update=False, prioritize=True
+            )
             motion_docs.load_raw_documents()
 
     # -----------------------------
@@ -240,7 +260,10 @@ class OpenPeruOrchestrator:
         with self.RawSession() as raw_db, self.DBSession() as db:
             rows = (
                 raw_db.query(RawCongresista)
-                .filter(RawCongresista.last_update.is_(True), RawCongresista.processed.is_(False))
+                .filter(
+                    RawCongresista.last_update.is_(True),
+                    RawCongresista.processed.is_(False),
+                )
                 .all()
             )
             for raw_cong in rows:
@@ -287,7 +310,9 @@ class OpenPeruOrchestrator:
                     raw_cong.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawCongresista id={raw_cong.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawCongresista id={raw_cong.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
             db.commit()
@@ -304,7 +329,10 @@ class OpenPeruOrchestrator:
         with self.RawSession() as raw_db, self.DBSession() as db:
             committees = (
                 raw_db.query(RawCommittee)
-                .filter(RawCommittee.last_update.is_(True), RawCommittee.processed.is_(False))
+                .filter(
+                    RawCommittee.last_update.is_(True),
+                    RawCommittee.processed.is_(False),
+                )
                 .all()
             )
             for raw_comm in committees:
@@ -318,7 +346,8 @@ class OpenPeruOrchestrator:
                         pre = (
                             db.query(db_models.Organization)
                             .filter(
-                                db_models.Organization.leg_period == org_schema.leg_period,
+                                db_models.Organization.leg_period
+                                == org_schema.leg_period,
                                 db_models.Organization.leg_year == org_schema.leg_year,
                                 db_models.Organization.org_name == org_schema.org_name,
                                 db_models.Organization.org_type == org_schema.org_type,
@@ -333,13 +362,18 @@ class OpenPeruOrchestrator:
                     raw_comm.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawCommittee id={raw_comm.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawCommittee id={raw_comm.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
 
             organizations = (
                 raw_db.query(RawOrganization)
-                .filter(RawOrganization.last_update.is_(True), RawOrganization.processed.is_(False))
+                .filter(
+                    RawOrganization.last_update.is_(True),
+                    RawOrganization.processed.is_(False),
+                )
                 .all()
             )
             for raw_org in organizations:
@@ -383,7 +417,9 @@ class OpenPeruOrchestrator:
                     raw_org.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawOrganization id={raw_org.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawOrganization id={raw_org.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
 
@@ -401,7 +437,9 @@ class OpenPeruOrchestrator:
         with self.RawSession() as raw_db, self.DBSession() as db:
             rows = (
                 raw_db.query(RawBancada)
-                .filter(RawBancada.last_update.is_(True), RawBancada.processed.is_(False))
+                .filter(
+                    RawBancada.last_update.is_(True), RawBancada.processed.is_(False)
+                )
                 .all()
             )
             for raw_bancada in rows:
@@ -430,7 +468,9 @@ class OpenPeruOrchestrator:
 
                     for ms in memberships:
                         leg_year_value = (
-                            ms.leg_year.value if hasattr(ms.leg_year, "value") else ms.leg_year
+                            ms.leg_year.value
+                            if hasattr(ms.leg_year, "value")
+                            else ms.leg_year
                         )
                         cong = crud_core.find_congresista(
                             db,
@@ -452,7 +492,9 @@ class OpenPeruOrchestrator:
                     raw_bancada.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawBancada id={raw_bancada.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawBancada id={raw_bancada.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
 
@@ -463,14 +505,15 @@ class OpenPeruOrchestrator:
         )
         return stats
 
-    def _process_bills(self, *, include_documents: bool, limit: int | None) -> StageStats:
+    def _process_bills(
+        self, *, include_documents: bool, limit: int | None
+    ) -> StageStats:
         stats = StageStats()
         clean_inserted = 0
         clean_updated = 0
         with self.RawSession() as raw_db, self.DBSession() as db:
-            query = (
-                raw_db.query(RawBill)
-                .filter(RawBill.last_update.is_(True), RawBill.processed.is_(False))
+            query = raw_db.query(RawBill).filter(
+                RawBill.last_update.is_(True), RawBill.processed.is_(False)
             )
             if limit is not None:
                 query = query.limit(limit)
@@ -537,7 +580,9 @@ class OpenPeruOrchestrator:
                     raw_bill.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawBill id={raw_bill.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawBill id={raw_bill.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
 
@@ -548,14 +593,15 @@ class OpenPeruOrchestrator:
         )
         return stats
 
-    def _process_motions(self, *, include_documents: bool, limit: int | None) -> StageStats:
+    def _process_motions(
+        self, *, include_documents: bool, limit: int | None
+    ) -> StageStats:
         stats = StageStats()
         clean_inserted = 0
         clean_updated = 0
         with self.RawSession() as raw_db, self.DBSession() as db:
-            query = (
-                raw_db.query(RawMotion)
-                .filter(RawMotion.last_update.is_(True), RawMotion.processed.is_(False))
+            query = raw_db.query(RawMotion).filter(
+                RawMotion.last_update.is_(True), RawMotion.processed.is_(False)
             )
             if limit is not None:
                 query = query.limit(limit)
@@ -610,7 +656,9 @@ class OpenPeruOrchestrator:
                     raw_motion.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(f"Error processing RawMotion id={raw_motion.id}: {exc}")
+                    logger.exception(
+                        f"Error processing RawMotion id={raw_motion.id}: {exc}"
+                    )
                     db.rollback()
                     stats.errors += 1
 

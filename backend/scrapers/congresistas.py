@@ -146,7 +146,7 @@ class RawCongresistasScraper:
                 )
         try:
             cargos = parse_url(cargos_url)
-            
+
             iframe = cargos.xpath('//*[@id="objContents"]/div[2]/p/iframe')
             if not iframe:
                 raise IndexError("No iframe found in cargos page")

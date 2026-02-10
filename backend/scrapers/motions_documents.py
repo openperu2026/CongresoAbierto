@@ -142,9 +142,11 @@ class RawMotionDocumentScraper:
         with self.Session() as session:
             last_document = (
                 session.query(RawMotionDocument)
-                .filter(RawMotionDocument.motion_id == document.motion_id,
-                        RawMotionDocument.seguimiento_id == document.seguimiento_id,
-                        RawMotionDocument.archivo_id == document.archivo_id,)
+                .filter(
+                    RawMotionDocument.motion_id == document.motion_id,
+                    RawMotionDocument.seguimiento_id == document.seguimiento_id,
+                    RawMotionDocument.archivo_id == document.archivo_id,
+                )
                 .order_by(RawMotionDocument.timestamp.desc())
                 .first()
             )

@@ -20,7 +20,7 @@ class RawBillScraper:
     Class to scrape and store raw bill information
     """
 
-    def __init__(self, session = None, engine = None):
+    def __init__(self, session=None, engine=None):
         # Engine and session maker for DB
         if session is not None:
             self.session = session
@@ -178,7 +178,9 @@ class RawBillScraper:
         session = self.session or self.Session()
 
         try:
-            latest_rows = session.query(RawBill).filter(RawBill.last_update == True).all()
+            latest_rows = (
+                session.query(RawBill).filter(RawBill.last_update == True).all()
+            )
             pending_ids: list[str] = []
 
             for row in latest_rows:
@@ -193,7 +195,9 @@ class RawBillScraper:
             if self.session is None:
                 session.close()
 
-    def scrape_pending_weekly(self, max_age_days: int = 7, flush_every: int = 100) -> list[str]:
+    def scrape_pending_weekly(
+        self, max_age_days: int = 7, flush_every: int = 100
+    ) -> list[str]:
         """
         Re-scrape pending, non-approved bill ids that are stale.
         """

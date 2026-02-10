@@ -14,7 +14,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-
 @pytest.fixture()
 def raw_session(tmp_path):
     db_path = tmp_path / "raw_test.db"

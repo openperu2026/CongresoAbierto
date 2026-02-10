@@ -210,7 +210,9 @@ def test_scrape_pending_weekly_uses_ids_without_number_ranges(monkeypatch):
     monkeypatch.setattr(
         scraper,
         "scrape_bill",
-        lambda year, number: calls.append((year, number)) or scraper.raw_bills.append(object()),
+        lambda year, number: (
+            calls.append((year, number)) or scraper.raw_bills.append(object())
+        ),
     )
 
     loads = {"n": 0}

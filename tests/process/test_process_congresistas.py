@@ -120,7 +120,7 @@ def test_process_memberships_all_branches(monkeypatch):
     assert m0.leg_period == "2021-2026"
     assert m0.role == "presidente"
     assert m0.org_name == "Subcomisión de Acusaciones Constitucionales"
-    assert m0.org_type == 'Subcomisión de Acusaciones Constitucionales'
+    assert m0.org_type == "Subcomisión de Acusaciones Constitucionales"
     assert m0.comm_type == "Subcomisión de Acusaciones Constitucionales"
     assert m0.start_date == datetime.fromisoformat("2025-08-01")
     assert m0.end_date is None

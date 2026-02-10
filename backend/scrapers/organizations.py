@@ -129,10 +129,12 @@ class RawOrganizationScraper:
             select_year.select_by_value(period_value)
 
             wait.until(
-                lambda d: Select(
-                    d.find_element(By.NAME, "idRegistroPadre")
-                ).first_selected_option.get_attribute("value")
-                == period_value
+                lambda d: (
+                    Select(
+                        d.find_element(By.NAME, "idRegistroPadre")
+                    ).first_selected_option.get_attribute("value")
+                    == period_value
+                )
             )
 
             # Strategy 2 (better if you know what changes): wait for a specific container/table to appear/update
