@@ -1,4 +1,3 @@
-import json
 import time
 from datetime import datetime
 from loguru import logger
@@ -33,6 +32,8 @@ class RawLeyesScraper:
 
         # List of raw leyes objects
         self.raw_leyes = []
+        # Track previous versions that were marked as not last_update.
+        self._tracking_updates = []
 
     def scrape_ley(self, ley_number: str) -> None:
         """
@@ -45,8 +46,14 @@ class RawLeyesScraper:
         if response:
             # Successfully built the raw ley!
             ley = self.create_raw_ley(ley_number, response)
-            self.raw_leyes.append(self.update_tracking(ley))
-            logger.success(f"Successfully scraped Raw Ley {ley_number}")
+            tracked = self.update_tracking(ley)
+            if tracked:
+                self.raw_leyes.append(tracked)
+                logger.success(f"Successfully scraped Raw Ley {ley_number}")
+            else:
+                logger.warning(
+                    f"Skipping Raw Ley {ley_number} due to tracking update failure."
+                )
 
         else:
             return None
@@ -54,7 +61,7 @@ class RawLeyesScraper:
     def create_raw_ley(self, ley_number: str, data: str) -> RawLey:
         # Initialize raw ley with id and timestamp
         raw_ley = RawLey(
-            id=ley_number, timestamp=datetime.now(), data=data, processed=False
+            id=ley_number, timestamp=datetime.utcnow(), data=data, processed=False
         )
 
         return raw_ley
@@ -78,19 +85,20 @@ class RawLeyesScraper:
                 ley.last_update = True
             else:
                 # Compare last vs new
-                ley.changed = ley != last_ley
+                ley.changed = ley.data != last_ley.data
                 ley.last_update = True
 
                 # Update the old version AFTER comparison
                 last_ley.last_update = False
                 session.add(last_ley)
                 session.commit()
+                self._tracking_updates.append(last_ley.id)
 
             return ley
         except SQLAlchemyError as e:
             logger.error(f"Failed to add update tracking to Raw Leyes table: {e}")
             session.rollback()
-            return False
+            return None
 
         finally:
             # Close Session
@@ -102,9 +110,9 @@ class RawLeyesScraper:
         Add a single ley to the database.
         Returns True on success, False on failure.
         """
-        assert len(self.raw_leyes) != 0, (
-            "There are no Raw Leyes scraped. Nothing to load to DB."
-        )
+        if len(self.raw_leyes) == 0:
+            logger.info("There are no Raw Leyes scraped. Nothing to load to DB.")
+            return False
 
         # Create a new session
         session = self.session or self.Session()
@@ -113,11 +121,13 @@ class RawLeyesScraper:
             session.bulk_save_objects(self.raw_leyes)
             session.commit()
             logger.success(f"Added {len(self.raw_leyes)} Raw Leyes to table.")
+            self._tracking_updates = []
             return True
 
         except SQLAlchemyError as e:
             logger.error(f"Failed to add leyes to Raw Leyes table: {e}")
             session.rollback()
+            self._restore_tracking_updates()
             return False
 
         finally:
@@ -125,9 +135,29 @@ class RawLeyesScraper:
             if self.session is None:
                 session.close()
 
+    def _restore_tracking_updates(self) -> None:
+        if not self._tracking_updates:
+            return
+
+        session = self.session or self.Session()
+        try:
+            (
+                session.query(RawLey)
+                .filter(RawLey.id.in_(self._tracking_updates))
+                .update({RawLey.last_update: True}, synchronize_session=False)
+            )
+            session.commit()
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to restore tracking updates for Raw Leyes: {e}")
+            session.rollback()
+        finally:
+            if self.session is None:
+                session.close()
+            self._tracking_updates = []
+
     def load_raw_leyes(self):
-        self.add_leyes_to_db()
-        self.raw_leyes = []
+        if self.add_leyes_to_db():
+            self.raw_leyes = []
 
 
 def main():
@@ -143,10 +173,12 @@ def main():
         except TypeError:
             break
 
-        if len(scraper.raw_leyes) % 10 == 0:
+        # Sleep every 10 requests
+        if len(scraper.raw_leyes) > 0 and len(scraper.raw_leyes) % 10 == 0:
             time.sleep(2)
 
-        if len(scraper.raw_leyes) % 100 == 0:
+        # Loading into DB every 100 successfull requests
+        if len(scraper.raw_leyes) > 0 and len(scraper.raw_leyes) % 100 == 0:
             scraper.load_raw_leyes()
 
 
