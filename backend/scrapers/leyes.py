@@ -14,12 +14,13 @@ from backend.database.raw_models import RawLey
 BASE_URL = "https://api.congreso.gob.pe/adlp-visor-service/expediente/ley?numley="
 RAW_DB_PATH = settings.RAW_DB_URL
 
+
 class RawLeyesScraper:
     """
     Class to scrape and store raw ley information
     """
 
-    def __init__(self, session = None, engine = None):
+    def __init__(self, session=None, engine=None):
         # Engine and session maker for DB
         if session is not None:
             self.session = session
@@ -53,7 +54,7 @@ class RawLeyesScraper:
     def create_raw_ley(self, ley_number: str, data: str) -> RawLey:
         # Initialize raw ley with id and timestamp
         raw_ley = RawLey(
-            id=ley_number, timestamp=datetime.now(), data = data, processed=False
+            id=ley_number, timestamp=datetime.now(), data=data, processed=False
         )
 
         return raw_ley
@@ -132,7 +133,7 @@ class RawLeyesScraper:
 def main():
     scraper = RawLeyesScraper()
 
-    #Pending: 16243, 10548, 9918, 9865, 9866, 9867, 9868, 9870
+    # Pending: 16243, 10548, 9918, 9865, 9866, 9867, 9868, 9870
 
     num_ley = 32570
     while True:
@@ -141,7 +142,6 @@ def main():
             num_ley += 1
         except TypeError:
             break
-
 
         if len(scraper.raw_leyes) % 10 == 0:
             time.sleep(2)
