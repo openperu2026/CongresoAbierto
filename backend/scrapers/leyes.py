@@ -134,17 +134,17 @@ def main():
 
     #Pending: 16243, 10548, 9918, 9865, 9866, 9867, 9868, 9870
 
-    num_ley = 17011
+    num_ley = 32570
     while True:
         try:
             scraper.scrape_ley(str(num_ley))
+            num_ley += 1
         except TypeError:
             break
 
-        num_ley += 1
 
         if len(scraper.raw_leyes) % 10 == 0:
-            time.sleep(5)
+            time.sleep(2)
 
         if len(scraper.raw_leyes) % 100 == 0:
             scraper.load_raw_leyes()
