@@ -53,7 +53,8 @@ async function downloadSeatsAsCSV(
   }
 
   const data = await res.json();
-  const csv = objectsToCSV(data);
+  const seats = Array.isArray(data) ? data : (data?.resultados ?? []);
+  const csv = objectsToCSV(seats);
   downloadTextFile(csv, filename);
 }
 

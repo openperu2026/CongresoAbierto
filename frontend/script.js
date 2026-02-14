@@ -2,20 +2,21 @@ console.log("script.js loaded ✅");
 console.log("d3 type:", typeof d3);
 
 const BANCADA_COLORS = {
+  "ACCION POPULAR": "#da2f2f",
   "ALIANZA PARA EL PROGRESO": "#1F77B4",
-  "HONOR Y DEMOCRACIA": "#4682B4",
+  "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL": "#E377C2",
+  "BANCADA SOCIALISTA": "#B2182B",
+  "BLOQUE DEMOCRATICO POPULAR": "#66C2A5",
+  "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL": "#E6D690",
   "FUERZA POPULAR": "#FF7F0E",
+  "HONOR Y DEMOCRACIA": "#4682B4",
+  "JUNTOS POR EL PERU - VOCES DEL PUEBLO": "#A6D854",
   "PERU LIBRE": "#D62728",
   "PODEMOS PERU": "#003F5C",
-  "NO AGRUPADO": "#000000",
-  "ACCION POPULAR": "#da2f2f",
-  "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL": "#E377C2",
-  "SOMOS PERU": "#2C7FB8",
   "RENOVACION POPULAR": "#76B7B2",
-  "BLOQUE DEMOCRATICO POPULAR": "#66C2A5",
-  "JUNTOS POR EL PERU - VOCES DEL PUEBLO": "#A6D854",
-  "BANCADA SOCIALISTA": "#B2182B",
-  "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL": "#E6D690"
+  "SOMOS PERU": "#2C7FB8",
+  "NO AGRUPADO": "#000000"
+  
 };
 
 // --- helper: normalize text like your Python function, but in JS ---
@@ -49,21 +50,46 @@ const tooltip = d3.select("body")
 
 
 
+function getField(data, name) {
+  if (!data || typeof data !== "object") return null;
+  if (Object.prototype.hasOwnProperty.call(data, name)) return data[name];
+  const key = Object.keys(data).find(
+    k => k.trim().toLowerCase() === name
+  );
+  return key ? data[key] : null;
+}
+
+function unpackSeatsForChart(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.resultados)) return data.resultados;
+  if (Array.isArray(data?.seats)) return data.seats;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.resultados?.data)) return data.resultados.data;
+  return [];
+}
+
+
 fetch("/data/seats.json")
   .then(res => {
     console.log("fetch status:", res.status);
     return res.json();
   })
   .then(data => {
-    console.log("seats loaded:", data.length);
-    drawHemicycle(data);
+    const seats = unpackSeatsForChart(data);
+    console.log("seats loaded:", seats.length);
+    if (!Array.isArray(seats)) {
+      console.error("seats is not an array:", seats);
+      return;
+    }
+    drawHemicycle(seats);
     console.log("circles drawn:", document.querySelectorAll("#chart circle").length);
   })
-  .catch(err => console.error("fetch error ❌", err));
+  .catch(err => console.error("fetch error ?", err));
 
 function getSeatColor(d) {
-  if (d.votacion !== "SI") return gray;
-  return BANCADA_COLORS[d.bancada_norm] ?? "#999999";
+  const baseColor = BANCADA_COLORS[d.bancada_norm] ?? "#999999";
+  if (d.votacion === "SI") return baseColor;
+  return d3.color(baseColor).copy({ opacity: 0.1 });
 }
 
 function drawHemicycle(seats) {

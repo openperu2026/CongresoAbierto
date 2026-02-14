@@ -9,13 +9,22 @@ function normalizeText(s) {
     .trim();
 }
 
+function unpackSeatsPayload(data) {
+  if (Array.isArray(data)) return { seats: data, fecha: null };
+  if (data && Array.isArray(data.resultados)) {
+    return { seats: data.resultados, fecha: data.fecha ?? null };
+  }
+  return { seats: [], fecha: null };
+}
+
 fetch("/data/seats.json")
   .then(r => r.json())
-  .then(seats => {
+  .then(data => {
+    const { seats } = unpackSeatsPayload(data);
     const tableData = buildTableData(seats);
     renderTable(tableData);
   })
-  .catch(err => console.error("Table fetch error ❌", err));
+  .catch(err => console.error("Table fetch error ?", err));
 
 function buildTableData(seats) {
   const map = new Map();

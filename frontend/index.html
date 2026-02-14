@@ -9,9 +9,10 @@
 <body>
   <main class="container">
     <h1>Votación del Congreso</h1>
-    <h2> Ley N° 32251 LEY QUE UNIFICA Y ARMONIZA LA REGULACIÓN DE LOS SÍMBOLOS DE LA PATRIA, SÍMBOLOS DEL ESTADO Y EMBLEMAS NACIONALES </h2>
+    <h2> Asunto: <span id="titulo"></span></h2>
     <h3>ESTADO: APROBADO</h3>
-    <h4> Fecha: 12 de diciembre de 2024</h3>
+    <h4> Fecha: <span id="fecha"></span></h4>
+    <h4> Evento: <span id="evento"></span></h4>
   
     <svg id="chart" width="800" height="250"></svg>
   
@@ -40,7 +41,8 @@
   </div>
 
 
-  <script src="./script.js"></script>
+  <script src="./script_header.js?v=1"></script>
+  <script src="./script.js?v=2"></script>
   <script src="./script_table.js"></script>
   <script src="./script_download.js"></script>
 
