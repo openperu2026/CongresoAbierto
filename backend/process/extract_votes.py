@@ -343,9 +343,10 @@ def format_jsn(congresistas):
         dict_congresista["apellido"] = item["apellido"]
         dict_congresista["nombre_completo"] = item["nombre"] + " " + item["apellido"]
         dict_congresista["partido"] = item["party_name"]
-        dict_congresista["bancada"] = item["bancada_name"]
-        dict_congresista["condicion"] = item["condicion"]
+        dict_congresista["bancada"] = item["bancada"]
+        dict_congresista["en_ejercicio"] = item["en_ejercicio"]
         dict_congresista["votacion"] = None
+        dict_congresista["periodo"]= item["periodo"]
 
         list_congreso.append(dict_congresista)
 
@@ -367,6 +368,58 @@ OTHER_ISOLATED_PATTERN = re.compile(
 )
 
 STAR_PATTERN = re.compile(r"^\*{1,4}$")
+
+
+def define_bancada(congresistas_raw, fecha):
+    
+    """"
+    congresistas_raw: producto of a json.load(f)  
+    fecha: a fecha in format dd/mm/year
+
+    """
+    # If fecha is between inicio and fin in "bancada.periodo",
+    # set "bancada" to the bancada name for that period.
+    if not fecha:
+        return congresistas_raw
+
+    try:
+        day, month, year = [int(x) for x in fecha.split("/")]
+        target = (year, month, day)
+    except Exception:
+        return congresistas_raw
+
+    for c in congresistas_raw:
+        bancada = c.get("bancada")
+        if not isinstance(bancada, dict):
+            continue
+
+        bancada_name = bancada.get("name")
+        periodo = bancada.get("periodo", {})
+        inicio = periodo.get("inicio")
+        fin = periodo.get("fin")
+
+        if not (isinstance(inicio, str) and isinstance(fin, str)):
+            # Keep existing value if we can't parse periodo
+            continue
+
+        try:
+            d_i, m_i, y_i = [int(x) for x in inicio.split("/")]
+            d_f, m_f, y_f = [int(x) for x in fin.split("/")]
+            start = (y_i, m_i, d_i)
+            end = (y_f, m_f, d_f)
+        except Exception:
+            continue
+
+        if start <= target <= end:
+            c["bancada"] = bancada_name
+
+    return congresistas_raw
+
+
+
+
+
+
 
 def categorize_estado(estado: str) -> str:
     """
@@ -458,6 +511,44 @@ def get_type(text):
     return None
 
 
+def define_enejercicio(congresistas_raw, fecha):
+    """"
+    congresistas_raw: producto of a json.load(f)  
+    fecha: a fecha in format dd/mm/year
+
+    """
+    # If fecha is between inicio and fin in "periodo" for each congresista,
+    # set "en_ejercicio"=True, else set it to False.
+    if not fecha:
+        return congresistas_raw
+
+    try:
+        day, month, year = [int(x) for x in fecha.split("/")]
+        target = (year, month, day)
+    except Exception:
+        return congresistas_raw
+
+    for c in congresistas_raw:
+        periodo = c.get("periodo", {})
+        inicio = periodo.get("inicio")
+        fin = periodo.get("fin")
+
+        if not (isinstance(inicio, str) and isinstance(fin, str)):
+            # Keep existing value if we can't parse periodo
+            continue
+
+        try:
+            d_i, m_i, y_i = [int(x) for x in inicio.split("/")]
+            d_f, m_f, y_f = [int(x) for x in fin.split("/")]
+            start = (y_i, m_i, d_i)
+            end = (y_f, m_f, d_f)
+        except Exception:
+            continue
+
+        c["en_ejercicio"] = start <= target <= end
+
+    return congresistas_raw
+
 def transformation_final(text, congresistas_jsn):
 
     #Create the dictionary for the json
@@ -480,7 +571,10 @@ def transformation_final(text, congresistas_jsn):
     d = run_exceptions(c)
 
     # Formatting the base of congresistas
+    fecha=bill["fecha"]
     congresistas = format_jsn(congresistas_jsn)
+    congresistas=define_enejercicio(congresistas, fecha)
+    congresistas=define_bancada(congresistas, fecha)
 
     # First matching between lists
     e = matching_lists(congresistas, d)
@@ -498,7 +592,7 @@ def transformation_final(text, congresistas_jsn):
     # Formatting the matching (normalize)
     j = []
     for congresista in i:
-        if congresista["condicion"] == "en Ejercicio":
+        if congresista["en_ejercicio"] == True:
             j.append(congresista)
 
     j = normalize_votes_in_place(j)
@@ -517,7 +611,7 @@ def transformation_final(text, congresistas_jsn):
 
     final_votes = matching_lists(l, below_brothers)
     titulo=bill["titulo"]
-    fecha=bill["fecha"]
+    
     
 
     dictionary_final["titulo"]=titulo

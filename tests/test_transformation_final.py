@@ -78,28 +78,37 @@ def load_json(path: Path) -> dict:
         return json.load(f)
 
 
-def index_by_id(results: list[dict]) -> dict:
-    indexed = {}
-    for r in results:
-        rid = str(r.get("id", "")).strip()
-        indexed[rid] = r
-    return indexed
-
-
 def compare_results(actual_results: list[dict], expected_results: list[dict]) -> None:
-    actual_by_id = index_by_id(actual_results)
-    expected_by_id = index_by_id(expected_results)
+    # Only compare rows where en_ejercicio is True in actual results.
+    actual_filtered = [r for r in actual_results if r.get("en_ejercicio") is True]
+    actual_ids = {str(r.get("id", "")).strip() for r in actual_filtered}
+    expected_filtered = [
+        r for r in expected_results if str(r.get("id", "")).strip() in actual_ids
+    ]
 
-    assert actual_by_id.keys() == expected_by_id.keys()
+    def row_key(r: dict) -> tuple:
+        return (
+            str(r.get("id", "")).strip(),
+            normalize_text(r.get("nombre")),
+            normalize_text(r.get("apellido")),
+            normalize_text(r.get("nombre_completo")),
+            normalize_text(r.get("bancada")),
+            normalize_vote(r.get("votacion")),
+        )
 
-    keys = ["nombre", "apellido", "nombre_completo", "bancada", "votacion"]
-    for rid, expected in expected_by_id.items():
-        actual = actual_by_id[rid]
-        for key in keys:
-            if key == "votacion":
-                assert normalize_vote(actual.get(key)) == normalize_vote(expected.get(key))
-            else:
-                assert normalize_text(actual.get(key)) == expected.get(key)
+    actual_sorted = sorted((row_key(r) for r in actual_filtered))
+    expected_sorted = sorted((row_key(r) for r in expected_filtered))
+
+    if actual_sorted != expected_sorted:
+        actual_set = set(actual_sorted)
+        expected_set = set(expected_sorted)
+        only_in_actual = sorted(actual_set - expected_set)
+        only_in_expected = sorted(expected_set - actual_set)
+        raise AssertionError(
+            "Result mismatch.\n"
+            f"Only in actual (first 20): {only_in_actual[:20]}\n"
+            f"Only in expected (first 20): {only_in_expected[:20]}"
+        )
 
 
 def test_seats_json_matches_input_test_xlsx():

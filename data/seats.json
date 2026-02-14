@@ -1,5 +1,5 @@
 {
-  "titulo": "RECONSIDERACION DE LA VOTACION DEL PROYECTO DE RESOLUCION LEGISLATIVA DEL CONGRESO N*9759 QUE INHABIL ITA POR DIEZ ANOS PARA EL EJERCICIO DE LA FUNCION PUBLICA AL EXMINISTRO DE SALUD VICTOR MARCIAL ZAMORA MESIA POR INFRACCION AL ARTICULO 9 DE LA CONSTITUCION POLITICA",
+  "titulo": "SEGUNDA VOTACION DEL TEXTO SUSTITUTORIO DEL PROYECTO DE LEY 5836, QUE PROPONE UNIFICAR Y ARMONIZAR LA REGULACION DE LOS SIMBOLOS DE LA PATRIA, SIMBOLOS DEL ESTADO Y EMBLEMAS NACIONALES",
   "evento": "VOTACION",
   "fecha": "13/12/2024",
   "resultados": [
@@ -10,8 +10,12 @@
       "nombre_completo": "ABEL AUGUSTO REYES CAM",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1036",
@@ -20,8 +24,12 @@
       "nombre_completo": "ADRIANA JOSEFINA TUDELA GUTIERREZ",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1037",
@@ -30,8 +38,12 @@
       "nombre_completo": "ALEJANDRO AURELIO AGUINAGA RECUENCO",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1038",
@@ -40,8 +52,12 @@
       "nombre_completo": "ALEJANDRO ENRIQUE CAVERO ALVA",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1039",
@@ -50,8 +66,12 @@
       "nombre_completo": "ALEJANDRO MUNANTE BARRIOS",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1040",
@@ -60,8 +80,12 @@
       "nombre_completo": "ALEJANDRO SOTO REYES",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1042",
@@ -70,8 +94,12 @@
       "nombre_completo": "ALEX ANTONIO PAREDES GONZALES",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1044",
@@ -80,8 +108,12 @@
       "nombre_completo": "ALEX RANDU FLORES RAMIREZ",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BANCADA SOCIALISTA",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1045",
@@ -90,8 +122,12 @@
       "nombre_completo": "ALFREDO AZURIN LOAYZA",
       "partido": "Partido Democrático Somos Perú",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1046",
@@ -100,8 +136,12 @@
       "nombre_completo": "ALFREDO PARIONA SINCHE",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BANCADA SOCIALISTA",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1031",
@@ -110,8 +150,12 @@
       "nombre_completo": "AMERICO GONZA CASTILLO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1169",
@@ -120,8 +164,12 @@
       "nombre_completo": "ANA ZADITH ZEGARRA SABOYA",
       "partido": "Partido Democrático Somos Perú",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "02/10/2024",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1168",
@@ -130,8 +178,12 @@
       "nombre_completo": "ARIANA MAYBEE ORUE MEDINA",
       "partido": "Podemos Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "26/07/2024",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1079",
@@ -140,8 +192,12 @@
       "nombre_completo": "ARTURO ALEGRIA GARCIA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1048",
@@ -150,8 +206,12 @@
       "nombre_completo": "AURISTELA ANA OBANDO MORGAN",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1050",
@@ -160,8 +220,12 @@
       "nombre_completo": "BERNARDO JAIME QUITO SARMIENTO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BANCADA SOCIALISTA",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1053",
@@ -170,8 +234,12 @@
       "nombre_completo": "CARLOS ANTONIO ANDERSON RAMIREZ",
       "partido": "Podemos Perú",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "26/12/2025"
+      }
     },
     {
       "id": "1054",
@@ -180,8 +248,12 @@
       "nombre_completo": "CARLOS ENRIQUE ALVA ROJAS",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1058",
@@ -190,8 +262,12 @@
       "nombre_completo": "CARLOS JAVIER ZEBALLOS MADARIAGA",
       "partido": "Acción Popular",
       "bancada": "BLOQUE DEMOCRATICO POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1059",
@@ -200,8 +276,12 @@
       "nombre_completo": "CARMEN PATRICIA JUAREZ GALLEGOS",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1061",
@@ -210,8 +290,12 @@
       "nombre_completo": "CESAR MANUEL REVILLA VILLANUEVA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1062",
@@ -220,8 +304,12 @@
       "nombre_completo": "CHERYL TRIGOZO REATEGUI",
       "partido": "Alianza para el Progreso",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1064",
@@ -230,8 +318,12 @@
       "nombre_completo": "CRUZ MARIA ZETA CHUNGA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1065",
@@ -240,8 +332,12 @@
       "nombre_completo": "DAVID JULIO JIMENEZ HEREDIA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1067",
@@ -250,8 +346,12 @@
       "nombre_completo": "DIANA CAROLINA GONZALES DELGADO",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1069",
@@ -260,8 +360,12 @@
       "nombre_completo": "DIEGO ALONSO FERNANDO BAZAN CALDERON",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1071",
@@ -270,8 +374,12 @@
       "nombre_completo": "DIGNA CALLE LOBATON",
       "partido": "Podemos Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1047",
@@ -280,8 +388,12 @@
       "nombre_completo": "EDGARD CORNELIO REYMUNDO MERCADO",
       "partido": "Juntos por el Perú",
       "bancada": "BLOQUE DEMOCRATICO POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1075",
@@ -290,8 +402,12 @@
       "nombre_completo": "EDUARDO ENRIQUE CASTILLO RIVAS",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1078",
@@ -300,8 +416,12 @@
       "nombre_completo": "EDUARDO SALHUANA CAVIDES",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1080",
@@ -310,8 +430,12 @@
       "nombre_completo": "ELIAS MARCIAL VARAS MELENDEZ",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1081",
@@ -320,8 +444,12 @@
       "nombre_completo": "ELIZABETH SARA MEDINA HERMOSILLA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1083",
@@ -330,8 +458,12 @@
       "nombre_completo": "ELVA EDHIT JULON IRIGOIN",
       "partido": "Alianza para el Progreso del Perú",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1084",
@@ -340,8 +472,12 @@
       "nombre_completo": "ELVIS HERNAN VERGARA MENDOZA",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1056",
@@ -350,8 +486,12 @@
       "nombre_completo": "ERNESTO BUSTAMANTE DONAYRE",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1088",
@@ -360,8 +500,12 @@
       "nombre_completo": "ESDRAS RICARDO MEDINA MINAYA",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1166",
@@ -370,8 +514,12 @@
       "nombre_completo": "FERNANDO MIGUEL ROSPIGLIOSI CAPURRO",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "19/10/2023",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1091",
@@ -380,8 +528,12 @@
       "nombre_completo": "FLAVIO CRUZ MAMANI",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1092",
@@ -390,8 +542,12 @@
       "nombre_completo": "FLOR AIDEE PABLO MEDINA",
       "partido": "Partido Morado",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1094",
@@ -400,8 +556,12 @@
       "nombre_completo": "FRANCIS JHASMINA PAREDES CASTRO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1097",
@@ -410,8 +570,12 @@
       "nombre_completo": "GEORGE EDWARD MALAGA TRILLO",
       "partido": "Partido Morado",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1098",
@@ -420,8 +584,12 @@
       "nombre_completo": "GERMAN ADOLFO TACURI VALDIVIA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "ABST",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1073",
@@ -430,8 +598,12 @@
       "nombre_completo": "GLADYS MARGOT ECHAIZ RAMOS VDA DE NUNEZ",
       "partido": "Alianza para el Progreso",
       "bancada": "HONOR Y DEMOCRACIA",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1101",
@@ -440,8 +612,12 @@
       "nombre_completo": "GUIDO BELLIDO UGARTE",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "ABST",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1103",
@@ -450,8 +626,12 @@
       "nombre_completo": "GUILLERMO BERMEJO ROJAS",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "24/10/2025"
+      }
     },
     {
       "id": "1104",
@@ -460,8 +640,12 @@
       "nombre_completo": "HAMLET ECHEVERRIA RODRIGUEZ",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1105",
@@ -470,8 +654,12 @@
       "nombre_completo": "HECTOR JOSE VENTURA ANGEL",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1106",
@@ -480,8 +668,12 @@
       "nombre_completo": "HECTOR VALER PINTO",
       "partido": "Renovación Popular",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1107",
@@ -490,8 +682,12 @@
       "nombre_completo": "HEIDY LISBETH JUAREZ CALLE",
       "partido": "Alianza para el Progreso del Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1110",
@@ -500,8 +696,12 @@
       "nombre_completo": "HILDA MARLENY PORTERO LOPEZ",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1113",
@@ -510,8 +710,12 @@
       "nombre_completo": "IDELSO MANUEL GARCIA CORREA",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1114",
@@ -520,8 +724,12 @@
       "nombre_completo": "ILICH FREDY LOPEZ URENA",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1165",
@@ -530,8 +738,12 @@
       "nombre_completo": "ISAAC MITA ALANOCA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "29/03/2023",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1115",
@@ -540,8 +752,12 @@
       "nombre_completo": "ISABEL CORTEZ AGUIRRE",
       "partido": "Juntos por el Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1117",
@@ -550,8 +766,12 @@
       "nombre_completo": "JANET MILAGROS RIVAS CHACARA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1119",
@@ -560,8 +780,12 @@
       "nombre_completo": "JAVIER ROMMEL PADILLA ROMERO",
       "partido": "Renovación Popular",
       "bancada": "HONOR Y DEMOCRACIA",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1120",
@@ -570,8 +794,12 @@
       "nombre_completo": "JENY LUZ LOPEZ MORALES",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1122",
@@ -580,8 +808,12 @@
       "nombre_completo": "JHAEC DARWIN ESPINOZA VARGAS",
       "partido": "Acción Popular",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1123",
@@ -590,8 +822,12 @@
       "nombre_completo": "JHAKELINE KATY UGARTE MAMANI",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1124",
@@ -600,8 +836,12 @@
       "nombre_completo": "JORGE ALBERTO MORANTE FIGARI",
       "partido": "Fuerza Popular",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1125",
@@ -610,8 +850,12 @@
       "nombre_completo": "JORGE ALFONSO MARTICORENA MENDOZA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1126",
@@ -620,8 +864,12 @@
       "nombre_completo": "JORGE ARTURO ZEBALLOS APONTE",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1127",
@@ -630,8 +878,12 @@
       "nombre_completo": "JORGE CARLOS MONTOYA MANRIQUE",
       "partido": "Renovación Popular",
       "bancada": "HONOR Y DEMOCRACIA",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1128",
@@ -640,8 +892,12 @@
       "nombre_completo": "JORGE LUIS FLORES ANCACHI",
       "partido": "Acción Popular",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1130",
@@ -650,8 +906,12 @@
       "nombre_completo": "JORGE SAMUEL COAYLA JUAREZ",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "ABST",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1041",
@@ -660,8 +920,12 @@
       "nombre_completo": "JOSE ALBERTO ARRIOLA TUEROS",
       "partido": "Acción Popular",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1164",
@@ -670,8 +934,12 @@
       "nombre_completo": "JOSE BERNARDO PAZO NUNURA",
       "partido": "Somos Perú",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "26/01/2023",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1043",
@@ -680,8 +948,12 @@
       "nombre_completo": "JOSE DANIEL WILLIAMS ZAPATA",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1049",
@@ -690,8 +962,12 @@
       "nombre_completo": "JOSE ENRIQUE JERI ORE",
       "partido": "Partido Democrático Somos Perú",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1100",
@@ -700,8 +976,12 @@
       "nombre_completo": "JOSE ERNESTO CUETO ASERVI",
       "partido": "Renovación Popular",
       "bancada": "HONOR Y DEMOCRACIA",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1055",
@@ -710,8 +990,12 @@
       "nombre_completo": "JOSE LEON LUNA GALVEZ",
       "partido": "Podemos Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1057",
@@ -720,8 +1004,12 @@
       "nombre_completo": "JOSE LUIS ELIAS AVALOS",
       "partido": "Podemos Perú",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1060",
@@ -730,8 +1018,12 @@
       "nombre_completo": "JOSE MARIA BALCAZAR ZELADA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "ABST",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1063",
@@ -740,8 +1032,12 @@
       "nombre_completo": "JUAN BARTOLOME BURGOS OLIVEROS",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1066",
@@ -750,8 +1046,12 @@
       "nombre_completo": "JUAN CARLOS MARTIN LIZARZABURU LIZARZABURU",
       "partido": "Fuerza Popular",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1068",
@@ -760,8 +1060,12 @@
       "nombre_completo": "JUAN CARLOS MORI CELIS",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1070",
@@ -770,8 +1074,12 @@
       "nombre_completo": "KAROL IVETT PAREDES FONSECA",
       "partido": "Acción Popular",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1072",
@@ -780,8 +1088,12 @@
       "nombre_completo": "KELLY ROXANA PORTALATINO AVALOS",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1030",
@@ -790,8 +1102,12 @@
       "nombre_completo": "LADY MERCEDES CAMONES SORIANO",
       "partido": "Alianza para el Progreso del Perú",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1076",
@@ -800,8 +1116,12 @@
       "nombre_completo": "LUCINDA VASQUEZ VELA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1077",
@@ -810,8 +1130,12 @@
       "nombre_completo": "LUIS ANGEL ARAGON CARRENO",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1082",
@@ -820,8 +1144,12 @@
       "nombre_completo": "LUIS GUSTAVO CORDERO JON TAY",
       "partido": "Fuerza Popular",
       "bancada": "SOMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1085",
@@ -830,8 +1158,12 @@
       "nombre_completo": "LUIS RAUL PICON QUEDO",
       "partido": "Alianza para el Progreso",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1087",
@@ -840,8 +1172,12 @@
       "nombre_completo": "LUIS ROBERTO KAMICHE MORANTE",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1167",
@@ -850,8 +1186,12 @@
       "nombre_completo": "MAGALLY SANTISTEBAN SUCLUPE",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "25/03/2024",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1090",
@@ -860,8 +1200,12 @@
       "nombre_completo": "MAGALY ROSMERY RUIZ RODRIGUEZ",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1093",
@@ -870,8 +1214,12 @@
       "nombre_completo": "MARGOT PALACIOS HUAMAN",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1096",
@@ -880,8 +1228,12 @@
       "nombre_completo": "MARIA ANTONIETA AGUERO GUTIERREZ",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1099",
@@ -890,8 +1242,12 @@
       "nombre_completo": "MARIA DE LOS MILAGROS JACKELINE JAUREGUI MARTINEZ DE AGUAYO",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1029",
@@ -900,8 +1256,12 @@
       "nombre_completo": "MARIA DEL CARMEN ALVA PRIETO",
       "partido": "Acción Popular",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1109",
@@ -910,8 +1270,12 @@
       "nombre_completo": "MARIA ELIZABETH TAIPE CORONADO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1112",
@@ -920,8 +1284,12 @@
       "nombre_completo": "MARIA GRIMANEZA ACUNA PERALTA",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1116",
@@ -930,8 +1298,12 @@
       "nombre_completo": "MARIA JESSICA CORDOVA LOBATON",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1118",
@@ -940,8 +1312,12 @@
       "nombre_completo": "MARTHA LUPE MOYANO DELGADO",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1052",
@@ -950,8 +1326,12 @@
       "nombre_completo": "MERY ELIANA INFANTES CASTANEDA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1129",
@@ -960,8 +1340,12 @@
       "nombre_completo": "MIGUEL ANGEL CICCIA VASQUEZ",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1163",
@@ -970,8 +1354,12 @@
       "nombre_completo": "NELCY LIDIA HEIDINGER BALLESTEROS",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "16/01/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1162",
@@ -980,8 +1368,12 @@
       "nombre_completo": "NIEVES ESMERALDA LIMACHI QUISPE",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "11/11/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1131",
@@ -990,8 +1382,12 @@
       "nombre_completo": "NILZA MERLY CHACON TRUJILLO",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1132",
@@ -1000,8 +1396,12 @@
       "nombre_completo": "NIVARDO EDGAR TELLO MONTES",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1133",
@@ -1010,8 +1410,12 @@
       "nombre_completo": "NOELIA ROSSVITH HERRERA MEDINA",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1134",
@@ -1020,8 +1424,12 @@
       "nombre_completo": "NORMA MARTINA YARROW LUMBRERAS",
       "partido": "Renovación Popular",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1135",
@@ -1030,8 +1438,12 @@
       "nombre_completo": "OSCAR ZEA CHOQUECHAMBI",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1136",
@@ -1040,8 +1452,12 @@
       "nombre_completo": "PASION NEOMIAS DAVILA ATANACIO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BANCADA SOCIALISTA",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1032",
@@ -1050,8 +1466,12 @@
       "nombre_completo": "PATRICIA ROSA CHIRINOS VENEGAS",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "RENOVACION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1137",
@@ -1060,8 +1480,12 @@
       "nombre_completo": "PAUL SILVIO GUTIERREZ TICONA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "ABST"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1138",
@@ -1070,8 +1494,12 @@
       "nombre_completo": "PEDRO EDWIN MARTINEZ TALAVERA",
       "partido": "Acción Popular",
       "bancada": "NO AGRUPADO",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1139",
@@ -1080,8 +1508,12 @@
       "nombre_completo": "RAUL FELIPE DOROTEO CARBAJO",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1140",
@@ -1090,8 +1522,12 @@
       "nombre_completo": "RAUL HUAMAN CORONADO",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1121",
@@ -1100,8 +1536,12 @@
       "nombre_completo": "ROBERTO ENRIQUE CHIABRA LEON",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1147",
@@ -1110,8 +1550,12 @@
       "nombre_completo": "ROBERTO HELBERT SANCHEZ PALOMINO",
       "partido": "Juntos por el Perú",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "ABST",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1152",
@@ -1120,8 +1564,12 @@
       "nombre_completo": "ROSANGELLA ANDREA BARBARAN REYES",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1155",
@@ -1130,8 +1578,12 @@
       "nombre_completo": "ROSIO TORRES SALINAS",
       "partido": "Alianza para el Progreso",
       "bancada": "ALIANZA PARA EL PROGRESO",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1157",
@@ -1140,8 +1592,12 @@
       "nombre_completo": "RUTH LUQUE IBARRA",
       "partido": "Juntos por el Perú",
       "bancada": "BLOQUE DEMOCRATICO POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1160",
@@ -1150,8 +1606,12 @@
       "nombre_completo": "SEGUNDO HECTOR ACUNA PERALTA",
       "partido": "Alianza para el Progreso",
       "bancada": "HONOR Y DEMOCRACIA",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1141",
@@ -1160,8 +1620,12 @@
       "nombre_completo": "SEGUNDO TEODOMIRO QUIROZ BARBOZA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BLOQUE MAGISTERIAL DE CONCERTACION NACIONAL",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1159",
@@ -1170,8 +1634,12 @@
       "nombre_completo": "SEGUNDO TORIBIO MONTALVO CUBAS",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1158",
@@ -1180,8 +1648,12 @@
       "nombre_completo": "SIGRID TESORO BAZAN NARRO",
       "partido": "Juntos por el Perú",
       "bancada": "BLOQUE DEMOCRATICO POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": null
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1156",
@@ -1190,8 +1662,12 @@
       "nombre_completo": "SILVANA EMPERATRIZ ROBLES ARAUJO",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "BANCADA SOCIALISTA",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1154",
@@ -1200,8 +1676,12 @@
       "nombre_completo": "SILVIA MARIA MONTEZA FACHO",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "AUS"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1153",
@@ -1210,8 +1690,12 @@
       "nombre_completo": "SUSEL ANA MARIA PAREDES PIQUE",
       "partido": "Partido Morado",
       "bancada": "BLOQUE DEMOCRATICO POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "AUS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1151",
@@ -1220,8 +1704,12 @@
       "nombre_completo": "TANIA ESTEFANY RAMIREZ GARCIA",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1150",
@@ -1230,8 +1718,12 @@
       "nombre_completo": "VICTOR RAUL CUTIPA CCAMA",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1149",
@@ -1240,8 +1732,12 @@
       "nombre_completo": "VICTOR SEFERINO FLORES RUIZ",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1074",
@@ -1250,8 +1746,12 @@
       "nombre_completo": "VIVIAN OLIVOS MARTINEZ",
       "partido": "Fuerza Popular",
       "bancada": "FUERZA POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "OTROS",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1148",
@@ -1260,8 +1760,12 @@
       "nombre_completo": "WALDEMAR JOSE CERRON ROJAS",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "PERU LIBRE",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1145",
@@ -1270,8 +1774,12 @@
       "nombre_completo": "WILSON RUSBEL QUISPE MAMANI",
       "partido": "Partido Politico Nacional Perú Libre",
       "bancada": "JUNTOS POR EL PERU - VOCES DEL PUEBLO",
-      "condicion": "en Ejercicio",
-      "votacion": "SI"
+      "en_ejercicio": true,
+      "votacion": "NO",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1144",
@@ -1280,8 +1788,12 @@
       "nombre_completo": "WILSON SOTO PALACIOS",
       "partido": "Acción Popular",
       "bancada": "ACCION POPULAR",
-      "condicion": "en Ejercicio",
-      "votacion": "OTROS"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1143",
@@ -1290,8 +1802,12 @@
       "nombre_completo": "YESSICA ROSSELLI AMURUZ DULANTO",
       "partido": "Avanza País - Partido de Integración Social",
       "bancada": "AVANZA PAIS - PARTIDO DE INTEGRACION SOCIAL",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     },
     {
       "id": "1142",
@@ -1300,8 +1816,12 @@
       "nombre_completo": "YOREL KIRA ALCARRAZ AGUERO",
       "partido": "Partido Democrático Somos Perú",
       "bancada": "PODEMOS PERU",
-      "condicion": "en Ejercicio",
-      "votacion": "NO"
+      "en_ejercicio": true,
+      "votacion": "SI",
+      "periodo": {
+        "inicio": "27/07/2021",
+        "fin": "27/07/2026"
+      }
     }
   ]
 }
