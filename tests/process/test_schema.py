@@ -132,6 +132,7 @@ def test_congresista_creation():
         nombre="Juan Pérez",
         leg_period=LegPeriod.PERIODO_2021_2026,
         party_name="Partido X",
+        current_bancada="Bancada X",
         votes_in_election=25000,
         dist_electoral="Lima",
         condicion="Activo",

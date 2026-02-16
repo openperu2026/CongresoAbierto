@@ -64,6 +64,7 @@ def test_create_congresista(session):
         nombre="Ana Torres",
         leg_period=LegPeriod.PERIODO_2021_2026,
         party_name="Partido 1",
+        current_bancada="Bancada 1",
         votes_in_election=25000,
         dist_electoral="Lima",
         condicion="Activo",
