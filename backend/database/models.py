@@ -286,6 +286,7 @@ class Congresista(Base):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         party_name (str): Name of the party.
+        current_bancada (str): Name of the bancada.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
@@ -299,6 +300,7 @@ class Congresista(Base):
     nombre = Column(String, nullable=False)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
     party_name = Column(String, nullable=False)
+    current_bancada = Column(String, nullable=False)
     votes_in_election = Column(Integer, nullable=False)
     dist_electoral = Column(String, nullable=True)
     condicion = Column(String, nullable=False)

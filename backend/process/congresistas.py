@@ -19,6 +19,7 @@ def process_profile_content(raw_cong: RawCongresista) -> Congresista:
         nombre=xpath2('//*[@class="nombres"]/span[2]', html),
         leg_period=raw_cong.leg_period,
         party_name=xpath2('//*[@class="grupo"]/span[2]', html),
+        current_bancada=xpath2('//*[@class="bancada"]/span[2]', html),
         votes_in_election=int(
             xpath2('//*[@class="votacion"]/span[2]', html).replace(",", "")
         ),
