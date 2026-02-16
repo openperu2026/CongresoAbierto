@@ -512,3 +512,19 @@ class MotionDocument(Base):
             "motion_id", "step_id", "archivo_id", name="motion_document_uniq"
         ),
     )
+
+class Ley(Base):
+    """
+    Represents a law (ley) in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the motion.
+        title (str): Law title.
+        bill_id (str): Bill id related to this law (Proyecto de Ley)
+    """
+
+    __tablename__ = "leyes"
+
+    id = Column(String, primary_key=True, nullable=False)
+    title = Column(String, nullable=False)
+    bill_id = Column(String, nullable=False)

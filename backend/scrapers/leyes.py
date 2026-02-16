@@ -165,7 +165,7 @@ def main():
 
     # Pending: 16243, 10548, 9918, 9865, 9866, 9867, 9868, 9870
 
-    num_ley = 32570
+    #num_ley = 32570
     while True:
         try:
             scraper.scrape_ley(str(num_ley))
