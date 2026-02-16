@@ -24,5 +24,5 @@ def process_leyes(raw_ley: RawLey) -> Ley | None:
             title = title,
             bill_id = bill_id,
         )
-    except AttributeError:
+    except (AttributeError, IndexError):
         return None

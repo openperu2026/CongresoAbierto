@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, UTC  
 from loguru import logger
 
 from sqlalchemy.orm import sessionmaker
@@ -61,7 +61,7 @@ class RawLeyesScraper:
     def create_raw_ley(self, ley_number: str, data: str) -> RawLey:
         # Initialize raw ley with id and timestamp
         raw_ley = RawLey(
-            id=ley_number, timestamp=datetime.utcnow(), data=data, processed=False
+            id=ley_number, timestamp=datetime.now(UTC), data=data, processed=False
         )
 
         return raw_ley
