@@ -22,7 +22,6 @@ from backend.database.raw_models import (
     RawBill,
     RawCommittee,
     RawCongresista,
-    RawLey,
     RawMotion,
     RawOrganization,
 )
@@ -34,7 +33,6 @@ from backend.process.bills import (
     process_bill_steps,
 )
 from backend.process.congresistas import process_memberships, process_profile_content
-from backend.process.leyes import process_leyes
 from backend.process.motions import (
     process_motion,
     process_motion_document,
