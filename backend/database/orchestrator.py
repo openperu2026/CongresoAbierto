@@ -22,6 +22,7 @@ from backend.database.raw_models import (
     RawBill,
     RawCommittee,
     RawCongresista,
+    RawLey,
     RawMotion,
     RawOrganization,
 )
@@ -33,6 +34,7 @@ from backend.process.bills import (
     process_bill_steps,
 )
 from backend.process.congresistas import process_memberships, process_profile_content
+from backend.process.leyes import process_leyes
 from backend.process.motions import (
     process_motion,
     process_motion_document,
@@ -48,6 +50,7 @@ from backend.scrapers.bills import RawBillScraper
 from backend.scrapers.bills_documents import RawBillDocumentScraper
 from backend.scrapers.committees import RawCommitteeScraper
 from backend.scrapers.congresistas import RawCongresistasScraper
+from backend.scrapers.leyes import RawLeyesScraper
 from backend.scrapers.motions import RawMotionScraper
 from backend.scrapers.motions_documents import RawMotionDocumentScraper
 from backend.scrapers.organizations import RawOrganizationScraper
@@ -87,7 +90,10 @@ class OpenPeruOrchestrator:
     # -----------------------------
     # Public API
     # -----------------------------
-    def _recent_raw_exists(self, raw_model, days: int = 7) -> bool:
+    def _recent_raw_exists(self, raw_model: RawBase, days: int = 7) -> bool:
+        """
+        Query to check recent changes in a period of time in any RawDB table (default 7 days / 1 week)
+        """
         cutoff = datetime.now() - timedelta(days=days)
         with self.RawSession() as raw_db:
             last_ts = raw_db.query(func.max(raw_model.timestamp)).scalar()
@@ -98,6 +104,7 @@ class OpenPeruOrchestrator:
         *,
         scrape_bills: bool = True,
         scrape_motions: bool = True,
+        scrape_leyes: bool = True,
         scrape_others: bool = True,
         only_current: bool = True,
         weekly_days: int = 7,
@@ -105,6 +112,8 @@ class OpenPeruOrchestrator:
         bill_year: int | None = None,
         bill_start: int | None = None,
         bill_end: int | None = None,
+        ley_start: int | None = None,
+        ley_end: int | None = None,
         motion_year: int | None = None,
         motion_start: int | None = None,
         motion_end: int | None = None,
@@ -175,14 +184,25 @@ class OpenPeruOrchestrator:
         if scrape_documents and (scrape_bills or scrape_motions):
             self._scrape_pending_documents()
 
+        if scrape_leyes:
+            if all(v is not None for v in [ley_start, ley_end]):
+                self._scrape_leyes_range(int(ley_start), int(ley_end))
+            else:
+                RawLeyesScraper().scrape_pending_weekly(
+                    max_age_days=weekly_days, flush_every=100
+                )
+
+
     def run_processing(
         self,
         *,
         process_bills: bool = True,
         process_motions: bool = True,
+        process_leyes: bool = True,
         process_others: bool = True,
         include_documents: bool = True,
         bills_limit: int | None = None,
+        leyes_limit: int | None = None,
         motions_limit: int | None = None,
     ) -> dict[str, StageStats]:
         """
@@ -204,6 +224,10 @@ class OpenPeruOrchestrator:
             summary["motions"] = self._process_motions(
                 include_documents=include_documents,
                 limit=motions_limit,
+            )
+        if process_leyes:
+            summary["leyes"] = self._process_leyes(
+                limit = leyes_limit
             )
 
         return summary
@@ -249,6 +273,9 @@ class OpenPeruOrchestrator:
                 motion_id=motion_id, update=False, prioritize=True
             )
             motion_docs.load_raw_documents()
+
+    def _scrape_leyes_range():
+        pass
 
     # -----------------------------
     # Processing internals
@@ -668,7 +695,9 @@ class OpenPeruOrchestrator:
             f"[motions] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
         )
         return stats
-
+    
+    def _process_leyes():
+        pass
 
 def _print_summary(summary: dict[str, StageStats]) -> None:
     total_processed = 0

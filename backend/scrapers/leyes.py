@@ -159,6 +159,8 @@ class RawLeyesScraper:
         if self.add_leyes_to_db():
             self.raw_leyes = []
 
+    def scrape_pending_weekly(self):
+        pass
 
 def main():
     scraper = RawLeyesScraper()
