@@ -154,6 +154,24 @@ Scrape pending bill and motion documents
 uv run python -m backend --scrape --scrape-documents
 ```
 
+Download PDFs from RawDB document links
+
+```bash
+uv run python -m backend --download-documents
+```
+
+Limit downloads per type (bills/motions)
+
+```bash
+uv run python -m backend --download-documents --download-documents-limit 100
+```
+
+Download PDFs and upload to AWS S3 (requires AWS_* env vars)
+
+```bash
+uv run python -m backend --download-documents --upload-documents-s3
+```
+
 Skip loading documents during processing
 
 ```bash
@@ -200,6 +218,14 @@ Optional range filters
 Documents
 
 • `--scrape-documents` scrape pending bill and motion documents
+
+• `--download-documents` download PDFs from RawDB document links
+
+• `--download-documents-limit` limit the number of documents downloaded per type (bills/motions)
+
+• `--update-documents` re-download PDFs even if they already exist locally
+
+• `--upload-documents-s3` upload downloaded PDFs to the configured AWS S3 bucket
 
 • `--no-documents` skip loading documents in processing stage
 

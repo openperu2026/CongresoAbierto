@@ -26,6 +26,11 @@ from backend.database.raw_models import (
     RawMotion,
     RawOrganization,
 )
+from backend.documents.downloader import (
+    DownloadStats,
+    download_bill_documents,
+    download_motion_documents,
+)
 from backend.process.bancadas import process_bancada
 from backend.process.bills import (
     get_committees,
@@ -227,6 +232,27 @@ class OpenPeruOrchestrator:
         if process_leyes:
             summary["leyes"] = self._process_leyes(limit=leyes_limit)
 
+        return summary
+
+    def run_document_downloads(
+        self,
+        *,
+        download_bills: bool = True,
+        download_motions: bool = True,
+        update: bool = False,
+        upload_s3: bool = False,
+        limit: int | None = None,
+    ) -> dict[str, DownloadStats]:
+        summary: dict[str, DownloadStats] = {}
+        with self.RawSession() as raw_db:
+            if download_bills:
+                summary["bill_documents"] = download_bill_documents(
+                    raw_db, update=update, upload_s3=upload_s3, limit=limit
+                )
+            if download_motions:
+                summary["motion_documents"] = download_motion_documents(
+                    raw_db, update=update, upload_s3=upload_s3, limit=limit
+                )
         return summary
 
     # -----------------------------
@@ -757,6 +783,28 @@ def _print_summary(summary: dict[str, StageStats]) -> None:
     )
 
 
+def _print_document_summary(summary: dict[str, DownloadStats]) -> None:
+    total_scanned = 0
+    total_downloaded = 0
+    total_skipped = 0
+    total_errors = 0
+    total_uploaded = 0
+    for stage, stats in summary.items():
+        logger.info(
+            f"{stage}: scanned={stats.scanned}, downloaded={stats.downloaded}, skipped={stats.skipped}, errors={stats.errors}, uploaded={stats.uploaded}"
+        )
+        total_scanned += stats.scanned
+        total_downloaded += stats.downloaded
+        total_skipped += stats.skipped
+        total_errors += stats.errors
+        total_uploaded += stats.uploaded
+    logger.info(
+        "documents_total: "
+        f"scanned={total_scanned}, downloaded={total_downloaded}, "
+        f"skipped={total_skipped}, errors={total_errors}, uploaded={total_uploaded}"
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="OpenPeru ETL Orchestrator")
     parser.add_argument(
@@ -819,6 +867,26 @@ def build_parser() -> argparse.ArgumentParser:
         "--scrape-documents",
         action="store_true",
         help="Scrape pending bill/motion documents",
+    )
+    parser.add_argument(
+        "--download-documents",
+        action="store_true",
+        help="Download PDF documents from RawDB links",
+    )
+    parser.add_argument(
+        "--download-documents-limit",
+        type=int,
+        help="Limit the number of documents downloaded per type (bills/motions)",
+    )
+    parser.add_argument(
+        "--update-documents",
+        action="store_true",
+        help="Re-download documents even if they already exist locally",
+    )
+    parser.add_argument(
+        "--upload-documents-s3",
+        action="store_true",
+        help="Upload downloaded documents to the configured AWS S3 bucket",
     )
     parser.add_argument(
         "--no-documents",
@@ -889,6 +957,16 @@ def main(argv: list[str] | None = None) -> None:
             ley_end=args.ley_end,
             scrape_documents=args.scrape_documents,
         )
+
+    if args.download_documents:
+        doc_summary = orchestrator.run_document_downloads(
+            download_bills=run_bills,
+            download_motions=run_motions,
+            update=args.update_documents,
+            upload_s3=args.upload_documents_s3,
+            limit=args.download_documents_limit,
+        )
+        _print_document_summary(doc_summary)
 
     if not args.skip_processing:
         summary = orchestrator.run_processing(

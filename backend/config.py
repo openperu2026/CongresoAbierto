@@ -24,10 +24,21 @@ class Directories:
     DATA = ROOT_DIR / "data"
     RAW_DATA = DATA / "raw"
     PROCESSED_DATA = DATA / "processed"
+    DOCUMENTS = RAW_DATA / "documents"
+    BILL_DOCUMENTS = DOCUMENTS / "bills"
+    MOTION_DOCUMENTS = DOCUMENTS / "motions"
     LOGS = ROOT_DIR / "logs"
 
     def __init__(self):
-        for dir in [self.DATA, self.RAW_DATA, self.PROCESSED_DATA, self.LOGS]:
+        for dir in [
+            self.DATA,
+            self.RAW_DATA,
+            self.PROCESSED_DATA,
+            self.DOCUMENTS,
+            self.BILL_DOCUMENTS,
+            self.MOTION_DOCUMENTS,
+            self.LOGS,
+        ]:
             dir.mkdir(exist_ok=True)
 
 
@@ -55,11 +66,11 @@ class Settings(BaseSettings):
     RAW_DB_URL: str = os.getenv(
         "RAW_DB_URL", f"sqlite:///{directories.RAW_DATA.as_posix()}/OpenPeruRaw.db"
     )
-    # Uncomment this
-    # AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID")
-    # AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY")
-    # AWS_REGION: str = os.getenv("AWS_REGION")
-    # AWS_S3_BUCKET_NAME: str = os.getenv("AWS_S3_BUCKET_NAME")
+    AWS_ACCESS_KEY_ID: str | None = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY: str | None = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_REGION: str | None = os.getenv("AWS_REGION")
+    AWS_S3_BUCKET_NAME: str | None = os.getenv("AWS_S3_BUCKET_NAME")
+    AWS_S3_PREFIX: str | None = os.getenv("AWS_S3_PREFIX")
 
     # This is only in case we need some API_KEYS. Allow us to handle safely.
     model_config = ConfigDict(env_file=directories.ROOT_DIR / ".env")
