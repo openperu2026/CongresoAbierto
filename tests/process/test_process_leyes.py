@@ -1,4 +1,3 @@
-import pytest
 from datetime import datetime, UTC
 
 from backend.database.raw_models import RawLey
@@ -72,9 +71,6 @@ def test_process_leyes_returns_none_when_missing_required_fields():
 
 
 def test_process_leyes_returns_none_when_no_menu_item_6_present():
-    # This currently triggers an error because bill_id is never set.
-    # Your function only catches AttributeError, but this case raises UnboundLocalError.
-    # We assert that behavior so the test documents the bug.
     xml = """
     <root>
       <data>
@@ -93,5 +89,5 @@ def test_process_leyes_returns_none_when_no_menu_item_6_present():
     </root>
     """.strip()
 
-    with pytest.raises(UnboundLocalError):
-        process_leyes(_raw_ley(xml))
+    out = process_leyes(_raw_ley(xml))
+    assert out is None

@@ -274,7 +274,7 @@ class OpenPeruOrchestrator:
             )
             motion_docs.load_raw_documents()
 
-    def _scrape_leyes_range(ley_start: int, ley_end: int, flush_every: int = 100):
+    def _scrape_leyes_range(self, ley_start: int, ley_end: int, flush_every: int = 100):
         logger.info(f"Scraping leyes in range {ley_start}..{ley_end}")
         scraper = RawLeyesScraper()
         for ley_number in range(ley_start, ley_end + 1):
@@ -703,7 +703,7 @@ class OpenPeruOrchestrator:
         )
         return stats
     
-    def _process_leyes(self, *, limit: int | None):
+    def _process_leyes(self, *, limit: int | None) -> StageStats:
         stats = StageStats()
         clean_inserted = 0
         clean_updated = 0
@@ -718,8 +718,12 @@ class OpenPeruOrchestrator:
             for raw_ley in rows:
                 try:
                     ley_schema = process_leyes(raw_ley)
+                    if ley_schema is None:
+                        raw_ley.processed = False
+                        stats.skipped += 1
+                        continue
                     pre = db.get(db_models.Ley, ley_schema.id)
-                    ley = crud_core.upsert_ley(db, ley_schema)
+                    crud_core.upsert_ley(db, ley_schema)
                     if pre is None:
                         clean_inserted += 1
                     else:
@@ -737,7 +741,7 @@ class OpenPeruOrchestrator:
             db.commit()
             raw_db.commit()
         logger.info(
-            f"[motions] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
+            f"[leyes] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
         )
         return stats
 
