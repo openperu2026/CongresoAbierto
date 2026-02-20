@@ -44,6 +44,7 @@ from backend.process.organizations import (
     process_org,
     process_org_membership,
 )
+from backend.process.leyes import process_leyes
 from backend.scrapers.bancadas import RawBancadaScraper
 from backend.scrapers.bills import RawBillScraper
 from backend.scrapers.bills_documents import RawBillDocumentScraper
