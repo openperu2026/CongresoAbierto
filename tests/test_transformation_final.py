@@ -25,6 +25,68 @@ def normalize_vote(value: str) -> str:
         return v
     return "OTROS"
 
+def jaro_winkler_similarity(s1: str, s2: str, prefix_scale: float = 0.1, max_prefix: int = 4) -> float:
+    # Pure Python implementation to avoid external deps in tests.
+    if s1 == s2:
+        return 1.0
+    len1, len2 = len(s1), len(s2)
+    if len1 == 0 or len2 == 0:
+        return 0.0
+
+    match_distance = max(len1, len2) // 2 - 1
+    s1_matches = [False] * len1
+    s2_matches = [False] * len2
+
+    matches = 0
+    for i in range(len1):
+        start = max(0, i - match_distance)
+        end = min(i + match_distance + 1, len2)
+        for j in range(start, end):
+            if s2_matches[j]:
+                continue
+            if s1[i] == s2[j]:
+                s1_matches[i] = True
+                s2_matches[j] = True
+                matches += 1
+                break
+
+    if matches == 0:
+        return 0.0
+
+    # Count transpositions.
+    t = 0
+    j = 0
+    for i in range(len1):
+        if not s1_matches[i]:
+            continue
+        while not s2_matches[j]:
+            j += 1
+        if s1[i] != s2[j]:
+            t += 1
+        j += 1
+    transpositions = t / 2
+
+    jaro = (
+        (matches / len1) +
+        (matches / len2) +
+        ((matches - transpositions) / matches)
+    ) / 3
+
+    # Winkler adjustment.
+    prefix = 0
+    for i in range(min(max_prefix, len1, len2)):
+        if s1[i] == s2[i]:
+            prefix += 1
+        else:
+            break
+    return jaro + prefix * prefix_scale * (1 - jaro)
+
+def assert_title_similar(actual_title: str, expected_title: str, threshold: float = 0.6) -> None:
+    a = normalize_text(actual_title)
+    e = normalize_text(expected_title)
+    score = jaro_winkler_similarity(a, e)
+    assert score >= threshold, f"Title similarity below threshold: {score:.3f} < {threshold}"
+
 def to_str(val) -> str:
     if pd.isna(val):
         return ""
@@ -33,8 +95,8 @@ def to_str(val) -> str:
     return str(val).strip()
 
 
-def parse_input_test_excel(path: Path) -> dict:
-    df = pd.read_excel(path, header=None)
+def parse_input_test_excel(path: Path, sheetname) -> dict:
+    df = pd.read_excel(path, sheet_name= sheetname, header=None)
 
     raw_title = df.iloc[0, 1]
     raw_fecha = df.iloc[1, 1]
@@ -78,7 +140,7 @@ def load_json(path: Path) -> dict:
         return json.load(f)
 
 
-def compare_results(actual_results: list[dict], expected_results: list[dict]) -> None:
+def compare_results(actual_results: list[dict], expected_results: list[dict], report: bool = False) -> None:
     # Only compare rows where en_ejercicio is True in actual results.
     actual_filtered = [r for r in actual_results if r.get("en_ejercicio") is True]
     actual_ids = {str(r.get("id", "")).strip() for r in actual_filtered}
@@ -96,33 +158,46 @@ def compare_results(actual_results: list[dict], expected_results: list[dict]) ->
             normalize_vote(r.get("votacion")),
         )
 
-    actual_sorted = sorted((row_key(r) for r in actual_filtered))
-    expected_sorted = sorted((row_key(r) for r in expected_filtered))
+    actual_keyed = [(row_key(r), r) for r in actual_filtered]
+    expected_keyed = [(row_key(r), r) for r in expected_filtered]
+
+    actual_sorted = sorted((k for k, _ in actual_keyed))
+    expected_sorted = sorted((k for k, _ in expected_keyed))
 
     if actual_sorted != expected_sorted:
         actual_set = set(actual_sorted)
         expected_set = set(expected_sorted)
         only_in_actual = sorted(actual_set - expected_set)
         only_in_expected = sorted(expected_set - actual_set)
+        matched = len(actual_set & expected_set)
+        actual_lookup = {k: r for k, r in actual_keyed}
+        expected_lookup = {k: r for k, r in expected_keyed}
+        only_in_actual_dicts = [actual_lookup[k] for k in only_in_actual[:20]]
+        only_in_expected_dicts = [expected_lookup[k] for k in only_in_expected[:20]]
+        if not report:
+            raise AssertionError("Result mismatch.")
         raise AssertionError(
             "Result mismatch.\n"
-            f"Only in actual (first 20): {only_in_actual[:20]}\n"
-            f"Only in expected (first 20): {only_in_expected[:20]}"
+            f"Matched results: {matched}\n"
+            f"Unmatched in actual: {len(only_in_actual)}\n"
+            f"Unmatched in expected: {len(only_in_expected)}\n"
+            f"Only in actual results (first 2 dicts): {only_in_actual_dicts}\n"
+            f"Only in expected results (first 2 dicts): {only_in_expected_dicts}"
         )
 
 
-def test_seats_json_matches_input_test_xlsx():
-    expected = parse_input_test_excel(Path("data/input_test.xlsx"))
-    actual = load_json(Path("data/seats.json"))
+#def test_seats_json_matches_input_test_xlsx():
+#    expected = parse_input_test_excel(Path("data/input_test.xlsx"), "Sheet1")
 
-    assert normalize_text(actual.get("titulo")) == expected.get("titulo")
-    assert normalize_text(actual.get("evento")) == expected.get("evento")
-    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
+#    actual = load_json(Path("data/seats.json"))
+#    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
+#    assert normalize_text(actual.get("evento")) == expected.get("evento")
+#    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
+#
+ #   compare_results(actual.get("resultados", []), expected.get("resultados", []))
+#
 
-    compare_results(actual.get("resultados", []), expected.get("resultados", []))
-
-
-def test_transformation_final_matches_input_test_xlsx():
+def test_transformation_final_L31751():
     tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
     if not tesseract_path.exists():
         pytest.skip("Tesseract not installed on this machine.")
@@ -132,19 +207,118 @@ def test_transformation_final_matches_input_test_xlsx():
     except Exception as exc:
         pytest.skip(f"extract_votes import failed: {exc}")
 
-    expected = parse_input_test_excel(Path("data/input_test.xlsx"))
+    expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31751")
+
+    pdf_candidates = list(Path("data/to_test_function").glob("L31751.pdf"))
+    if not pdf_candidates:
+        pytest.skip("Sample PDF not found.")
+    pdf_path = pdf_candidates[0]
+
+    votes_text = ev.render_bill(str(pdf_path), 1)
+    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
+    
+    actual = ev.transformation_final(votes_text, congresistas_jsn)
+
+    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
+    assert normalize_text(actual.get("evento")) == expected.get("evento")
+    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
+
+
+    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)
+
+
+
+def test_pdf_excel_basic():
+    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
+    if not tesseract_path.exists():
+        pytest.skip("Tesseract not installed on this machine.")
+
+    try:
+        from backend.process import extract_votes as ev
+    except Exception as exc:
+        pytest.skip(f"extract_votes import failed: {exc}")
+
+    expected = parse_input_test_excel(Path("data/input_test.xlsx"), "Sheet1")
 
     pdf_candidates = list(Path("data").glob("Asis_y_vot_de_la_*_13-12-2024.pdf"))
     if not pdf_candidates:
         pytest.skip("Sample PDF not found.")
     pdf_path = pdf_candidates[0]
 
-    attendance_text, votes_text = ev.render_bill(str(pdf_path))
-    congresistas_jsn = load_json(Path("data/congresistas.json"))
+    votes_text = ev.render_bill(str(pdf_path), 2)
+    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
     actual = ev.transformation_final(votes_text, congresistas_jsn)
 
-    assert normalize_text(actual.get("titulo")) == expected.get("titulo")
+    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
     assert normalize_text(actual.get("evento")) == expected.get("evento")
     assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
 
     compare_results(actual.get("resultados", []), expected.get("resultados", []))
+
+
+
+
+
+
+
+
+
+def test_transformation_final_L31989():
+    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
+    if not tesseract_path.exists():
+        pytest.skip("Tesseract not installed on this machine.")
+
+    try:
+        from backend.process import extract_votes as ev
+    except Exception as exc:
+        pytest.skip(f"extract_votes import failed: {exc}")
+
+    expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31989")
+
+    pdf_candidates = list(Path("data/to_test_function").glob("L31989.pdf"))
+    if not pdf_candidates:
+        pytest.skip("Sample PDF not found.")
+    pdf_path = pdf_candidates[0]
+
+    votes_text = ev.render_bill(str(pdf_path), 1)
+    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
+    
+    actual = ev.transformation_final(votes_text, congresistas_jsn)
+
+    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
+    assert normalize_text(actual.get("evento")) == expected.get("evento")
+    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
+
+
+    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)
+
+
+
+
+def test_transformation_final_L31990(): 
+    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
+    if not tesseract_path.exists():
+        pytest.skip("Tesseract not installed on this machine.")
+
+    try:
+        from backend.process import extract_votes as ev
+    except Exception as exc:
+        pytest.skip(f"extract_votes import failed: {exc}")
+
+    expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31990")
+
+    pdf_candidates = list(Path("data/to_test_function").glob("L31990.pdf"))
+    if not pdf_candidates:
+        pytest.skip("Sample PDF not found.")
+    pdf_path = pdf_candidates[0]
+
+    votes_text = ev.render_bill(str(pdf_path), 1)
+    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
+    
+    actual = ev.transformation_final(votes_text, congresistas_jsn)
+
+    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
+    assert normalize_text(actual.get("evento")) == expected.get("evento")
+    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
+
+    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)

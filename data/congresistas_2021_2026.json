@@ -6,13 +6,13 @@
     "votation": "11,384",
     "leg_period": "Parlamentario 2021 - 2026",
     "party_name": "Alianza para el Progreso",
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    },
+    }],
     "dist_electoral": "Lambayeque",
     "website": "https://www.congreso.gob.pe/congresistas2021/GrimanezaAcuna/",
     "periodo": {
@@ -35,13 +35,50 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
-      "name": "HONOR Y DEMOCRACIA",
-      "periodo": {
-        "inicio": "27/07/2021",
-        "fin": "27/07/2026"
-      }
-    }
+    "bancada": [
+        {"name": "ALIANZA PARA EL PROGRESO",
+        "periodo": {
+          "inicio": "27/07/2021",
+          "fin": "15/07/2022"
+        }},
+        {"name": "NO AGRUPADO",
+        "periodo": {
+          "inicio": "15/07/2022",
+          "fin": "20/07/2022"
+        }},
+        {"name": "CAMBIO DEMOCRATICO - JUNTOS POR EL PERU",
+        "periodo": {
+          "inicio": "20/07/2022",
+          "fin": "30/07/2022"
+        }},
+        {"name": "INTEGRIDAD Y DESARROLLO",
+        "periodo": {
+          "inicio": "01/08/2022",
+          "fin": "10/05/2023"
+        }},  
+
+           {"name": "NO AGRUPADO",
+        "periodo": {
+          "inicio": "11/05/2023",
+          "fin": "20/07/2023"
+        }},
+        
+
+         {"name": "UNIDAD Y DIALOGO",
+        "periodo": {
+          "inicio": "21/07/2023",
+          "fin": "26/05/2024"
+        }},
+        
+      
+        {
+        "name": "HONOR Y DEMOCRACIA",
+        "periodo": {
+          "inicio": "27/05/2024",
+          "fin": "27/07/2026"
+        }
+        }
+    ]
   },
   {
     "id": "1096",
@@ -57,13 +94,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1037",
@@ -79,13 +116,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1142",
@@ -101,13 +138,36 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
-      "name": "PODEMOS PERÚ",
+    "bancada": [ 
+      {
+      "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
+        "fin": "10/08/2022"
+      }
+      },
+      {
+      "name": "INTEGRIDAD Y DESAROLLO",
+      "periodo": {
+        "inicio": "11/08/2022",
+        "fin": "29/12/2022"
+      }
+      },
+      {
+      "name": "PODEMOS PERÚ",
+      "periodo": {
+        "inicio": "30/12/2021",
+        "fin": "07/11/2025"
+      }
+      },
+      {
+      "name": "NO AGRUPADO",
+      "periodo": {
+        "inicio": "07/11/2025",
         "fin": "27/07/2026"
       }
-    }
+      }
+  ]
   },
   {
     "id": "1079",
@@ -123,13 +183,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1029",
@@ -145,13 +205,29 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
-      "name": "NO AGRUPADO",
+    "bancada": [{
+      "name": "ACCION POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
+        "fin": "07/08/2023"
+      }
+    },
+    {
+      "name": "NO AGRUPADO",
+      "periodo": {
+        "inicio": "08/08/2023",
+        "fin": "07/10/2025"
+      }
+    },
+    {
+      "name": "ACCION POPULAR",
+      "periodo": {
+        "inicio": "08/10/2025",
         "fin": "27/07/2026"
       }
     }
+  
+    ]
   },
   {
     "id": "1054",
@@ -167,13 +243,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1143",
@@ -189,13 +265,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1053",
@@ -211,13 +287,13 @@
       "fin": "26/12/2025"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1077",
@@ -233,13 +309,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1041",
@@ -255,13 +331,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1045",
@@ -277,13 +353,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1060",
@@ -299,13 +375,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1152",
@@ -321,13 +397,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1069",
@@ -343,13 +419,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1158",
@@ -365,13 +441,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE DEMOCRÁTICO POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1101",
@@ -387,13 +463,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1103",
@@ -409,13 +485,13 @@
       "fin": "24/10/2025"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1063",
@@ -431,13 +507,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1056",
@@ -453,13 +529,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1071",
@@ -475,13 +551,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1030",
@@ -497,13 +573,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1075",
@@ -519,13 +595,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1038",
@@ -541,13 +617,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1148",
@@ -563,13 +639,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1131",
@@ -585,13 +661,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1051",
@@ -607,13 +683,13 @@
       "fin": "22/03/2023"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1121",
@@ -629,13 +705,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1032",
@@ -651,13 +727,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1129",
@@ -673,13 +749,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1130",
@@ -695,13 +771,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1082",
@@ -717,13 +793,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1102",
@@ -739,13 +815,13 @@
       "fin": "14/03/2024"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1116",
@@ -761,13 +837,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1115",
@@ -783,13 +859,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1091",
@@ -805,13 +881,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1100",
@@ -827,13 +903,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "HONOR Y DEMOCRACIA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1150",
@@ -849,13 +925,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1136",
@@ -871,13 +947,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BANCADA SOCIALISTA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1095",
@@ -893,13 +969,13 @@
       "fin": "12/01/2023"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1139",
@@ -915,13 +991,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1073",
@@ -937,13 +1013,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "HONOR Y DEMOCRACIA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1104",
@@ -959,13 +1035,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1146",
@@ -981,13 +1057,13 @@
       "fin": "12/01/2023"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1057",
@@ -1003,13 +1079,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1122",
@@ -1025,13 +1101,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1128",
@@ -1047,13 +1123,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1044",
@@ -1069,13 +1145,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BANCADA SOCIALISTA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1149",
@@ -1091,13 +1167,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1113",
@@ -1113,13 +1189,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1031",
@@ -1135,13 +1211,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1067",
@@ -1157,13 +1233,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1108",
@@ -1179,13 +1255,13 @@
       "fin": "29/09/2023"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1137",
@@ -1201,13 +1277,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1163",
@@ -1223,13 +1299,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1089",
@@ -1245,13 +1321,13 @@
       "fin": "25/10/2021"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1133",
@@ -1267,13 +1343,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1140",
@@ -1289,13 +1365,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1052",
@@ -1311,13 +1387,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1099",
@@ -1333,13 +1409,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1049",
@@ -1355,13 +1431,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1065",
@@ -1377,13 +1453,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1107",
@@ -1399,13 +1475,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1059",
@@ -1421,13 +1497,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1083",
@@ -1443,13 +1519,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1087",
@@ -1465,13 +1541,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1162",
@@ -1487,13 +1563,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1066",
@@ -1509,13 +1585,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1120",
@@ -1531,13 +1607,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1114",
@@ -1553,13 +1629,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1055",
@@ -1575,13 +1651,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1157",
@@ -1597,13 +1673,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE DEMOCRÁTICO POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1097",
@@ -1619,13 +1695,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1125",
@@ -1641,13 +1717,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1138",
@@ -1663,13 +1739,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1081",
@@ -1685,13 +1761,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1088",
@@ -1707,13 +1783,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1165",
@@ -1729,13 +1805,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1159",
@@ -1751,13 +1827,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1154",
@@ -1773,13 +1849,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1127",
@@ -1795,13 +1871,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "HONOR Y DEMOCRACIA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1124",
@@ -1817,13 +1893,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1068",
@@ -1839,13 +1915,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1118",
@@ -1861,13 +1937,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1039",
@@ -1883,13 +1959,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1048",
@@ -1905,13 +1981,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1074",
@@ -1927,13 +2003,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1168",
@@ -1949,13 +2025,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1092",
@@ -1971,13 +2047,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1119",
@@ -1993,13 +2069,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "HONOR Y DEMOCRACIA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1093",
@@ -2015,13 +2091,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "NO AGRUPADO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1094",
@@ -2037,13 +2113,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1070",
@@ -2059,13 +2135,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1042",
@@ -2081,13 +2157,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1153",
@@ -2103,13 +2179,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE DEMOCRÁTICO POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1046",
@@ -2125,13 +2201,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BANCADA SOCIALISTA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1164",
@@ -2147,13 +2223,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1085",
@@ -2169,13 +2245,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1072",
@@ -2191,13 +2267,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1110",
@@ -2213,13 +2289,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCION POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1141",
@@ -2235,13 +2311,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1145",
@@ -2257,13 +2333,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1050",
@@ -2279,13 +2355,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BANCADA SOCIALISTA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1151",
@@ -2301,13 +2377,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1061",
@@ -2323,13 +2399,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1035",
@@ -2345,13 +2421,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1047",
@@ -2367,13 +2443,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE DEMOCRÁTICO POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1117",
@@ -2389,13 +2465,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1156",
@@ -2411,13 +2487,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BANCADA SOCIALISTA",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1166",
@@ -2433,13 +2509,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1090",
@@ -2455,13 +2531,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1111",
@@ -2477,13 +2553,13 @@
       "fin": "17/09/2024"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1078",
@@ -2499,13 +2575,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1147",
@@ -2521,13 +2597,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1167",
@@ -2543,13 +2619,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1144",
@@ -2565,13 +2641,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCION POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1040",
@@ -2587,13 +2663,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1098",
@@ -2609,13 +2685,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1109",
@@ -2631,13 +2707,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PERÚ LIBRE",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1132",
@@ -2653,13 +2729,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1155",
@@ -2675,13 +2751,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ALIANZA PARA EL PROGRESO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1062",
@@ -2697,13 +2773,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1036",
@@ -2719,13 +2795,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1123",
@@ -2741,13 +2817,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1106",
@@ -2763,13 +2839,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1080",
@@ -2785,13 +2861,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "JUNTOS POR EL PERÚ - VOCES DEL PUEBLO",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1076",
@@ -2807,13 +2883,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1105",
@@ -2829,13 +2905,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1084",
@@ -2851,13 +2927,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "ACCION POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1043",
@@ -2873,13 +2949,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1086",
@@ -2895,13 +2971,13 @@
       "fin": "13/07/2024"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "PODEMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1134",
@@ -2917,13 +2993,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1135",
@@ -2939,13 +3015,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE MAGISTERIAL DE CONCERTACIÓN NACIONAL",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1126",
@@ -2961,13 +3037,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "RENOVACIÓN POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1058",
@@ -2983,13 +3059,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "BLOQUE DEMOCRÁTICO POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1169",
@@ -3005,13 +3081,13 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "SOMOS PERÚ",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   },
   {
     "id": "1064",
@@ -3027,12 +3103,12 @@
       "fin": "27/07/2026"
     },
     "en_ejercicio": false,
-    "bancada": {
+    "bancada": [{
       "name": "FUERZA POPULAR",
       "periodo": {
         "inicio": "27/07/2021",
         "fin": "27/07/2026"
       }
-    }
+    }]
   }
 ]

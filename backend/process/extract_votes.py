@@ -13,6 +13,39 @@ from jellyfish import jaro_winkler_similarity as jws
 
 pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
 
+# --- Shared patterns ---
+UPPER_SPANISH = r"A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1"
+BANCADA_REGEX = rf"([{UPPER_SPANISH}]{{2,5}}(?:-[{UPPER_SPANISH}]{{2,5}})?)"
+NOMBRE_REGEX = rf"([{UPPER_SPANISH} ,.'-]+?)"
+
+ATTENDANCE_STATE_REGEX = rf"(?<![{UPPER_SPANISH}])\s*(AUS|PRE|LE|LO|LP)\s*(?![{UPPER_SPANISH}])"
+
+SI_REGEX = (
+    rf"(?<![{UPPER_SPANISH}])[S5][I\u00cd](?:\s+[\+\d]{{0,4}})?(?:\s+|$)(?![{UPPER_SPANISH}])"
+    rf"|S\s+\+{{1,4}}(?:\s+|$)"
+    rf"|S\d\s+\+{{1,4}}(?:\s+|$)"
+    rf"|\"?\$1\"?(?:\s+|$)"
+)
+
+
+NO_REGEX = rf"(?<![{UPPER_SPANISH}])N[O\u00d3](?:\s+[-=\d]{{0,4}})?(?:\s+|$)(?![{UPPER_SPANISH}])"
+AUS_REGEX = r"(?:AUS|AIS|US)"
+ABST_REGEX = r"(?:ABST\.)"
+ASIS_REGEX = r"(?:PRE)"
+OTHER_REGEX = rf"(?<![{UPPER_SPANISH}])(?:LE|LO|LP|SINRES|SINRRES|TT|TTT)(?![{UPPER_SPANISH}])"
+STAR_REGEX = r"(?:\*{1,4})"
+
+VOTE_STATE_REGEX = rf"(?:{SI_REGEX}|{NO_REGEX}|{AUS_REGEX}|{ABST_REGEX}|{OTHER_REGEX}|{STAR_REGEX})"
+
+# Compiled patterns for estado categorization
+SI_PATTERN = re.compile(rf"^(?:{SI_REGEX})$", re.IGNORECASE)
+NO_PATTERN = re.compile(rf"^(?:{NO_REGEX})$", re.IGNORECASE)
+ABST_PATTERN = re.compile(rf"^(?:{ABST_REGEX})$", re.IGNORECASE)
+AUS_PATTERN = re.compile(rf"^(?:{AUS_REGEX})$", re.IGNORECASE)
+ASIS_PATTERN = re.compile(rf"^(?:{ASIS_REGEX})$", re.IGNORECASE)
+OTHER_PATTERN = re.compile(rf"^(?:{OTHER_REGEX})$", re.IGNORECASE)
+STAR_PATTERN = re.compile(rf"^(?:{STAR_REGEX})$")
+
 def extract_text_from_page(page):
     """
     Extract text from a single PDF page using Tesseract OCR.
@@ -59,39 +92,38 @@ def render_bill(pdf_path: str, page=0):
 def extract_information(text: str, is_attendance=True) -> dict:
     """Extracts attendance and votes from a bill voting."""
     
-    fecha_match = re.search(r'[Ff]echa[:\s]*([\d/]+)', text)
     hora_match = re.search(r'[Hh]ora[:\s]*([\d:\samp]+)', text)
     #titulo_match = re.search(
     #    r"(?is)\bAsunto\b\s*:?(?:\s*\r?\n)?\s*([^\r\n]+)",
     #    text
     #)
+    
+    fecha_match = re.search(r'[Ff]echa[:\s]*([\d/]+)', text, re.IGNORECASE)
 
-    fecha = fecha_match.group(1) if fecha_match else "No found"
+    if not fecha_match:
+        fecha_match = re.search(r'[Ee]ccha[:\s]*([\d/]+)', text, re.IGNORECASE)
+
+
+    fecha = fecha_match.group(1) if fecha_match else "Not found"
+
     hora = hora_match.group(1) if hora_match else "No found"
     #titulo = titulo_match.group(1).strip() if titulo_match else "No found"
-
     if is_attendance is True:
         # Attendance
-        estado_pattern = r"(?<![A-ZÁÉÍÓÚÑ])\s*(AUS|PRE|LE|LO|LP)\s*(?![A-ZÁÉÍÓÚÑ])"
+        estado_pattern = rf"({ATTENDANCE_STATE_REGEX})"
         # Regex
         fila_pattern = re.compile(
-            rf"([A-ZÁÉÍÓÚÑ]{{2,5}})\s+([A-ZÁÉÍÓÚÑ ,.'-]+?)\s+{estado_pattern}",
+            rf"{BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado_pattern}",
             re.IGNORECASE
         )
 
     else:
-        bancada = r"([A-ZÁÉÍÓÚÑ]{2,5})"
-        nombre = r"([A-ZÁÉÍÓÚÑ ,.'-]+?)"
-        si_no_pattern = r"(?:S[IÍ]\s*[\+\d]{1,4}|N[OÓ]\s*[-=\d]{1,4})"
-        isolated = r"(?<![A-ZÁÉÍÓÚÑ])(?:AUS|US|PRE|LE|LO|LP|ABST\.|SINRES|SINRRES|TT|TTT)(?![A-ZÁÉÍÓÚÑ])"
-        star_pattern = r"(?:\*{1,4})"
-        estado = rf"({si_no_pattern}|{isolated}|{star_pattern})"
+        estado = rf"({VOTE_STATE_REGEX})"
 
         fila_pattern = re.compile(
-            rf"{bancada}\s+{nombre}\s+{estado}",
+            rf"{BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado}",
             re.IGNORECASE
         )
-
     resultados = []
 
     # For lines
@@ -119,7 +151,7 @@ def extract_information(text: str, is_attendance=True) -> dict:
         "resultados": resultados,
     }
 
-def extract_congressmen(text: str) -> list[str]:
+def extract_afavor(text: str) -> list[str]:
     """
     Extracts congressmen names from attendance/vote records,
     handling multiline text and final 'y Name' cases.
@@ -138,6 +170,74 @@ def extract_congressmen(text: str) -> list[str]:
         return []
 
     names_block = match.group(1)
+    # Stop if another vote clause appears after this block
+    names_block = re.split(r"\sVOT(?:O)?\s", names_block, maxsplit=1, flags=re.IGNORECASE)[0]
+
+    # Replace " y " with comma for consistent splitting
+    names_block = re.sub(r"\s+y\s+", ", ", names_block, flags=re.IGNORECASE)
+
+    # Split and clean
+    names = [
+        name.strip()
+        for name in names_block.split(",")
+        if name.strip()
+    ]
+
+    return names
+
+def extract_encontra(text: str) -> list[str]:
+    """
+    Extracts congressmen names from 'voto en contra' records,
+    handling multiline text and final 'y Name' cases.
+    """
+    text = normalize_text(text)
+
+    pattern = (
+        r"vot(?:o)?\s+en\s+contra\s+de\s+los\s+congresistas\s+"
+        r"(.+?)\."
+    )
+
+    match = re.search(pattern, text, flags=re.IGNORECASE)
+
+    if not match:
+        return []
+
+    names_block = match.group(1)
+    # Stop if another vote clause appears after this block
+    names_block = re.split(r"\sVOT(?:O)?\s", names_block, maxsplit=1, flags=re.IGNORECASE)[0]
+
+    # Replace " y " with comma for consistent splitting
+    names_block = re.sub(r"\s+y\s+", ", ", names_block, flags=re.IGNORECASE)
+
+    # Split and clean
+    names = [
+        name.strip()
+        for name in names_block.split(",")
+        if name.strip()
+    ]
+
+    return names
+
+def extract_enabstencion(text: str) -> list[str]:
+    """
+    Extracts congressmen names from 'voto en abstencion' records,
+    handling multiline text and final 'y Name' cases.
+    """
+    text = normalize_text(text)
+
+    pattern = (
+        r"vot(?:o)?\s+en\s+abstencion\s+de\s+los\s+congresistas\s+"
+        r"(.+?)\."
+    )
+
+    match = re.search(pattern, text, flags=re.IGNORECASE)
+
+    if not match:
+        return []
+
+    names_block = match.group(1)
+    # Stop if another vote clause appears after this block
+    names_block = re.split(r"\sVOT(?:O)?\s", names_block, maxsplit=1, flags=re.IGNORECASE)[0]
 
     # Replace " y " with comma for consistent splitting
     names_block = re.sub(r"\s+y\s+", ", ", names_block, flags=re.IGNORECASE)
@@ -276,11 +376,11 @@ def matching_last_name(lst_congres, lst_attendance, text_below=False):
         x2 = x.copy()
         if "apellido" not in x2:
             x2["apellido"] = "NO_NAME"
-        x2["_norm_apellido"] = normalize_text(x2["apellido"])
+        x2["apellido"] = normalize_text(x2["apellido"])
         att.append(x2)
 
     sorted_congres = sorted(lst_congres, key=lambda x: x["apellido"])
-    sorted_attendance = sorted(att, key=lambda x: x["_norm_apellido"])
+    sorted_attendance = sorted(att, key=lambda x: x["apellido"])
 
     for congresista in sorted_congres:
         c_apellido = normalize_text(congresista.get("apellido", ""))
@@ -291,7 +391,7 @@ def matching_last_name(lst_congres, lst_attendance, text_below=False):
                 counter = 0
                 while (
                     counter < len(sorted_attendance)
-                    and jws(c_apellido, sorted_attendance[counter]["_norm_apellido"]) < 0.950
+                    and jws(c_apellido, sorted_attendance[counter]["apellido"]) < 0.950
                 ):
                     counter += 1
 
@@ -304,7 +404,7 @@ def matching_last_name(lst_congres, lst_attendance, text_below=False):
             counter = 0
             while (
                 counter < len(sorted_attendance)
-                and jws(c_apellido, sorted_attendance[counter]["_norm_apellido"]) < 0.950
+                and jws(c_apellido, sorted_attendance[counter]["apellido"]) < 0.950
             ):
                 counter += 1
 
@@ -354,26 +454,36 @@ def format_jsn(congresistas):
 
 #############################
 
-# --- Patterns (based on yours) ---
-SI_NO_PATTERN = re.compile(r"^(?:S[IÍ]\s*[\+\d]{0,4}|N[OÓ]\s*[-=\d]{0,4})$", re.IGNORECASE)
+def _parse_fecha(fecha: str):
+    if not isinstance(fecha, str):
+        return None
+    try:
+        day, month, year = [int(x) for x in fecha.split("/")]
+        return (year, month, day)
+    except Exception:
+        return None
 
-ABST_PATTERN = re.compile(r"^ABST\.?$", re.IGNORECASE)
 
-AUS_PATTERN = re.compile(r"^(?:AUS|US)$", re.IGNORECASE)
-
-# Everything else you listed as "isolated" that isn't SI/NO/ABST/AUS.
-OTHER_ISOLATED_PATTERN = re.compile(
-    r"^(?:PRE|LE|LO|LP|SINRES|SINRRES|TT|TTT)$",
-    re.IGNORECASE
-)
-
-STAR_PATTERN = re.compile(r"^\*{1,4}$")
+def _period_contains(periodo: dict, target):
+    if not isinstance(periodo, dict):
+        return False
+    inicio = periodo.get("inicio")
+    fin = periodo.get("fin")
+    if not (isinstance(inicio, str) and isinstance(fin, str)):
+        return False
+    try:
+        d_i, m_i, y_i = [int(x) for x in inicio.split("/")]
+        d_f, m_f, y_f = [int(x) for x in fin.split("/")]
+        start = (y_i, m_i, d_i)
+        end = (y_f, m_f, d_f)
+    except Exception:
+        return False
+    return start <= target <= end
 
 
 def define_bancada(congresistas_raw, fecha):
-    
     """"
-    congresistas_raw: producto of a json.load(f)  
+    congresistas_raw: producto of a json.load(f)
     fecha: a fecha in format dd/mm/year
 
     """
@@ -382,36 +492,34 @@ def define_bancada(congresistas_raw, fecha):
     if not fecha:
         return congresistas_raw
 
-    try:
-        day, month, year = [int(x) for x in fecha.split("/")]
-        target = (year, month, day)
-    except Exception:
+    target = _parse_fecha(fecha)
+    if not target:
         return congresistas_raw
 
     for c in congresistas_raw:
         bancada = c.get("bancada")
-        if not isinstance(bancada, dict):
+
+        # Bancada can be a dict (single) or list (many)
+        if isinstance(bancada, dict):
+            if _period_contains(bancada.get("periodo"), target):
+                c["bancada"] = bancada.get("name")
+            else:
+                c["bancada"] = None
             continue
 
-        bancada_name = bancada.get("name")
-        periodo = bancada.get("periodo", {})
-        inicio = periodo.get("inicio")
-        fin = periodo.get("fin")
-
-        if not (isinstance(inicio, str) and isinstance(fin, str)):
-            # Keep existing value if we can't parse periodo
+        if isinstance(bancada, list):
+            found = None
+            for item in bancada:
+                if not isinstance(item, dict):
+                    continue
+                if _period_contains(item.get("periodo"), target):
+                    found = item.get("name")
+                    break
+            c["bancada"] = found
             continue
 
-        try:
-            d_i, m_i, y_i = [int(x) for x in inicio.split("/")]
-            d_f, m_f, y_f = [int(x) for x in fin.split("/")]
-            start = (y_i, m_i, d_i)
-            end = (y_f, m_f, d_f)
-        except Exception:
-            continue
-
-        if start <= target <= end:
-            c["bancada"] = bancada_name
+        # Unknown/empty types -> set to None
+        c["bancada"] = None
 
     return congresistas_raw
 
@@ -433,8 +541,11 @@ def categorize_estado(estado: str) -> str:
     e = re.sub(r"\s+", " ", e)  # normalize spaces
 
     # SI / NO
-    if SI_NO_PATTERN.match(e):
-        return "SI" if e.startswith("SI") or e.startswith("SÍ") else "NO"
+    if SI_PATTERN.match(e):
+        return "SI" 
+
+    if NO_PATTERN.match(e):
+        return "NO" 
 
     # ABST
     if ABST_PATTERN.match(e):
@@ -445,9 +556,9 @@ def categorize_estado(estado: str) -> str:
         return "AUS"
 
     # Other isolated tokens or stars -> OTROS
-    if OTHER_ISOLATED_PATTERN.match(e) or STAR_PATTERN.match(e):
+    if OTHER_PATTERN.match(e) or STAR_PATTERN.match(e):
         return "OTROS"
-
+    
     return "OTROS"
 
 def normalize_votes_in_place(congresistas: list[dict], key: str = "votacion"):
@@ -502,10 +613,13 @@ def get_title(text):
 def get_type(text):
     texto_normalized = normalize_text(text)
 
-    if re.search(r"\bVOTACION:\s+FECHA\b", texto_normalized):
+    if re.search(r"\bVOTACI[OÓ]N:\s*(?:—|-)?\s*FECHA:?\b", texto_normalized, re.IGNORECASE):
         return "VOTACION"
 
-    elif re.search(r"\bASISTENCIA:\s+FECHA\b", texto_normalized):
+    if re.search(r"\bVOTACI[OÓ]N:\s*(?:—|-)?\s*ECCHA:?\b", texto_normalized, re.IGNORECASE):
+        return "VOTACION"
+
+    elif re.search(r"\bASISTENCIA:\s*(?:—|-)?\s+[FE]CHA\b", texto_normalized):
         return "ASISTENCIA"
 
     return None
@@ -565,10 +679,10 @@ def transformation_final(text, congresistas_jsn):
     else:
          raise ValueError("No se identifica asistencia o votación")
 
-    a=bill["resultados"]
-    b = extraction_first_second(a)
-    c = no_comma_readed(b)
-    d = run_exceptions(c)
+    step_a=bill["resultados"]
+    step_b = extraction_first_second(step_a)
+    step_c = no_comma_readed(step_b)
+    step_d = run_exceptions(step_c)
 
     # Formatting the base of congresistas
     fecha=bill["fecha"]
@@ -576,42 +690,52 @@ def transformation_final(text, congresistas_jsn):
     congresistas=define_enejercicio(congresistas, fecha)
     congresistas=define_bancada(congresistas, fecha)
 
+    
     # First matching between lists
-    e = matching_lists(congresistas, d)
-    f = matching_last_name(e, d)
+    step_e = matching_lists(congresistas, step_d)
+    
+
+    step_f = matching_last_name(step_e, step_d)
 
     # match when there is no comma
-    g = swap_names(f)
-    h = matching_lists(g, d)
-    i = swap_names(h)
+    step_g = swap_names(step_f)
+    step_h = matching_lists(step_g, step_d)
+    step_i = swap_names(step_h)
 
-    # Adding the congressmen at the base
-    below = text_below_to_dict(extract_congressmen(text))
+    # Adding the congressmen at the base (favor + contra + abstencion)
+    below_names = (
+        extract_afavor(text)
+        + extract_encontra(text)
+        + extract_enabstencion(text)
+    )
+    below = text_below_to_dict(below_names)
     below_brothers = run_exceptions(below)
 
+
     # Formatting the matching (normalize)
-    j = []
-    for congresista in i:
+    step_j = []
+    for congresista in step_i:
         if congresista["en_ejercicio"] == True:
-            j.append(congresista)
+            step_j.append(congresista)
+    
+    step_j = normalize_votes_in_place(step_j)
 
-    j = normalize_votes_in_place(j)
-
-    for vote in j:
+    for vote in step_j:
         vote["nombre_completo"] = normalize_text(vote["nombre_completo"])
         vote["nombre"] = normalize_text(vote["nombre"])
         vote["apellido"] = normalize_text(vote["apellido"])
-        vote["bancada"] = normalize_text(vote["bancada"])
 
     # second round of match (with the one below):
-    k = matching_last_name(j, below, True)
+    step_k = matching_last_name(step_j, below, True)
 
     # we eliminate the absence for the brother in the below
-    l = look_for_absent_brother(k, below_brothers)
+    step_l = look_for_absent_brother(step_k, below_brothers)
 
-    final_votes = matching_lists(l, below_brothers)
+    
+    final_votes = matching_lists(step_l, below_brothers)
     titulo=bill["titulo"]
     
+    #breakpoint()
     
 
     dictionary_final["titulo"]=titulo

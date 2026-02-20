@@ -180,8 +180,10 @@ cython_debug/
 # Data
 data/bill_jsons/*.json
 data/ocr_cache/*.txt
+data/*xlsx
 *.db
 *.csv
 
 # DS_Store
 .DS_Store
+

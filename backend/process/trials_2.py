@@ -22,7 +22,7 @@ from backend.process.extract_votes import (
     no_comma_readed,
     run_exceptions,
     matching_last_name,
-    extract_congressmen,
+    extract_afavor,
     swap_names, 
     normalize_votes_in_place,
     normalize_text,
@@ -31,18 +31,26 @@ from backend.process.extract_votes import (
     transformation_final
 )
 
-DATA_DIR = ROOT_DIR / "data"
-PDF_NAME = "Asis_y_vot_de_la_sesión_del_13-12-2024.pdf"
+DATA_DIR = ROOT_DIR / "data/to_test_function"
+#PDF_NAME = "Asis_y_vot_de_la_sesión_del_13-12-2024.pdf"
+PDF_NAME = "L31751.pdf"
+
 pdf_path=DATA_DIR / PDF_NAME
 
-votes=render_bill(pdf_path,2)
+votes=render_bill(pdf_path,1)
+
+
+#print(votes)
+
 
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-json_path = DATA_DIR / "congresistas_2016_2021.json"
+json_path = DATA_DIR / "congresistas_2021_2026.json"
 
 #print(json_path)
 with json_path.open(encoding="utf-8-sig") as f:
     congresistas_raw = json.load(f)  
+
+
 
 final_votes=transformation_final(votes, congresistas_raw )
 
@@ -51,8 +59,12 @@ output_path = DATA_DIR / "seats.json"
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(final_votes, f, ensure_ascii=False, indent=2)
 
-print(count_votes(final_votes["resultados"], "votacion"))
-print(final_votes["titulo"])
 
-print(final_votes["evento"])
+bill= extract_information(votes, False)
+
+print(bill)
+#print(count_votes(final_votes["resultados"], "votacion"))
+#print(final_votes["resultados"])
+
+#print(final_votes["fecha"])
 #print(normalize_text(votes))
