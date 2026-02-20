@@ -321,6 +321,7 @@ class RawOrganization(RawBase):
         Boolean, nullable=False, server_default=expression.false(), default=False
     )
 
+
 class RawLey(RawBase):
     """
     Represents a raw law extracted from the Peruvian congress web page.
@@ -333,6 +334,7 @@ class RawLey(RawBase):
         changed (bool): Column that indicates if the last update has any difference from the previous update
         processed (bool): Column that indicates if the last update with changes have been updated
     """
+
     __tablename__ = "raw_leyes"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

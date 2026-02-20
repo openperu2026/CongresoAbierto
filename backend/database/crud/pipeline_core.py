@@ -7,6 +7,7 @@ from backend import find_leg_period
 from backend.database import models as db_models
 from backend.process import schema
 
+
 def find_congresista(
     db: Session, name: str, leg_period, website: str | None = None
 ) -> db_models.Congresista | None:
@@ -42,7 +43,9 @@ def find_organization(
     )
 
 
-def upsert_congresista(db: Session, schema: schema.Congresista) -> db_models.Congresista:
+def upsert_congresista(
+    db: Session, schema: schema.Congresista
+) -> db_models.Congresista:
     existing = find_congresista(db, schema.nombre, schema.leg_period, schema.website)
     payload = schema.model_dump()
 
@@ -58,7 +61,9 @@ def upsert_congresista(db: Session, schema: schema.Congresista) -> db_models.Con
     return existing
 
 
-def upsert_organization(db: Session, schema: schema.Organization) -> db_models.Organization:
+def upsert_organization(
+    db: Session, schema: schema.Organization
+) -> db_models.Organization:
     existing = (
         db.query(db_models.Organization)
         .filter(

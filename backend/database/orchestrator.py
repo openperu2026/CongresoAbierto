@@ -190,7 +190,6 @@ class OpenPeruOrchestrator:
                     max_age_days=weekly_days, flush_every=100
                 )
 
-
     def run_processing(
         self,
         *,
@@ -224,9 +223,7 @@ class OpenPeruOrchestrator:
                 limit=motions_limit,
             )
         if process_leyes:
-            summary["leyes"] = self._process_leyes(
-                limit = leyes_limit
-            )
+            summary["leyes"] = self._process_leyes(limit=leyes_limit)
 
         return summary
 
@@ -700,7 +697,7 @@ class OpenPeruOrchestrator:
             f"[motions] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
         )
         return stats
-    
+
     def _process_leyes(self, *, limit: int | None) -> StageStats:
         stats = StageStats()
         clean_inserted = 0
@@ -730,9 +727,7 @@ class OpenPeruOrchestrator:
                     raw_ley.processed = True
                     stats.processed += 1
                 except Exception as exc:
-                    logger.exception(
-                        f"Error processing RawLey id={raw_ley.id}: {exc}"
-                    )
+                    logger.exception(f"Error processing RawLey id={raw_ley.id}: {exc}")
                     db.rollback()
                     stats.errors += 1
 
@@ -742,6 +737,7 @@ class OpenPeruOrchestrator:
             f"[leyes] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
         )
         return stats
+
 
 def _print_summary(summary: dict[str, StageStats]) -> None:
     total_processed = 0

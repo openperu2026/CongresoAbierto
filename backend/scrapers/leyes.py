@@ -169,9 +169,7 @@ class RawLeyesScraper:
         session = self.session or self.Session()
 
         try:
-            latest_rows = (
-                session.query(RawLey).filter(RawLey.last_update == True).all()
-            )
+            latest_rows = session.query(RawLey).filter(RawLey.last_update == True).all()
             pending_ids: list[str] = []
 
             for row in latest_rows:
@@ -207,12 +205,13 @@ class RawLeyesScraper:
         logger.info(f"Weekly motion refresh processed {len(pending_ids)} ids")
         return pending_ids
 
+
 def main():
     scraper = RawLeyesScraper()
 
     # Pending: 16243, 10548, 9918, 9865, 9866, 9867, 9868, 9870
 
-    #num_ley = 32570
+    # num_ley = 32570
     while True:
         try:
             scraper.scrape_ley(str(num_ley))

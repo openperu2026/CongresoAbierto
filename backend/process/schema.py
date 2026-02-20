@@ -581,6 +581,7 @@ class BancadaMembership(PrintableModel):
     website: str
     bancada_name: str
 
+
 class Ley(PrintableModel):
     """
     Represents a law (ley) in the peruvian parliament.
@@ -590,7 +591,7 @@ class Ley(PrintableModel):
         title (str): Law title.
         bill_id (str): Bill id related to this law (Proyecto de Ley)
     """
-    
-    id : str
-    title : str
-    bill_id : str
+
+    id: str
+    title: str
+    bill_id: str

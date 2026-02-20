@@ -515,6 +515,7 @@ class MotionDocument(Base):
         ),
     )
 
+
 class Ley(Base):
     """
     Represents a law (ley) in the peruvian parliament.
