@@ -22,6 +22,7 @@ from backend.database.raw_models import (
     RawBill,
     RawCommittee,
     RawCongresista,
+    RawLey,
     RawMotion,
     RawOrganization,
 )
