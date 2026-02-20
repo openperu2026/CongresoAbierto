@@ -15,7 +15,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tessera
 
 # --- Shared patterns ---
 UPPER_SPANISH = r"A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1"
-BANCADA_REGEX = rf"([{UPPER_SPANISH}]{{2,5}}(?:-[{UPPER_SPANISH}]{{2,5}})?)"
+BANCADA_REGEX = rf"([{UPPER_SPANISH}]{{1,5}}(?:-[{UPPER_SPANISH}]{{1,5}})?)"
 NOMBRE_REGEX = rf"([{UPPER_SPANISH} ,.'-]+?)"
 
 ATTENDANCE_STATE_REGEX = rf"(?<![{UPPER_SPANISH}])\s*(AUS|PRE|LE|LO|LP)\s*(?![{UPPER_SPANISH}])"
@@ -28,7 +28,7 @@ SI_REGEX = (
 )
 
 
-NO_REGEX = rf"(?<![{UPPER_SPANISH}])N[O\u00d3](?:\s+[-=\d]{{0,4}})?(?:\s+|$)(?![{UPPER_SPANISH}])"
+NO_REGEX = rf"(?<![{UPPER_SPANISH}])[NH][O\u00d3](?:\s+[-=\d]{{0,4}})?(?:\s+|$)(?![{UPPER_SPANISH}])"
 AUS_REGEX = r"(?:AUS|AIS|US)"
 ABST_REGEX = r"(?:ABST\.)"
 ASIS_REGEX = r"(?:PRE)"
@@ -113,7 +113,7 @@ def extract_information(text: str, is_attendance=True) -> dict:
         estado_pattern = rf"({ATTENDANCE_STATE_REGEX})"
         # Regex
         fila_pattern = re.compile(
-            rf"{BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado_pattern}",
+            rf"(?<!\S){BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado_pattern}",
             re.IGNORECASE
         )
 
@@ -121,15 +121,19 @@ def extract_information(text: str, is_attendance=True) -> dict:
         estado = rf"({VOTE_STATE_REGEX})"
 
         fila_pattern = re.compile(
-            rf"{BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado}",
+             rf"(?<!\S){BANCADA_REGEX}\s+{NOMBRE_REGEX}\s+{estado}",
             re.IGNORECASE
         )
     resultados = []
 
     # For lines
     for line in text.splitlines():
-        line = line.replace("5", "S").replace("0", "O")
+        line = line.replace("5", "S").replace("0", "O").replace("£","L").replace(".","X")
         line_upper = line.upper()
+
+        # Remove/space-out OCR garbage characters (keeps letters, accents, spaces, common punctuation)
+        line_upper = re.sub(r"[^A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1\s,.'\-+=\d$*]", " ", line_upper)
+        line_upper = re.sub(r"\s+", " ", line_upper).strip()
 
         matches = fila_pattern.findall(line_upper)
     
@@ -734,7 +738,7 @@ def transformation_final(text, congresistas_jsn):
     
     final_votes = matching_lists(step_l, below_brothers)
     titulo=bill["titulo"]
-    
+
     #breakpoint()
     
 

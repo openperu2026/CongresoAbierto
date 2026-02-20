@@ -33,7 +33,7 @@ from backend.process.extract_votes import (
 
 DATA_DIR = ROOT_DIR / "data/to_test_function"
 #PDF_NAME = "Asis_y_vot_de_la_sesión_del_13-12-2024.pdf"
-PDF_NAME = "L31751.pdf"
+PDF_NAME = "L31989.pdf"
 
 pdf_path=DATA_DIR / PDF_NAME
 
