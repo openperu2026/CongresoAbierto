@@ -274,8 +274,15 @@ class OpenPeruOrchestrator:
             )
             motion_docs.load_raw_documents()
 
-    def _scrape_leyes_range():
-        pass
+    def _scrape_leyes_range(ley_start: int, ley_end: int, flush_every: int = 100):
+        logger.info(f"Scraping leyes in range {ley_start}..{ley_end}")
+        scraper = RawLeyesScraper()
+        for ley_number in range(ley_start, ley_end + 1):
+            scraper.scrape_ley(ley_number)
+            if len(scraper.raw_leyes) >= flush_every:
+                scraper.load_raw_leyes()
+        if scraper.raw_leyes:
+            scraper.load_raw_leyes()
 
     # -----------------------------
     # Processing internals
@@ -696,8 +703,43 @@ class OpenPeruOrchestrator:
         )
         return stats
     
-    def _process_leyes():
-        pass
+    def _process_leyes(self, *, limit: int | None):
+        stats = StageStats()
+        clean_inserted = 0
+        clean_updated = 0
+        with self.RawSession() as raw_db, self.DBSession() as db:
+            query = raw_db.query(RawLey).filter(
+                RawLey.last_update.is_(True), RawLey.processed.is_(False)
+            )
+            if limit is not None:
+                query = query.limit(limit)
+            rows = query.all()
+
+            for raw_ley in rows:
+                try:
+                    ley_schema = process_leyes(raw_ley)
+                    pre = db.get(db_models.Ley, ley_schema.id)
+                    ley = crud_core.upsert_ley(db, ley_schema)
+                    if pre is None:
+                        clean_inserted += 1
+                    else:
+                        clean_updated += 1
+
+                    raw_ley.processed = True
+                    stats.processed += 1
+                except Exception as exc:
+                    logger.exception(
+                        f"Error processing RawLey id={raw_ley.id}: {exc}"
+                    )
+                    db.rollback()
+                    stats.errors += 1
+
+            db.commit()
+            raw_db.commit()
+        logger.info(
+            f"[motions] raw_total={len(rows)} processed={stats.processed} skipped={stats.skipped} errors={stats.errors} clean_inserted={clean_inserted} clean_updated={clean_updated}"
+        )
+        return stats
 
 def _print_summary(summary: dict[str, StageStats]) -> None:
     total_processed = 0
@@ -756,6 +798,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run only motions scraping/processing",
     )
     target_group.add_argument(
+        "--only-leyes",
+        action="store_true",
+        help="Run only leyes scraping/processing",
+    )
+    target_group.add_argument(
         "--only-others",
         action="store_true",
         help="Run only non-bill/non-motion entities (congresistas, bancadas, organizations)",
@@ -766,6 +813,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--motion-year", type=int)
     parser.add_argument("--motion-start", type=int)
     parser.add_argument("--motion-end", type=int)
+    parser.add_argument("--ley-start", type=int)
+    parser.add_argument("--ley-end", type=int)
     parser.add_argument(
         "--scrape-documents",
         action="store_true",
@@ -786,6 +835,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         help="Limit the number of motion raw rows processed",
     )
+    parser.add_argument(
+        "--process-leyes-limit",
+        type=int,
+        help="Limit the number of leyes raw rows processed",
+    )
     return parser
 
 
@@ -796,22 +850,31 @@ def main(argv: list[str] | None = None) -> None:
     orchestrator = OpenPeruOrchestrator()
     run_bills = True
     run_motions = True
+    run_leyes = True
     run_others = True
 
     if args.only_bills:
         run_motions = False
         run_others = False
+        run_leyes = False
     elif args.only_motions:
+        run_bills = False
+        run_others = False
+        run_leyes = False
+    elif args.only_leyes:
+        run_motions = False
         run_bills = False
         run_others = False
     elif args.only_others:
         run_bills = False
         run_motions = False
+        run_leyes = False
 
     if args.scrape:
         orchestrator.run_scrapers(
             scrape_bills=run_bills,
             scrape_motions=run_motions,
+            scrape_leyes=run_leyes,
             scrape_others=run_others,
             only_current=args.only_current,
             weekly_days=args.weekly_days,
@@ -822,6 +885,8 @@ def main(argv: list[str] | None = None) -> None:
             motion_year=args.motion_year,
             motion_start=args.motion_start,
             motion_end=args.motion_end,
+            ley_start=args.ley_start,
+            ley_end=args.ley_end,
             scrape_documents=args.scrape_documents,
         )
 
@@ -829,10 +894,12 @@ def main(argv: list[str] | None = None) -> None:
         summary = orchestrator.run_processing(
             process_bills=run_bills,
             process_motions=run_motions,
+            process_leyes=run_leyes,
             process_others=run_others,
             include_documents=not args.no_documents,
             bills_limit=args.process_bills_limit,
             motions_limit=args.process_motions_limit,
+            leyes_limit=args.process_leyes_limit,
         )
         _print_summary(summary)
 

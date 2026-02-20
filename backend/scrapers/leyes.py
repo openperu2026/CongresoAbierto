@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, UTC  
+from datetime import datetime, UTC, timedelta
 from loguru import logger
 
 from sqlalchemy.orm import sessionmaker
@@ -159,8 +159,53 @@ class RawLeyesScraper:
         if self.add_leyes_to_db():
             self.raw_leyes = []
 
-    def scrape_pending_weekly(self):
-        pass
+    def get_ids_pending_weekly_refresh(self, max_age_days: int = 7) -> list[str]:
+        """
+        Return ids that should be refreshed this week:
+          - latest snapshot is older than `max_age_days`
+          - latest snapshot is not approved
+        """
+        cutoff = datetime.now() - timedelta(days=max_age_days)
+        session = self.session or self.Session()
+
+        try:
+            latest_rows = (
+                session.query(RawLey).filter(RawLey.last_update == True).all()
+            )
+            pending_ids: list[str] = []
+
+            for row in latest_rows:
+                if row.timestamp > cutoff:
+                    continue
+                pending_ids.append(row.id)
+
+            return pending_ids
+        finally:
+            if self.session is None:
+                session.close()
+
+    def scrape_pending_weekly(
+        self, max_age_days: int = 7, flush_every: int = 100
+    ) -> list[str]:
+        """
+        Re-scrape pending, non-approved motion ids that are stale.
+        """
+        pending_ids = self.get_ids_pending_weekly_refresh(max_age_days=max_age_days)
+
+        for idx, motion_id in enumerate(pending_ids, start=1):
+            self.scrape_ley(motion_id)
+
+            if len(self.raw_leyes) >= flush_every:
+                self.load_raw_leyes()
+
+            if idx % 10 == 0:
+                time.sleep(2)
+
+        if self.raw_leyes:
+            self.load_raw_leyes()
+
+        logger.info(f"Weekly motion refresh processed {len(pending_ids)} ids")
+        return pending_ids
 
 def main():
     scraper = RawLeyesScraper()

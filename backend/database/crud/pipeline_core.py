@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from backend import find_leg_period
 from backend.database import models as db_models
-
+from backend.process import schema
 
 def find_congresista(
     db: Session, name: str, leg_period, website: str | None = None
@@ -42,7 +42,7 @@ def find_organization(
     )
 
 
-def upsert_congresista(db: Session, schema) -> db_models.Congresista:
+def upsert_congresista(db: Session, schema: schema.Congresista) -> db_models.Congresista:
     existing = find_congresista(db, schema.nombre, schema.leg_period, schema.website)
     payload = schema.model_dump()
 
@@ -58,7 +58,7 @@ def upsert_congresista(db: Session, schema) -> db_models.Congresista:
     return existing
 
 
-def upsert_organization(db: Session, schema) -> db_models.Organization:
+def upsert_organization(db: Session, schema: schema.Organization) -> db_models.Organization:
     existing = (
         db.query(db_models.Organization)
         .filter(
@@ -158,3 +158,24 @@ def upsert_bancada_membership(
     db.add(obj)
     db.flush()
     return obj
+
+
+def upsert_ley(db: Session, schema: schema.Ley) -> db_models.Ley:
+
+    payload = {
+        "id": schema.id,
+        "title": schema.title,
+        "bill_id": schema.bill_id,
+    }
+
+    existing = db.get(db_models.Ley, schema.id)
+    if existing is None:
+        obj = db_models.Ley(**payload)
+        db.add(obj)
+        db.flush()
+        return obj
+
+    for key, value in payload.items():
+        setattr(existing, key, value)
+    db.flush()
+    return existing
