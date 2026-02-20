@@ -16,7 +16,7 @@ def _raw_ley(xml: str) -> RawLey:
     )
 
 
-def test_process_leyes_extracts_numley_title_and_bill_id():
+def test_process_leyes_returns_none_when_link_has_no_year_number_pattern():
     xml = """
     <root>
       <data>
@@ -32,7 +32,31 @@ def test_process_leyes_extracts_numley_title_and_bill_id():
           </recursos>
           <recursos>
             <tiporecursoleyitemmenu>6</tiporecursoleyitemmenu>
-            <enlace>PL-12345</enlace>
+            <enlace>https://wb2server.congreso.gob.pe/spley-portal/#/expediente/12345</enlace>
+          </recursos>
+        </recursos>
+      </data>
+    </root>
+    """.strip()
+
+    out = process_leyes(_raw_ley(xml))
+
+    assert out is None
+
+
+def test_process_leyes_extracts_bill_id_year_and_number_from_link():
+    xml = """
+    <root>
+      <data>
+        <ley>
+          <numley>32558</numley>
+          <tituloley>LEY DE PRUEBA</tituloley>
+        </ley>
+        <ignored></ignored>
+        <recursos>
+          <recursos>
+            <tiporecursoleyitemmenu>6</tiporecursoleyitemmenu>
+            <enlace>https://wb2server.congreso.gob.pe/spley-portal/#/expediente/2021/3623</enlace>
           </recursos>
         </recursos>
       </data>
@@ -42,9 +66,7 @@ def test_process_leyes_extracts_numley_title_and_bill_id():
     out = process_leyes(_raw_ley(xml))
 
     assert isinstance(out, Ley)
-    assert out.id == "32558"
-    assert out.title == "LEY DE PRUEBA"
-    assert out.bill_id == "PL-12345"
+    assert out.bill_id == "2021_3623"
 
 
 def test_process_leyes_returns_none_when_missing_required_fields():
@@ -59,7 +81,7 @@ def test_process_leyes_returns_none_when_missing_required_fields():
         <recursos>
           <recursos>
             <tiporecursoleyitemmenu>6</tiporecursoleyitemmenu>
-            <enlace>PL-12345</enlace>
+            <enlace>https://wb2server.congreso.gob.pe/spley-portal/#/expediente/2021/3623</enlace>
           </recursos>
         </recursos>
       </data>
@@ -90,4 +112,28 @@ def test_process_leyes_returns_none_when_no_menu_item_6_present():
     """.strip()
 
     out = process_leyes(_raw_ley(xml))
+    assert out is None
+
+
+def test_process_leyes_returns_none_when_link_is_plain_number():
+    xml = """
+    <root>
+      <data>
+        <ley>
+          <numley>32558</numley>
+          <tituloley>LEY DE PRUEBA</tituloley>
+        </ley>
+        <ignored></ignored>
+        <recursos>
+          <recursos>
+            <tiporecursoleyitemmenu>6</tiporecursoleyitemmenu>
+            <enlace>67890</enlace>
+          </recursos>
+        </recursos>
+      </data>
+    </root>
+    """.strip()
+
+    out = process_leyes(_raw_ley(xml))
+
     assert out is None

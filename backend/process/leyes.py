@@ -1,3 +1,4 @@
+import re
 from lxml.html import fromstring
 
 from backend.database.raw_models import RawLey
@@ -16,7 +17,17 @@ def process_leyes(raw_ley: RawLey) -> Ley | None:
 
         for recurso in recursos.getchildren():
             if recurso.xpath('tiporecursoleyitemmenu')[0].text == '6':
-                bill_id = recurso.xpath('enlace')[0].text
+                link = recurso.xpath('enlace')[0].text
+                if not link:
+                    continue
+                clean_link = link.strip()
+                # Congreso links encode expediente as /expediente/<year>/<number>.
+                match_year_num = re.search(
+                    r"/expediente/(\d{4})/(\d+)(?:[/?#].*)?$", clean_link
+                )
+                if match_year_num:
+                    bill_id = f"{match_year_num.group(1)}_{match_year_num.group(2)}"
+                    break
                 break
 
         if bill_id is None:

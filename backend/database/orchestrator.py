@@ -719,7 +719,7 @@ class OpenPeruOrchestrator:
                 try:
                     ley_schema = process_leyes(raw_ley)
                     if ley_schema is None:
-                        raw_ley.processed = False
+                        raw_ley.processed = True
                         stats.skipped += 1
                         continue
                     pre = db.get(db_models.Ley, ley_schema.id)
