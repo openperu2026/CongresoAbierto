@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-
+import unicodedata
 from backend.core.constants import (
     BILL_ROLE_MAPS,
     LEG_PERIOD_ALIASES,
@@ -21,25 +21,44 @@ from backend.core.enums import (
 
 
 def _normalize_leg_period(value: str) -> str:
-    v = value.strip()
-    # normalize different dash characters to "-"
+    # 1) Unicode normalize (handles odd forms)
+    v = unicodedata.normalize("NFKC", value)
+
+    # 2) Replace non-breaking spaces and other common weird spaces with normal space
+    v = v.replace("\xa0", " ").replace("\u202f", " ").replace("\u2007", " ")
+
+    v = v.strip()
+
+    # 3) normalize different dash characters to "-"
     v = re.sub(r"[–—−]", "-", v)
-    # normalize spaces around dash
+
+    # 4) normalize spaces around dash
     v = re.sub(r"\s*-\s*", "-", v)
-    # collapse multiple spaces
+
+    # 5) collapse multiple spaces
     v = re.sub(r"\s+", " ", v)
+
     return v
 
+
+LEG_PERIOD_RE = re.compile(r"(\d{4})-(\d{4})")
 
 def parse_leg_period(value: str) -> LegPeriod:
     if value is None:
         raise ValueError("leg_period cannot be null")
+
     v = _normalize_leg_period(value)
+
     canon = LEG_PERIOD_ALIASES.get(v)
     if canon is None:
-        raise ValueError(f"Unknown leg period: {value!r}")
-    return LegPeriod(canon)
+        m = LEG_PERIOD_RE.search(v)
+        if m:
+            canon = f"{m.group(1)}-{m.group(2)}"
 
+    if canon is None:
+        raise ValueError(f"Unknown leg period: {value!r} (normalized={v!r})")
+
+    return LegPeriod(canon)
 
 def _normalize_legislature(value: str) -> str:
     v = value.strip()
@@ -308,3 +327,48 @@ def normalize_membership_role(raw: str) -> str:
         raise ValueError(f"Unknown role: {role!r}")
 
     return RoleOrganization(canon)
+
+def _norm_text(s: str) -> str:
+    s = unicodedata.normalize("NFKC", s or "")
+    s = s.replace("\xa0", " ").replace("\u202f", " ").replace("\u2007", " ")
+    s = s.strip()
+    s = re.sub(r"\s+", " ", s)
+    return s
+
+# Canonical outputs must exactly match your enum values
+_COMM_TYPE_RULES: list[tuple[re.Pattern[str], str]] = [
+    # Most specific first
+    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+acusaciones\s+constitucionales", re.I),
+     "Subcomisión de Acusaciones Constitucionales"),
+    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+control\s+pol[ií]tico", re.I),
+     "Subcomisión de Control Político"),
+    (re.compile(r"^comisi[oó]n\s+de\s+levantamiento\s+de\s+inmunidad\s+parlamentaria", re.I),
+     "Comisión de Levantamiento de Inmunidad Parlamentaria"),
+    (re.compile(r"^comisi[oó]n\s+de\s+[eé]tica\s+parlamentaria", re.I),
+     "Comisión de Ética Parlamentaria"),
+    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+seguimiento\s+del\s+tlc", re.I),
+     "Sub Comisión de Seguimiento del TLC"),
+
+    # Common noisy cases
+    (re.compile(r"^comisi[oó]n\s+ordinaria\b", re.I),
+     "Comisión Ordinaria"),
+    (re.compile(r"^comisiones?\s+investigadoras?\b", re.I),
+     "Comisiones Investigadoras"),
+    (re.compile(r"^comisiones?\s+especiales?\b", re.I),
+     "Comisiones Especiales"),
+    (re.compile(r"^grupo\s+de\s+trabajo\b", re.I),
+     "Grupo de Trabajo"),
+]
+
+def parse_comm_type(value: str) -> str:
+    raw = value
+    v = _norm_text(value)
+
+    # normalize dash variants (optional, but consistent with your style)
+    v = re.sub(r"[–—−]", "-", v)
+
+    for pat, canon in _COMM_TYPE_RULES:
+        if pat.search(v):
+            return canon
+
+    raise ValueError(f"Unknown comm_type: {raw!r} (normalized={v!r})")

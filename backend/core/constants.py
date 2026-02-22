@@ -51,7 +51,6 @@ PARTY_ALIASES = {
     "Unión por el Perú": "Unión por el Perú - Social Democracia",
 }
 
-
 LEG_PERIOD_ALIASES = {
     "Parlamentario 2026 - 2031": "2026-2031",
     "Parlamentario 2021 - 2026": "2021-2026",

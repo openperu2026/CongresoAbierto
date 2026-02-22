@@ -183,6 +183,25 @@ def test_process_bill_steps_vote_detection_and_vote_id_increment():
     assert out[2].step_files == []
 
 
+def test_process_bill_steps_carries_des_estado_as_step_status():
+    steps = [
+        {
+            "seguimientoPleyId": 7,
+            "fecha": "2026-02-01",
+            "desEstado": "En Comisión",
+            "detalle": "Texto narrativo libre que no clasifica",
+            "archivos": [],
+        }
+    ]
+    rb = _raw_bill(id="PL_888", steps=steps)
+
+    out = mod.process_bill_steps(rb)
+
+    assert out is not None
+    assert len(out) == 1
+    assert out[0].step_status == "En Comisión"
+
+
 def test_process_bill_document_vote_doc_true_for_si_no_pattern_si_first():
     # Matches: SI ++ ... NO --
     text = "Resultado: SI +++++  80 votos ... NO ---- 20 votos"

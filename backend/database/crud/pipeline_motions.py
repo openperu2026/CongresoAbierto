@@ -67,9 +67,15 @@ def upsert_motion_congresista(
 
 
 def upsert_motion_step(
-    db: Session, *, step_id: int, motion_id: str, step_date, step_detail: str
+    db: Session,
+    *,
+    step_id: int,
+    motion_id: str,
+    step_date,
+    step_detail: str,
+    step_status: str | None = None,
 ) -> db_models.MotionStep:
-    step_type = classify_motion_des_estado(step_detail)
+    step_type = classify_motion_des_estado(step_status or step_detail)
     existing = db.get(db_models.MotionStep, step_id)
     if existing is None:
         obj = db_models.MotionStep(

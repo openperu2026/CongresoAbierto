@@ -1,5 +1,6 @@
 from backend.database.raw_models import RawCommittee, RawOrganization
 from backend.process.schema import Organization, Membership
+from backend.core.parsers import parse_comm_type
 
 from backend import find_leg_period, normalize_membership_role
 
@@ -22,14 +23,14 @@ def process_committee(raw_comm: RawCommittee) -> list[Organization]:
         if type_comm and name_comm and type_comm != "Comisión":
             link = content.xpath(".//a/@href")
             link = link[0] if link else ""
-
+            
             final_lst.append(
                 Organization(
                     leg_period=find_leg_period(raw_comm.legislative_year),
                     leg_year=str(raw_comm.legislative_year),
                     org_name=name_comm,
                     org_type="Comisión",
-                    comm_type=type_comm,
+                    comm_type=parse_comm_type(type_comm),
                     org_link=link,
                 )
             )
@@ -68,6 +69,7 @@ def process_org_membership(
             Membership(
                 role=normalize_membership_role(cargo.text),
                 nombre=name.text_content(),
+                web_page = web,
                 leg_period=org.leg_period,
                 org_name=org.org_name,
                 org_type=org.org_type,

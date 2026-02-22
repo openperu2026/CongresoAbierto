@@ -216,8 +216,8 @@ class OpenPeruOrchestrator:
         summary: dict[str, StageStats] = {}
 
         if process_others:
-            summary["congresistas"] = self._process_congresistas()
             summary["organizations"] = self._process_organizations()
+            summary["congresistas"] = self._process_congresistas()
             summary["bancadas"] = self._process_bancadas()
         if process_bills:
             summary["bills"] = self._process_bills(
@@ -326,8 +326,8 @@ class OpenPeruOrchestrator:
             for raw_cong in rows:
                 try:
                     # TODO: Remove this range to process all years
-                    if raw_cong.leg_period not in ["2021-2026", "2016-2021"]:
-                        raw_cong.processed = True
+                    if raw_cong.leg_period not in ["Parlamentario 2021 - 2026", "Parlamentario 2016 - 2021"]:
+                        raw_cong.processed = False
                         stats.skipped += 1
                         continue
                     cong_schema = process_profile_content(raw_cong)
@@ -392,11 +392,12 @@ class OpenPeruOrchestrator:
                 )
                 .all()
             )
+
             for raw_comm in committees:
                 try:
                     # TODO: Remove this range to process all years
                     if raw_comm.legislative_year not in range(2016, 2027):
-                        raw_comm.processed = True
+                        raw_comm.processed = False
                         stats.skipped += 1
                         continue
                     for org_schema in process_committee(raw_comm):
@@ -437,7 +438,7 @@ class OpenPeruOrchestrator:
                 try:
                     # TODO: Remove this range to process all years
                     if raw_org.legislative_year not in range(2016, 2027):
-                        raw_org.processed = True
+                        raw_org.processed = False
                         stats.skipped += 1
                         continue
                     org_schema = process_org(raw_org)
@@ -458,7 +459,7 @@ class OpenPeruOrchestrator:
                         clean_updated += 1
                     for ms in process_org_membership(raw_org, org_schema):
                         cong = crud_core.find_congresista(
-                            db, name=ms.nombre, leg_period=ms.leg_period
+                            db, name=ms.nombre, leg_period=ms.leg_period, website=ms.web_page
                         )
                         if cong is None:
                             stats.skipped += 1
@@ -501,28 +502,23 @@ class OpenPeruOrchestrator:
             )
             for raw_bancada in rows:
                 try:
+                    if raw_bancada.legislative_period not in [
+                        "Parlamentario 2021 - 2026"
+                    ]:
+                        raw_bancada.processed = False
+                        stats.skipped += 1
+                        continue
                     bancadas, memberships = process_bancada(raw_bancada)
+                    bancada_rows = [
+                        (bancada.leg_year, bancada.bancada_name) for bancada in bancadas
+                    ]
+                    bancadas_index, inserted_count, existing_count = (
+                        crud_core.upsert_bancadas_bulk(db, bancada_rows)
+                    )
+                    clean_inserted += inserted_count
+                    clean_updated += existing_count
 
-                    bancadas_index: dict[str, db_models.Bancada] = {}
-                    for bancada in bancadas:
-                        pre = (
-                            db.query(db_models.Bancada)
-                            .filter(
-                                db_models.Bancada.leg_year == bancada.leg_year,
-                                func.lower(db_models.Bancada.bancada_name)
-                                == bancada.bancada_name.lower(),
-                            )
-                            .first()
-                        )
-                        model = crud_core.upsert_bancada(
-                            db, bancada.leg_year, bancada.bancada_name
-                        )
-                        bancadas_index[bancada.bancada_name] = model
-                        if pre is None:
-                            clean_inserted += 1
-                        else:
-                            clean_updated += 1
-
+                    membership_rows: list[tuple[str, int, int]] = []
                     for ms in memberships:
                         leg_year_value = (
                             ms.leg_year.value
@@ -535,16 +531,16 @@ class OpenPeruOrchestrator:
                             leg_period=find_leg_period(str(leg_year_value)),
                             website=ms.website,
                         )
-                        bancada = bancadas_index.get(ms.bancada_name)
+                        bancada = bancadas_index.get(
+                            (str(leg_year_value), ms.bancada_name.lower())
+                        )
                         if cong is None or bancada is None:
                             stats.skipped += 1
                             continue
-                        crud_core.upsert_bancada_membership(
-                            db=db,
-                            leg_year=leg_year_value,
-                            person_id=cong.id,
-                            bancada_id=bancada.bancada_id,
+                        membership_rows.append(
+                            (str(leg_year_value), cong.id, bancada.bancada_id)
                         )
+                    crud_core.upsert_bancada_memberships_bulk(db, membership_rows)
 
                     raw_bancada.processed = True
                     stats.processed += 1
@@ -585,10 +581,10 @@ class OpenPeruOrchestrator:
                         clean_inserted += 1
                     else:
                         clean_updated += 1
-
+                        
                     for cong_rel in bill_congs:
                         cong = crud_core.find_congresista(
-                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period
+                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period, website=cong_rel.web_page
                         )
                         if cong is None:
                             stats.skipped += 1
@@ -616,6 +612,7 @@ class OpenPeruOrchestrator:
                             bill.id,
                             step_schema.step_date,
                             step_schema.step_detail,
+                            step_schema.step_status,
                         )
 
                     if include_documents:
@@ -676,7 +673,7 @@ class OpenPeruOrchestrator:
 
                     for cong_rel in motion_congs:
                         cong = crud_core.find_congresista(
-                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period
+                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period, website=cong_rel.web_page
                         )
                         if cong is None:
                             stats.skipped += 1
@@ -692,6 +689,7 @@ class OpenPeruOrchestrator:
                             motion_id=motion.id,
                             step_date=step_schema.step_date,
                             step_detail=step_schema.step_detail,
+                            step_status=step_schema.step_status,
                         )
 
                     if include_documents:
@@ -742,7 +740,7 @@ class OpenPeruOrchestrator:
                 try:
                     ley_schema = process_leyes(raw_ley)
                     if ley_schema is None:
-                        raw_ley.processed = True
+                        raw_ley.processed = False
                         stats.skipped += 1
                         continue
                     pre = db.get(db_models.Ley, ley_schema.id)
