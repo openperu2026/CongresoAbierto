@@ -59,6 +59,7 @@ def process_motion(raw_motion: RawMotion) -> tuple[Motion, list[MotionCongresist
                     nombre=cong.get("nombre"),
                     leg_period=leg_period,
                     role_type=cong.get("tipoFirmanteId"),
+                    web_page=cong.get("pagWeb"),
                 )
             )
 
@@ -103,6 +104,7 @@ def process_motion_steps(raw_motion: RawMotion) -> list[MotionStep] | None:
             # Extracting information from each step
             id = step.get("seguimientoId")
             date = step.get("fecSeguimiento")
+            status = step.get("desEstadoMocion")
             details = step.get("detalle") or ""
             files = step.get("adjuntos") or []
             vote_step = any(
@@ -126,6 +128,7 @@ def process_motion_steps(raw_motion: RawMotion) -> list[MotionStep] | None:
                 vote_step=vote_step,
                 vote_id=vote_id,
                 step_date=date,
+                step_status=status,
                 step_detail=details,
                 step_files=file_ids,
             )

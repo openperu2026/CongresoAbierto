@@ -49,6 +49,7 @@ def process_bill(raw_bill: RawBill) -> tuple[Bill, list[BillCongresistas]]:
 
     # Extracting information from firmantes dictionary
     cong_list = []
+
     if firmantes:
         author_info = firmantes[0]
         author_name = author_info.get("nombre")
@@ -61,6 +62,7 @@ def process_bill(raw_bill: RawBill) -> tuple[Bill, list[BillCongresistas]]:
                     nombre=cong.get("nombre"),
                     leg_period=leg_period,
                     role_type=cong.get("tipoFirmanteId"),
+                    web_page=cong.get("pagWeb")
                 )
             )
     else:
@@ -109,6 +111,7 @@ def process_bill_steps(raw_bill: RawBill) -> list[BillStep] | None:
             # Extracting information from each step
             id = step.get("seguimientoPleyId")
             date = step.get("fecha")
+            status = step.get("desEstado")
             details = step.get("detalle") or ""
             vote_step = any(
                 vote_word in details.lower() for vote_word in ["votacion", "votación"]
@@ -132,6 +135,7 @@ def process_bill_steps(raw_bill: RawBill) -> list[BillStep] | None:
                 vote_step=vote_step,
                 vote_id=vote_id,
                 step_date=date,
+                step_status=status,
                 step_detail=details,
                 step_files=file_ids,
             )

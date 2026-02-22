@@ -107,6 +107,7 @@ def process_memberships(
             Membership(
                 role=cargo,
                 nombre=cong.nombre,
+                web_page=cong.website,
                 leg_period=cong.leg_period,
                 org_name=(org_name or "").strip(),
                 org_type=org_type,

@@ -178,6 +178,25 @@ def test_process_motion_steps_vote_detection_and_vote_id_increment():
     assert out[2].step_files == []
 
 
+def test_process_motion_steps_carries_des_estado_mocion_as_step_status():
+    steps = [
+        {
+            "seguimientoId": 456,
+            "fecSeguimiento": "2026-02-10",
+            "desEstadoMocion": "En Comisión",
+            "detalle": "Texto libre sin clasificación directa",
+            "adjuntos": [],
+        }
+    ]
+    rm = _raw_motion(id="MO_888", steps=steps)
+
+    out = mod.process_motion_steps(rm)
+
+    assert out is not None
+    assert len(out) == 1
+    assert out[0].step_status == "En Comisión"
+
+
 def test_process_motion_document_vote_doc_true_for_si_no_pattern_si_first():
     text = "Resultado: SI +++++  80 ... NO ---- 20"
     rmd = _raw_motion_document(text=text)

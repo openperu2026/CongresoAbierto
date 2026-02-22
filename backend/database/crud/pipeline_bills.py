@@ -87,9 +87,14 @@ def upsert_bill_committee(
 
 
 def upsert_bill_step(
-    db: Session, step_id: int, bill_id: str, step_date, step_detail: str
+    db: Session,
+    step_id: int,
+    bill_id: str,
+    step_date,
+    step_detail: str,
+    step_status: str | None = None,
 ) -> db_models.BillStep:
-    step_type = classify_des_estado(step_detail)
+    step_type = classify_des_estado(step_status or step_detail)
     existing = db.get(db_models.BillStep, step_id)
     if existing is None:
         obj = db_models.BillStep(

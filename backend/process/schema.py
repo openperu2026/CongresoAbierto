@@ -218,12 +218,14 @@ class BillCongresistas(PrintableModel):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the bill (e.g. author, coauthor, adherente, etc)
+        web_page (str): Webpage.
     """
 
     bill_id: str
     nombre: str
     leg_period: LegPeriod
     role_type: RoleTypeBill
+    web_page: str | None = None
 
     @field_validator("leg_period", mode="before")
     @classmethod
@@ -272,6 +274,7 @@ class BillStep(PrintableModel):
     vote_step: bool
     vote_id: str | None
     step_date: datetime
+    step_status: str | None = None
     step_detail: str
     step_files: list[int]
 
@@ -368,12 +371,14 @@ class MotionCongresistas(PrintableModel):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the motion (e.g. author, coauthor, adherente, etc)
+        web_page (str): website.
     """
 
     motion_id: str
     nombre: str
     leg_period: LegPeriod
     role_type: RoleTypeBill
+    web_page: str | None = None
 
     @field_validator("leg_period", mode="before")
     @classmethod
@@ -410,6 +415,7 @@ class MotionStep(PrintableModel):
     vote_step: bool
     vote_id: str | None
     step_date: datetime
+    step_status: str | None = None
     step_detail: str
     step_files: list[int]
 
@@ -541,6 +547,7 @@ class Membership(PrintableModel):
     # Attributes that fit in Popolo structure
     role: RoleOrganization
     nombre: str
+    web_page: str
     leg_period: LegPeriod
     org_name: str
     org_type: TypeOrganization

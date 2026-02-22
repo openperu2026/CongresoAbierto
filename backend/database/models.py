@@ -324,8 +324,8 @@ class Bancada(Base):
 
     __tablename__ = "bancadas"
 
+    bancada_id = Column(Integer, primary_key=True, autoincrement=True)
     leg_year = Column(Enum(LegislativeYear, name="leg_period"), nullable=False)
-    bancada_id = Column(Integer, primary_key=True)
     bancada_name = Column(String, nullable=False)
 
 
@@ -399,7 +399,7 @@ class BancadaMembership(Base):
 
     __tablename__ = "bancada_memberships"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     leg_year = Column(Enum(LegislativeYear, name="leg_year"), nullable=False)
     person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=False)
