@@ -496,7 +496,11 @@ def define_bancada(congresistas_raw, fecha):
     if not fecha:
         return congresistas_raw
 
-    target = _parse_fecha(fecha)
+    # Accept either "dd/mm/yyyy" string or (year, month, day) tuple.
+    if isinstance(fecha, tuple) and len(fecha) == 3:
+        target = fecha
+    else:
+        target = _parse_fecha(fecha)
     if not target:
         return congresistas_raw
 

@@ -60,9 +60,6 @@ with open(output_path, "w", encoding="utf-8") as f:
     json.dump(final_votes, f, ensure_ascii=False, indent=2)
 
 
-bill= extract_information(votes, False)
-
-print(bill)
 #print(count_votes(final_votes["resultados"], "votacion"))
 #print(final_votes["resultados"])
 
