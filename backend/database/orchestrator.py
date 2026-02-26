@@ -31,6 +31,12 @@ from backend.documents.downloader import (
     download_bill_documents,
     download_motion_documents,
 )
+from backend.ocr import (
+    DeepSeekOCRProvider,
+    OCRPipelineConfig,
+    OCRRepository,
+    run_ocr_pipeline,
+)
 from backend.process.bancadas import process_bancada
 from backend.process.bills import (
     get_committees,
@@ -255,6 +261,44 @@ class OpenPeruOrchestrator:
                 )
         return summary
 
+    def run_document_ocr(
+        self,
+        *,
+        provider_name: str = "deepseek",
+        model_name: str = "deepseek-ai/DeepSeek-OCR",
+        prompt: str = "<image>\nFree OCR.",
+        limit: int | None = None,
+        workers: int = 1,
+        queue_size: int = 32,
+        dpi: int = 220,
+        only_without_pages: bool = True,
+        include_bills: bool = True,
+        include_motions: bool = True,
+    ):
+        provider_name = provider_name.lower()
+        if provider_name != "deepseek":
+            raise ValueError(
+                f"Unsupported OCR provider '{provider_name}'. Only 'deepseek' is supported."
+            )
+
+        repository = OCRRepository(settings.RAW_DB_URL)
+        provider = DeepSeekOCRProvider(model_name=model_name)
+        config = OCRPipelineConfig(
+            prompt=prompt,
+            queue_maxsize=queue_size,
+            workers=workers,
+            page_dpi=dpi,
+            documents_limit=limit,
+            include_bills=include_bills,
+            include_motions=include_motions,
+            only_without_pages=only_without_pages,
+        )
+        return run_ocr_pipeline(
+            repository=repository,
+            provider=provider,
+            config=config,
+        )
+
     # -----------------------------
     # Scraping internals
     # -----------------------------
@@ -287,13 +331,21 @@ class OpenPeruOrchestrator:
 
         bill_docs = RawBillDocumentScraper()
         for bill_id in bill_docs.get_bills_pending_documents():
-            bill_docs.get_bill_documents(bill_id=bill_id, update=False, prioritize=True)
+            bill_docs.get_bill_documents(
+                bill_id=bill_id,
+                update=False,
+                prioritize=True,
+                ocr_inline=False,
+            )
             bill_docs.load_raw_documents()
 
         motion_docs = RawMotionDocumentScraper()
         for motion_id in motion_docs.get_motions_pending_documents():
             motion_docs.get_motion_documents(
-                motion_id=motion_id, update=False, prioritize=True
+                motion_id=motion_id,
+                update=False,
+                prioritize=True,
+                ocr_inline=False,
             )
             motion_docs.load_raw_documents()
 
@@ -803,6 +855,17 @@ def _print_document_summary(summary: dict[str, DownloadStats]) -> None:
     )
 
 
+def _print_ocr_summary(stats) -> None:
+    logger.info(
+        "ocr_total: "
+        f"documents_scanned={stats.documents_scanned}, "
+        f"documents_completed={stats.documents_completed}, "
+        f"documents_failed={stats.documents_failed}, "
+        f"pages_processed={stats.pages_processed}, "
+        f"pages_failed={stats.pages_failed}"
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="OpenPeru ETL Orchestrator")
     parser.add_argument(
@@ -870,6 +933,57 @@ def build_parser() -> argparse.ArgumentParser:
         "--download-documents",
         action="store_true",
         help="Download PDF documents from RawDB links",
+    )
+    parser.add_argument(
+        "--ocr-documents",
+        action="store_true",
+        help="Run page-level OCR for pending bill/motion documents",
+    )
+    parser.add_argument(
+        "--ocr-provider",
+        type=str,
+        default="deepseek",
+        help="OCR provider (currently supports: deepseek)",
+    )
+    parser.add_argument(
+        "--ocr-model",
+        type=str,
+        default="deepseek-ai/DeepSeek-OCR",
+        help="OCR model name to load",
+    )
+    parser.add_argument(
+        "--ocr-prompt",
+        type=str,
+        default="<image>\nFree OCR.",
+        help="Single-page OCR prompt",
+    )
+    parser.add_argument(
+        "--ocr-limit",
+        type=int,
+        help="Limit the number of documents to OCR",
+    )
+    parser.add_argument(
+        "--ocr-workers",
+        type=int,
+        default=1,
+        help="Number of async OCR workers",
+    )
+    parser.add_argument(
+        "--ocr-queue-size",
+        type=int,
+        default=32,
+        help="Bounded queue size used by page-level OCR pipeline",
+    )
+    parser.add_argument(
+        "--ocr-dpi",
+        type=int,
+        default=220,
+        help="Render DPI used for PDF->image conversion",
+    )
+    parser.add_argument(
+        "--ocr-reprocess",
+        action="store_true",
+        help="Reprocess documents even if page rows already exist",
     )
     parser.add_argument(
         "--download-documents-limit",
@@ -965,6 +1079,21 @@ def main(argv: list[str] | None = None) -> None:
             limit=args.download_documents_limit,
         )
         _print_document_summary(doc_summary)
+
+    if args.ocr_documents:
+        ocr_stats = orchestrator.run_document_ocr(
+            provider_name=args.ocr_provider,
+            model_name=args.ocr_model,
+            prompt=args.ocr_prompt,
+            limit=args.ocr_limit,
+            workers=args.ocr_workers,
+            queue_size=args.ocr_queue_size,
+            dpi=args.ocr_dpi,
+            only_without_pages=not args.ocr_reprocess,
+            include_bills=run_bills,
+            include_motions=run_motions,
+        )
+        _print_ocr_summary(ocr_stats)
 
     if not args.skip_processing:
         summary = orchestrator.run_processing(

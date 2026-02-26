@@ -133,7 +133,7 @@ def test_get_bill_documents_populates_documents_and_calls_render_pdf(monkeypatch
 
     monkeypatch.setattr("backend.scrapers.bills_documents.render_pdf", fake_render_pdf)
 
-    scraper.get_bill_documents(bill_id=bill_id)
+    scraper.get_bill_documents(bill_id=bill_id, ocr_inline=True)
     # Should have called render_pdf once
     assert len(calls) == 1
     # b64 of "111"

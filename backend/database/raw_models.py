@@ -256,6 +256,59 @@ class RawMotionDocument(RawBase):
     )
 
 
+class RawDocumentPage(RawBase):
+    """
+    Page-level OCR output for bill and motion documents.
+
+    This table stores one row per extracted page, which allows asynchronous,
+    resumable OCR processing without requiring whole-document OCR in a single step.
+    """
+
+    __tablename__ = "raw_document_pages"
+
+    __table_args__ = (
+        Index(
+            "idx_raw_document_pages_parent",
+            "parent_type",
+            "parent_doc_id",
+        ),
+        Index(
+            "idx_raw_document_pages_type",
+            "page_type",
+        ),
+        Index(
+            "ux_raw_document_pages_unique_page",
+            "parent_type",
+            "parent_doc_id",
+            "page_number",
+            "ocr_model",
+            unique=True,
+        ),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime, nullable=False)
+    parent_type = Column(String, nullable=False)  # bill | motion
+    parent_doc_id = Column(Integer, nullable=False)
+    parent_natural_id = Column(String, nullable=False)  # bill_id | motion_id
+    seguimiento_id = Column(String, nullable=False)
+    archivo_id = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    page_number = Column(Integer, nullable=False)
+    text = Column(String, nullable=False)
+    page_type = Column(String, nullable=False)  # vote | attendance | other
+    ocr_provider = Column(String, nullable=False)
+    ocr_model = Column(String, nullable=False)
+    prompt = Column(String, nullable=True)
+    error = Column(String, nullable=True)
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.true(), default=True
+    )
+
+
 class RawBancada(RawBase):
     """
     Represents a raw scraped bancada in the peruvian parliament.

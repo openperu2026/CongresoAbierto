@@ -5,7 +5,7 @@ This module extracts raw data from Congress endpoints/web pages and stores it in
 ## Files
 
 - `bills.py`, `motions.py`: scrape bill/motion JSON payloads into `RawBill`/`RawMotion`.
-- `bills_documents.py`, `motions_documents.py`: extract and OCR documents into raw document tables.
+- `bills_documents.py`, `motions_documents.py`: scrape document metadata/URLs into raw document tables (OCR is now handled asynchronously by `backend/ocr`).
 - `congresistas.py`, `bancadas.py`, `committees.py`, `organizations.py`: scrape reference entities.
 - `utils.py`: HTTP helpers, parsing helpers, OCR/PDF support.
 

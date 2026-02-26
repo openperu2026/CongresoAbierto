@@ -71,7 +71,11 @@ class RawMotionDocumentScraper:
         return filtered_steps
 
     def get_motion_documents(
-        self, motion_id: str, update: bool = False, prioritize: bool = True
+        self,
+        motion_id: str,
+        update: bool = False,
+        prioritize: bool = True,
+        ocr_inline: bool = False,
     ) -> list[RawMotionDocument]:
         """
         Extract the documents from a RawMotion's files and extract the text from each of them
@@ -119,9 +123,17 @@ class RawMotionDocumentScraper:
                 b64_id = base64.b64encode(str(file_id).encode()).decode()
                 url = f"{BASE_URL}/seguimiento-adjunto/{b64_id}/pdf"
 
-                logger.info(f"Extracting document {ix + 1}/{len(steps)} at url: {url}")
-                extracted_text = render_pdf(url)
-                logger.success(f"Successfully extracted text from {url}")
+                if ocr_inline:
+                    logger.info(
+                        f"Extracting document {ix + 1}/{len(steps)} at url: {url}"
+                    )
+                    extracted_text = render_pdf(url)
+                    logger.success(f"Successfully extracted text from {url}")
+                else:
+                    extracted_text = ""
+                    logger.info(
+                        f"Queued document {ix + 1}/{len(steps)} for async OCR at url: {url}"
+                    )
 
                 new_doc = RawMotionDocument(
                     timestamp=datetime.now(),

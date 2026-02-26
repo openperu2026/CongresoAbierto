@@ -154,6 +154,12 @@ Scrape pending bill and motion documents
 uv run python -m backend --scrape --scrape-documents
 ```
 
+Run page-level OCR on pending bill/motion documents (DeepSeekOCR)
+
+```bash
+uv run python -m backend --ocr-documents --skip-processing
+```
+
 Download PDFs from RawDB document links
 
 ```bash
@@ -226,6 +232,24 @@ Documents
 • `--update-documents` re-download PDFs even if they already exist locally
 
 • `--upload-documents-s3` upload downloaded PDFs to the configured AWS S3 bucket
+
+OCR
+
+• `--ocr-documents` run page-level OCR over pending bill/motion document URLs
+
+• `--ocr-provider` OCR provider (currently `deepseek`)
+
+• `--ocr-model` model id (default `deepseek-ai/DeepSeek-OCR`)
+
+• `--ocr-prompt` single-page OCR prompt
+
+• `--ocr-limit` limit number of documents OCRed
+
+• `--ocr-workers`, `--ocr-queue-size` async throughput controls
+
+• `--ocr-dpi` render DPI for PDF page rasterization
+
+• `--ocr-reprocess` OCR documents even if page rows already exist
 
 • `--no-documents` skip loading documents in processing stage
 

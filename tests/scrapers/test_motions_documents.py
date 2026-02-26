@@ -128,7 +128,7 @@ def test_get_motion_documents_populates_urls_and_calls_render_pdf(monkeypatch):
 
     monkeypatch.setattr(motions_documents, "render_pdf", fake_render_pdf)
 
-    scraper.get_motion_documents(motion_id=motion_id)
+    scraper.get_motion_documents(motion_id=motion_id, ocr_inline=True)
 
     # One document should have been created
     assert len(scraper.documents) == 1

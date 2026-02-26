@@ -68,7 +68,11 @@ class RawBillDocumentScraper:
         ]
 
     def get_bill_documents(
-        self, bill_id: str, update: bool = False, prioritize: bool = True
+        self,
+        bill_id: str,
+        update: bool = False,
+        prioritize: bool = True,
+        ocr_inline: bool = False,
     ) -> list[RawBillDocument]:
         """
         Extract the urls from a RawBill's files and extract the text from each of them
@@ -111,9 +115,17 @@ class RawBillDocumentScraper:
 
                 b64_id = base64.b64encode(str(file_id).encode()).decode()
                 url = f"{BASE_URL}/archivo/{b64_id}/pdf"
-                logger.info(f"Extracting document {ix + 1}/{len(steps)} at url: {url}")
-                extracted_text = render_pdf(url)
-                logger.success(f"Successfully extracted text from {url}")
+                if ocr_inline:
+                    logger.info(
+                        f"Extracting document {ix + 1}/{len(steps)} at url: {url}"
+                    )
+                    extracted_text = render_pdf(url)
+                    logger.success(f"Successfully extracted text from {url}")
+                else:
+                    extracted_text = ""
+                    logger.info(
+                        f"Queued document {ix + 1}/{len(steps)} for async OCR at url: {url}"
+                    )
 
                 new_doc = RawBillDocument(
                     timestamp=datetime.now(),
