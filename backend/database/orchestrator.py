@@ -326,7 +326,10 @@ class OpenPeruOrchestrator:
             for raw_cong in rows:
                 try:
                     # TODO: Remove this range to process all years
-                    if raw_cong.leg_period not in ["Parlamentario 2021 - 2026", "Parlamentario 2016 - 2021"]:
+                    if raw_cong.leg_period not in [
+                        "Parlamentario 2021 - 2026",
+                        "Parlamentario 2016 - 2021",
+                    ]:
                         raw_cong.processed = False
                         stats.skipped += 1
                         continue
@@ -459,7 +462,10 @@ class OpenPeruOrchestrator:
                         clean_updated += 1
                     for ms in process_org_membership(raw_org, org_schema):
                         cong = crud_core.find_congresista(
-                            db, name=ms.nombre, leg_period=ms.leg_period, website=ms.web_page
+                            db,
+                            name=ms.nombre,
+                            leg_period=ms.leg_period,
+                            website=ms.web_page,
                         )
                         if cong is None:
                             stats.skipped += 1
@@ -581,10 +587,13 @@ class OpenPeruOrchestrator:
                         clean_inserted += 1
                     else:
                         clean_updated += 1
-                        
+
                     for cong_rel in bill_congs:
                         cong = crud_core.find_congresista(
-                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period, website=cong_rel.web_page
+                            db,
+                            name=cong_rel.nombre,
+                            leg_period=cong_rel.leg_period,
+                            website=cong_rel.web_page,
                         )
                         if cong is None:
                             stats.skipped += 1
@@ -673,7 +682,10 @@ class OpenPeruOrchestrator:
 
                     for cong_rel in motion_congs:
                         cong = crud_core.find_congresista(
-                            db, name=cong_rel.nombre, leg_period=cong_rel.leg_period, website=cong_rel.web_page
+                            db,
+                            name=cong_rel.nombre,
+                            leg_period=cong_rel.leg_period,
+                            website=cong_rel.web_page,
                         )
                         if cong is None:
                             stats.skipped += 1

@@ -16,13 +16,14 @@ def _raw_org(
     legislative_year: str = "2025",
     type_org: str = "Mesa Directiva",
     org_link: str = "/org/mesa",
-    web_page: str = "www.org.gob.pe/org/mesa"):
+    web_page: str = "www.org.gob.pe/org/mesa",
+):
     return SimpleNamespace(
         raw_html=raw_html,
         legislative_year=legislative_year,
         type_org=type_org,
         org_link=org_link,
-        web_page=web_page
+        web_page=web_page,
     )
 
 
@@ -96,7 +97,7 @@ def test_process_org_maps_fields(monkeypatch):
         legislative_year="2024",
         type_org="Mesa Directiva",
         org_link="/org/mesa",
-        web_page="www.org.gob.pe/org/mesa"
+        web_page="www.org.gob.pe/org/mesa",
     )
 
     org = mod.process_org(raw)
@@ -159,7 +160,7 @@ def test_process_org_membership_creates_memberships_with_year_window(
         legislative_year="2025",
         type_org="Mesa Directiva",
         org_link="/org/mesa",
-        web_page="www.org.gob.pe/org/mesa"
+        web_page="www.org.gob.pe/org/mesa",
     )
 
     org = mod.process_org(raw_org)

@@ -23,7 +23,7 @@ def process_committee(raw_comm: RawCommittee) -> list[Organization]:
         if type_comm and name_comm and type_comm != "Comisión":
             link = content.xpath(".//a/@href")
             link = link[0] if link else ""
-            
+
             final_lst.append(
                 Organization(
                     leg_period=find_leg_period(raw_comm.legislative_year),
@@ -69,7 +69,7 @@ def process_org_membership(
             Membership(
                 role=normalize_membership_role(cargo.text),
                 nombre=name.text_content(),
-                web_page = web.text_content(),
+                web_page=web.text_content(),
                 leg_period=org.leg_period,
                 org_name=org.org_name,
                 org_type=org.org_type,

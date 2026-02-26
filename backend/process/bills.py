@@ -62,7 +62,7 @@ def process_bill(raw_bill: RawBill) -> tuple[Bill, list[BillCongresistas]]:
                     nombre=cong.get("nombre"),
                     leg_period=leg_period,
                     role_type=cong.get("tipoFirmanteId"),
-                    web_page=cong.get("pagWeb")
+                    web_page=cong.get("pagWeb"),
                 )
             )
     else:

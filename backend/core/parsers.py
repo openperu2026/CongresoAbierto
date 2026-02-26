@@ -43,6 +43,7 @@ def _normalize_leg_period(value: str) -> str:
 
 LEG_PERIOD_RE = re.compile(r"(\d{4})-(\d{4})")
 
+
 def parse_leg_period(value: str) -> LegPeriod:
     if value is None:
         raise ValueError("leg_period cannot be null")
@@ -59,6 +60,7 @@ def parse_leg_period(value: str) -> LegPeriod:
         raise ValueError(f"Unknown leg period: {value!r} (normalized={v!r})")
 
     return LegPeriod(canon)
+
 
 def _normalize_legislature(value: str) -> str:
     v = value.strip()
@@ -328,6 +330,7 @@ def normalize_membership_role(raw: str) -> str:
 
     return RoleOrganization(canon)
 
+
 def _norm_text(s: str) -> str:
     s = unicodedata.normalize("NFKC", s or "")
     s = s.replace("\xa0", " ").replace("\u202f", " ").replace("\u2007", " ")
@@ -335,30 +338,42 @@ def _norm_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s)
     return s
 
+
 # Canonical outputs must exactly match your enum values
 _COMM_TYPE_RULES: list[tuple[re.Pattern[str], str]] = [
     # Most specific first
-    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+acusaciones\s+constitucionales", re.I),
-     "Subcomisión de Acusaciones Constitucionales"),
-    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+control\s+pol[ií]tico", re.I),
-     "Subcomisión de Control Político"),
-    (re.compile(r"^comisi[oó]n\s+de\s+levantamiento\s+de\s+inmunidad\s+parlamentaria", re.I),
-     "Comisión de Levantamiento de Inmunidad Parlamentaria"),
-    (re.compile(r"^comisi[oó]n\s+de\s+[eé]tica\s+parlamentaria", re.I),
-     "Comisión de Ética Parlamentaria"),
-    (re.compile(r"^sub\s*comisi[oó]n\s+de\s+seguimiento\s+del\s+tlc", re.I),
-     "Sub Comisión de Seguimiento del TLC"),
-
+    (
+        re.compile(r"^sub\s*comisi[oó]n\s+de\s+acusaciones\s+constitucionales", re.I),
+        "Subcomisión de Acusaciones Constitucionales",
+    ),
+    (
+        re.compile(r"^sub\s*comisi[oó]n\s+de\s+control\s+pol[ií]tico", re.I),
+        "Subcomisión de Control Político",
+    ),
+    (
+        re.compile(
+            r"^comisi[oó]n\s+de\s+levantamiento\s+de\s+inmunidad\s+parlamentaria", re.I
+        ),
+        "Comisión de Levantamiento de Inmunidad Parlamentaria",
+    ),
+    (
+        re.compile(r"^comisi[oó]n\s+de\s+[eé]tica\s+parlamentaria", re.I),
+        "Comisión de Ética Parlamentaria",
+    ),
+    (
+        re.compile(r"^sub\s*comisi[oó]n\s+de\s+seguimiento\s+del\s+tlc", re.I),
+        "Sub Comisión de Seguimiento del TLC",
+    ),
     # Common noisy cases
-    (re.compile(r"^comisi[oó]n\s+ordinaria\b", re.I),
-     "Comisión Ordinaria"),
-    (re.compile(r"^comisiones?\s+investigadoras?\b", re.I),
-     "Comisiones Investigadoras"),
-    (re.compile(r"^comisiones?\s+especiales?\b", re.I),
-     "Comisiones Especiales"),
-    (re.compile(r"^grupo\s+de\s+trabajo\b", re.I),
-     "Grupo de Trabajo"),
+    (re.compile(r"^comisi[oó]n\s+ordinaria\b", re.I), "Comisión Ordinaria"),
+    (
+        re.compile(r"^comisiones?\s+investigadoras?\b", re.I),
+        "Comisiones Investigadoras",
+    ),
+    (re.compile(r"^comisiones?\s+especiales?\b", re.I), "Comisiones Especiales"),
+    (re.compile(r"^grupo\s+de\s+trabajo\b", re.I), "Grupo de Trabajo"),
 ]
+
 
 def parse_comm_type(value: str) -> str:
     raw = value

@@ -88,9 +88,7 @@ def download_bill_documents(
     limit: int | None = None,
 ) -> DownloadStats:
     stats = DownloadStats()
-    query = raw_db.query(RawBillDocument).filter(
-        RawBillDocument.last_update.is_(True)
-    )
+    query = raw_db.query(RawBillDocument).filter(RawBillDocument.last_update.is_(True))
     if limit is not None:
         query = query.limit(limit)
 

@@ -134,9 +134,7 @@ def upsert_bancada(db: Session, leg_year, bancada_name: str) -> db_models.Bancad
     if existing is not None:
         return existing
 
-    obj = db_models.Bancada(
-        leg_year=normalized_leg_year, bancada_name=bancada_name
-    )
+    obj = db_models.Bancada(leg_year=normalized_leg_year, bancada_name=bancada_name)
     db.add(obj)
     db.flush()
     return obj
@@ -184,9 +182,7 @@ def upsert_bancadas_bulk(
         if key in index:
             existing_count += 1
             continue
-        to_insert.append(
-            db_models.Bancada(leg_year=key[0], bancada_name=original_name)
-        )
+        to_insert.append(db_models.Bancada(leg_year=key[0], bancada_name=original_name))
 
     if to_insert:
         db.add_all(to_insert)
