@@ -9,7 +9,7 @@ import pytesseract
 from jellyfish import jaro_winkler_similarity as jws
 from typing import Dict, List, Any, Optional
 
-BANCADA_START = r"\|\s*AP\s*\|"
+BANCADA_START = r"\|\s*(?:AP|APP)\s*\|"
 # STEP 4 — Stable token defs
 # -------------------------
 
@@ -21,7 +21,7 @@ NO_RE   = r"NO"
 AUS_RE  = r"(?:AUS|AIS|US)"
 ABST_RE = r"ABST\.?"          # dot optional
 ASIS_RE = r"PRE"              # (not used in VOTE_RE right now)
-OTHER_RE= r"(?:SINRRES|SINRES|TTT|TT|LP|LE|LO)"  # longer-first helps
+OTHER_RE= r"(?:SINRRES|SINRES|TTT|TT|LP|LE|LO|SUS)"  # longer-first helps
 STAR_RE = r"\*{1,4}"
 
 # whole-token boundary (avoid matching inside words)
@@ -286,7 +286,7 @@ def extraction_first_second(resultados):
 
 #### FOR THE EXCEPTION PART
 def find_below_block(text):
-    start = text.find("EL PRESIDENTE DEL CONGRESO DEJA CONSTANCIA")
+    start = text.find("DEJA CONSTANCIA")
     return text[start:].strip()
 
 
@@ -327,7 +327,7 @@ def _split_nombres(raw: str) -> List[str]:
     raw = re.sub(r"\s+(?:DEL|DE)$", "", raw)
 
     # Split by ; or , (names lists)
-    parts = re.split(r"\s*[;,]\s*", raw)
+    parts = re.split(r"\s*(?:,|;|\s+Y\s+)\s*", raw)
 
     cleaned = []
     for p in parts:
@@ -427,15 +427,18 @@ def define_enejercicio(congresistas_raw, fecha):
         target = _parse_fecha(fecha)
     if not target:
         return congresistas_raw
+    
+    congresistas_filtrados = []
 
     for c in congresistas_raw:
-        periodo = c.get("periodo") 
-        found=None
-        if _period_contains(periodo, target):
-            found = True
-            c["en_ejercicio"] = found
+        periodo = c.get("periodo")
 
-    return congresistas_raw
+        if _period_contains(periodo, target):
+            c["en_ejercicio"] = True
+            congresistas_filtrados.append(c)
+
+    return  congresistas_filtrados
+    
         
 
 
@@ -527,3 +530,106 @@ def matching_lists(lst_congres, lst_results, threshold=0.90):
             congresista["voto"] = None
 
     return sorted_congres
+
+
+
+def run_exceptions(lst_attendance):
+    for x in lst_attendance:
+        if "apellido" in x:
+            if x["apellido"] == "ECHAIZ DE NUNEZ IZAGA":
+                x["apellido"] = "ECHAIZ RAMOS VDA DE NUNEZ"
+    return lst_attendance
+
+
+
+
+def run_brothers(lst_attendance):
+    for x in lst_attendance:
+        if "apellido" in x:
+            if x["nombre_completo"] == "HECTOR ACUNA PERALTA":
+                x["nombre_completo"] = "SEGUNDO HECTOR ACUNA PERALTA"
+
+    return lst_attendance
+
+
+
+
+def matching_last_name(lst_congres, lst_attendance, text_below=False):
+    att = []
+
+    for x in lst_attendance:
+        x2 = x.copy()
+        if "apellido" not in x2:
+            x2["apellido"] = "NO_NAME"
+        x2["apellido"] = normalize_text(x2["apellido"])
+        att.append(x2)
+
+    sorted_congres = sorted(lst_congres, key=lambda x: x["apellido"])
+    sorted_attendance = sorted(att, key=lambda x: x["apellido"])
+
+    for congresista in sorted_congres:
+        c_apellido = normalize_text(congresista.get("apellido", ""))
+        if text_below is False:
+            if congresista["voto"] is None:
+                # Solo para los que aun no ha hecho match
+                # Que pasa si los hermanos aun no han hecho match?
+                counter = 0
+                while (
+                    counter < len(sorted_attendance)
+                    and jws(c_apellido, sorted_attendance[counter]["apellido"]) < 0.950
+                ):
+                    counter += 1
+
+                if counter < len(sorted_attendance):
+                    congresista["voto"] = sorted_attendance[counter]["voto"]
+                else:
+                    congresista["voto"] = None  # no match found
+
+        if text_below is True:
+            counter = 0
+            while (
+                counter < len(sorted_attendance)
+                and jws(c_apellido, sorted_attendance[counter]["apellido"]) < 0.950
+            ):
+                counter += 1
+
+            if counter < len(sorted_attendance):
+                congresista["voto"] = sorted_attendance[counter]["voto"]
+
+    return sorted_congres
+
+
+#####Final functionÑ
+
+def transformation_final(texto, congresistas_raw):
+
+    texto_normalized=normalize_text(texto)
+    type_text=get_type(texto_normalized)
+    blocks=locate_blocks(texto_normalized, type_text)
+    fecha=get_fecha(blocks["header_block"])
+    titulo=get_title(blocks["header_block"])
+    table=parse_vote_table(blocks["table_block"])
+
+    ####RESULTADOS PARA COMAPRAR
+    results_formated=extraction_first_second(table["resultados"])
+    results_formated=run_exceptions(results_formated)
+    #print(results_formated)
+    #####LISTA DE EXCEPCIONES DEBAJO
+    below_block=clean_vote_block(find_below_block(blocks["table_block"]))
+    list_below=extract_constancias(below_block)
+    list_below=run_brothers(list_below)
+    list_below=run_exceptions(list_below)
+
+    congresistas = format_jsn(congresistas_raw)
+    congresistas=define_enejercicio(congresistas, fecha)
+    congresistas=define_bancada(congresistas, fecha)
+
+    ####################################################################
+    #MAKING THE MATCHES
+    #breakpoint()
+    first_match=matching_lists(congresistas, results_formated)
+    second_match=matching_last_name(first_match, results_formated)
+    third_match=matching_last_name(second_match, list_below, True)
+    final_match=matching_lists(third_match, list_below)
+
+    return final_match

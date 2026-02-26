@@ -67,9 +67,15 @@
          {"name": "UNIDAD Y DIALOGO",
         "periodo": {
           "inicio": "21/07/2023",
-          "fin": "26/05/2024"
+          "fin": "10/03/2024"
         }},
         
+
+        {"name": "NO AGRUPADO",
+        "periodo": {
+          "inicio": "11/03/2024",
+          "fin": "26/05/2024"
+        }},
       
         {
         "name": "HONOR Y DEMOCRACIA",

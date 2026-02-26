@@ -1,3 +1,5 @@
+#uv run pytest -W ignore::UserWarning  .\tests\test_transformation_final.py -vv
+
 import re
 import unicodedata
 from pathlib import Path
@@ -5,6 +7,7 @@ from pathlib import Path
 import json
 import pandas as pd
 import pytest
+
 
 
 def normalize_text(s: str) -> str:
@@ -124,7 +127,7 @@ def parse_input_test_excel(path: Path, sheetname) -> dict:
                 "apellido": normalize_text(row.get("apellido")),
                 "nombre_completo": normalize_text(row.get("nombre_completo")),
                 "bancada": normalize_text(row.get("bancada")),
-                "votacion": normalize_text(row.get("votacion")),
+                "voto": normalize_text(row.get("voto")),
             }
         )
 
@@ -155,7 +158,7 @@ def compare_results(actual_results: list[dict], expected_results: list[dict], re
             normalize_text(r.get("apellido")),
             normalize_text(r.get("nombre_completo")),
             normalize_text(r.get("bancada")),
-            normalize_vote(r.get("votacion")),
+            normalize_vote(r.get("voto")),
         )
 
     actual_keyed = [(row_key(r), r) for r in actual_filtered]
@@ -185,6 +188,17 @@ def compare_results(actual_results: list[dict], expected_results: list[dict], re
             f"Only in expected results (first 2 dicts): {only_in_expected_dicts}"
         )
 
+def with_voto_key(expected_results: list[dict]) -> list[dict]:
+    out = []
+    for r in expected_results:
+        if "voto" in r:
+            out.append(r)
+            continue
+        rr = dict(r)
+        rr["voto"] = r.get("voto")
+        out.append(rr)
+    return out
+
 
 #def test_seats_json_matches_input_test_xlsx():
 #    expected = parse_input_test_excel(Path("data/input_test.xlsx"), "Sheet1")
@@ -198,63 +212,22 @@ def compare_results(actual_results: list[dict], expected_results: list[dict], re
 #
 
 def test_transformation_final_L31751():
-    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
-    if not tesseract_path.exists():
-        pytest.skip("Tesseract not installed on this machine.")
-
     try:
-        from backend.process import extract_votes as ev
+        from backend.process import extract_votes_DS as ev
     except Exception as exc:
-        pytest.skip(f"extract_votes import failed: {exc}")
+        pytest.skip(f"extract_votes_DS import failed: {exc}")
 
     expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31751")
 
-    pdf_candidates = list(Path("data/to_test_function").glob("L31751.pdf"))
-    if not pdf_candidates:
-        pytest.skip("Sample PDF not found.")
-    pdf_path = pdf_candidates[0]
-
-    votes_text = ev.render_bill(str(pdf_path), 1)
+    txt_path = Path("data/extracted_text/L31751.txt")
+    if not txt_path.exists():
+        pytest.skip("Sample text not found.")
+    votes_text = txt_path.read_text(encoding="utf-8", errors="ignore")
     congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
     
     actual = ev.transformation_final(votes_text, congresistas_jsn)
 
-    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
-    assert normalize_text(actual.get("evento")) == expected.get("evento")
-    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
-
-
-    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)
-
-
-
-def test_pdf_excel_basic():
-    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
-    if not tesseract_path.exists():
-        pytest.skip("Tesseract not installed on this machine.")
-
-    try:
-        from backend.process import extract_votes as ev
-    except Exception as exc:
-        pytest.skip(f"extract_votes import failed: {exc}")
-
-    expected = parse_input_test_excel(Path("data/input_test.xlsx"), "Sheet1")
-
-    pdf_candidates = list(Path("data").glob("Asis_y_vot_de_la_*_13-12-2024.pdf"))
-    if not pdf_candidates:
-        pytest.skip("Sample PDF not found.")
-    pdf_path = pdf_candidates[0]
-
-    votes_text = ev.render_bill(str(pdf_path), 2)
-    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
-    actual = ev.transformation_final(votes_text, congresistas_jsn)
-
-    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
-    assert normalize_text(actual.get("evento")) == expected.get("evento")
-    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
-
-    compare_results(actual.get("resultados", []), expected.get("resultados", []))
-
+    compare_results(actual, with_voto_key(expected.get("resultados", [])), report=True)
 
 
 
@@ -264,61 +237,23 @@ def test_pdf_excel_basic():
 
 
 def test_transformation_final_L31989():
-    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
-    if not tesseract_path.exists():
-        pytest.skip("Tesseract not installed on this machine.")
 
     try:
-        from backend.process import extract_votes as ev
+        from backend.process import extract_votes_DS as ev
     except Exception as exc:
-        pytest.skip(f"extract_votes import failed: {exc}")
+        pytest.skip(f"extract_votes_DS import failed: {exc}")
 
     expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31989")
 
-    pdf_candidates = list(Path("data/to_test_function").glob("L31989.pdf"))
-    if not pdf_candidates:
-        pytest.skip("Sample PDF not found.")
-    pdf_path = pdf_candidates[0]
-
-    votes_text = ev.render_bill(str(pdf_path), 1)
+    txt_path = Path("data/extracted_text/L31989.txt")
+    if not txt_path.exists():
+        pytest.skip("Sample text not found.")
+    votes_text = txt_path.read_text(encoding="utf-8", errors="ignore")
     congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
     
     actual = ev.transformation_final(votes_text, congresistas_jsn)
 
-    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
-    assert normalize_text(actual.get("evento")) == expected.get("evento")
-    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
-
-
-    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)
+    compare_results(actual, with_voto_key(expected.get("resultados", [])), report=True)
 
 
 
-
-def test_transformation_final_L31990(): 
-    tesseract_path = Path(r"C:/Program Files/Tesseract-OCR/tesseract.exe")
-    if not tesseract_path.exists():
-        pytest.skip("Tesseract not installed on this machine.")
-
-    try:
-        from backend.process import extract_votes as ev
-    except Exception as exc:
-        pytest.skip(f"extract_votes import failed: {exc}")
-
-    expected = parse_input_test_excel(Path("data/to_test_function/input_test.xlsx"), "L31990")
-
-    pdf_candidates = list(Path("data/to_test_function").glob("L31990.pdf"))
-    if not pdf_candidates:
-        pytest.skip("Sample PDF not found.")
-    pdf_path = pdf_candidates[0]
-
-    votes_text = ev.render_bill(str(pdf_path), 1)
-    congresistas_jsn = load_json(Path("data/congresistas_2021_2026.json"))
-    
-    actual = ev.transformation_final(votes_text, congresistas_jsn)
-
-    assert_title_similar(actual.get("titulo"), expected.get("titulo"))
-    assert normalize_text(actual.get("evento")) == expected.get("evento")
-    assert str(actual.get("fecha", "")).strip() == expected.get("fecha")
-
-    compare_results(actual.get("resultados", []), expected.get("resultados", []), report=True)

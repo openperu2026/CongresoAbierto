@@ -268,12 +268,12 @@ def text_below_to_dict(lst: list) -> list:
 
 def run_exceptions(lst_attendance):
     for x in lst_attendance:
-        if "apellido" in x:
+        if "apellido" in x: 
             if x["apellido"] == "Echaíz De Núñez Izaga":
                 x["apellido"] = "Echaíz Ramos vda de Núñez"
 
             if x["nombre_completo"] == "HECTOR ACUNA PERALTA":
-                x["nombre_completo"] = "SEGUNDO HECTOR ACUNA PERALTA"
+                x["nombre_completo"] = "ACUNA PERALTA SEGUNDO HECTOR "
 
     return lst_attendance
 
