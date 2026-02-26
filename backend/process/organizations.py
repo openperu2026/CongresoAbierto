@@ -69,7 +69,7 @@ def process_org_membership(
             Membership(
                 role=normalize_membership_role(cargo.text),
                 nombre=name.text_content(),
-                web_page = web,
+                web_page = web.text_content(),
                 leg_period=org.leg_period,
                 org_name=org.org_name,
                 org_type=org.org_type,

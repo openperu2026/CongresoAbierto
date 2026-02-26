@@ -27,6 +27,7 @@ def _raw_cong(
     memberships_content=None,
     leg_period="2021-2026",
     url="https://www.congreso.gob.pe/congresista/juan",
+    website="https://www.congreso.gob.pe/congresista/juan",
 ):
     if memberships_content is None:
         memberships_content = {"data": []}
@@ -35,6 +36,7 @@ def _raw_cong(
         memberships_content=json.dumps(memberships_content),
         leg_period=leg_period,
         url=url,
+        website=website
     )
 
 
@@ -110,7 +112,7 @@ def test_process_memberships_all_branches(monkeypatch):
     }
 
     raw = _raw_cong(memberships_content=memberships_payload, leg_period="2021-2026")
-    cong = SimpleNamespace(nombre="Juan Pérez", leg_period="2021-2026")
+    cong = SimpleNamespace(nombre="Juan Pérez", leg_period="2021-2026", website = "www.congreso.gob.pe/juan")
 
     out = mod.process_memberships(raw, cong)
 
