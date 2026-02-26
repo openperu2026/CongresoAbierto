@@ -1,8 +1,6 @@
 from pathlib import Path
 import sys
-import fitz
 import json
-from pathlib import Path
 
 # Ensure project root is on sys.path so imports like `backend.process` work when
 # running this file directly (e.g., `uv run backend/process/trials.py`).
@@ -39,21 +37,6 @@ def count_votes(lst, key):
 from backend.process.extract_votes_DS import (
     say_hello,
     read_txt,
-    normalize_text,
-    get_type,
-    locate_blocks,
-    get_fecha,
-    get_title,
-    parse_vote_table,
-    find_below_block,
-    clean_vote_block,
-    _split_nombres,
-    extract_constancias,
-    extraction_first_second,
-    format_jsn,
-    define_enejercicio,
-    define_bancada,
-    matching_lists,
     transformation_final
 )
 
