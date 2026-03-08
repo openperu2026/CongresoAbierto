@@ -1,13 +1,7 @@
-from io import BytesIO
 import re
 import unicodedata
-import fitz
-from PIL import Image
-import numpy as np
-import cv2
-import pytesseract
 from jellyfish import jaro_winkler_similarity as jws
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 BANCADA_START = r"\|\s*(?:AP|APP)\s*\|"
 # STEP 4 — Stable token defs
