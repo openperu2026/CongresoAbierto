@@ -1,8 +1,6 @@
 from pathlib import Path
 import sys
-import fitz
 import json
-from pathlib import Path
 
 # Ensure project root is on sys.path so imports like `backend.process` work when
 # running this file directly (e.g., `uv run backend/process/trials.py`).
@@ -14,20 +12,6 @@ if str(ROOT_DIR) not in sys.path:
 
 from backend.process.extract_votes import (
     render_bill,
-    extract_information,
-    count_votes,
-    matching_lists,
-    extraction_first_second,
-    format_jsn,
-    no_comma_readed,
-    run_exceptions,
-    matching_last_name,
-    extract_afavor,
-    swap_names, 
-    normalize_votes_in_place,
-    normalize_text,
-    text_below_to_dict,
-    look_for_absent_brother, 
     transformation_final
 )
 
