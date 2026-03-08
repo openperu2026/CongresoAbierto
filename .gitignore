@@ -177,12 +177,20 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
-# Data
+# Data / logs / cache
+data/raw/**
+data/processed/**
+data/ocr_cache/**
+data/bill_jsons/**
+logs/**
 data/bill_jsons/*.json
 data/ocr_cache/*.txt
 data/*xlsx
 *.db
 *.csv
+
+# Big notebooks outputs (optional)
+notebooks/.ipynb_checkpoints/
 
 # DS_Store
 .DS_Store

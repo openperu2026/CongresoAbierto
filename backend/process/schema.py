@@ -1,8 +1,9 @@
 from pydantic import BaseModel, field_validator, ConfigDict
 from backend import (
     VoteOption,
+    VoteResult,
+    MajorityType,
     AttendanceStatus,
-    BillStepType,
     RoleTypeBill,
     LegPeriod,
     Legislature,
@@ -10,10 +11,14 @@ from backend import (
     Proponents,
     TypeOrganization,
     RoleOrganization,
+    TypeCommittee,
+    MotionType,
+    parse_leg_period,
+    parse_legislature,
+    parse_role_bill,
 )
-from typing import List, Optional, Dict
+from typing import Optional
 from datetime import datetime
-from pathlib import Path
 
 
 class PrintableModel(BaseModel):
@@ -51,7 +56,6 @@ class Attendance(PrintableModel):
         status (str): Attendance status, e.g., 'present', 'absent'.
     """
 
-    org_id: int
     event_id: str
     attendee_id: int
     status: AttendanceStatus
@@ -63,24 +67,31 @@ class VoteEvent(PrintableModel):
     """
     Represents a vote event in a parliament session.
     Attributes:
-        org_id (str): The org_id or parliament where the vote took place.
         leg_period (str): The legislative period during which the vote occurred.
         bill_id (str): Unique identifier for the bill associated with the vote.
         date (str): The date of the vote event.
     """
 
     # Attributes that fit in in Popolo structure
-    id: str
-    org_id: int
     leg_period: LegPeriod
-    bill_id: str
+    bill_or_motion: str
+    bill_motion_id: str
     date: datetime
-    votes: Optional[List[Vote]] = None
-    attendance: Optional[List[Attendance]] = None
+    result: VoteResult
+    majority_type: MajorityType | None
+    votes: Optional[list[Vote]] = None
+    attendance: Optional[list[Attendance]] = None
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
 
     model_config = ConfigDict(use_enum_values=False)
 
-    def get_counts(self) -> Dict[VoteOption, int]:
+    def get_counts(self) -> dict[VoteOption, int]:
         """
         Counts the number of votes per option.
         """
@@ -91,27 +102,27 @@ class VoteEvent(PrintableModel):
             for option in set(vote.option for vote in self.votes)
         }
 
-    def get_counts_by_bancada(self) -> Dict[int, Dict[VoteOption, int]]:
+    def get_counts_by_bancada(self) -> dict[int, dict[VoteOption, int]]:
         """
         Returns vote counts grouped by bancada and option.
         """
         if not self.votes:
             return {}
 
-        counts: Dict[int, Dict[VoteOption, int]] = {}
+        counts: dict[int, dict[VoteOption, int]] = {}
         for vote in self.votes:
             counts.setdefault(vote.bancada_id, {}).setdefault(vote.option, 0)
             counts[vote.bancada_id][vote.option] += 1
         return counts
 
-    def get_attendance_summary(self) -> Dict[str, int]:
+    def get_attendance_summary(self) -> dict[str, int]:
         """
         Returns a summary count of attendance statuses.
         """
         if not self.attendance:
             return {}
 
-        summary: Dict[str, int] = {}
+        summary: dict[str, int] = {}
         for att in self.attendance:
             summary[att.status] = summary.get(att.status, 0) + 1
         return summary
@@ -122,14 +133,12 @@ class VoteCount(PrintableModel):
     Represents the counts of votes in a vote event.
 
     Attributes:
-        org_id (int): The org_id or parliament where the vote took place.
         vote_event_id (str): Unique identifier for the vote event.
         option (str): The voter's choice, e.g., 'yes', 'no', 'abstain'.
         bancada (str): The political group of the voter.
         count (int): Number of votes for the option.
     """
 
-    org_id: int
     vote_event_id: str
     option: VoteOption
     bancada_id: int
@@ -138,75 +147,12 @@ class VoteCount(PrintableModel):
     model_config = ConfigDict(use_enum_values=False)
 
 
-class BillStep(PrintableModel):
-    """
-    Represents a bill step record with details about the actions taken on a bill.
-
-    Attributes:
-        id (int): A unique identifier for each step record.
-        bill_id (str): The identifier of the bill associated with this step.
-        step_type (str): The type of step record (e.g. "Vote", "Assigned to Committee", "Presented", etc.)
-        step_date (datetime): The date and time when the step occured.
-        step_detail (str): The details on the step
-        step_url (str): The url associated to the step
-    """
-
-    id: int
-    bill_id: str
-    step_type: BillStepType
-    step_date: datetime
-    step_detail: str
-    step_url: str
-
-    model_config = ConfigDict(use_enum_values=False)
-
-
-class Committee(PrintableModel):
-    """
-    Represents a committee in the peruvian parliament.
-
-    Attributes:
-        leg_period (str): Legislative period of the committee.
-        leg_year (str): Year period of the committee
-        org_id (int): The org_id or parliament where the committee belongs.
-        id (int): A unique identifier for the committee.
-        name (str): Name of the committee
-    """
-
-    leg_period: LegPeriod
-    leg_year: LegislativeYear
-    org_id: int
-    id: str
-    name: str
-
-    model_config = ConfigDict(use_enum_values=False)
-
-
-class RawBill(PrintableModel):
-    """
-    Represents a raw bill, with sections saved as attributes:
-        id (str) Unique identifier for the bill.
-        general (str) Main bill info
-        committees (str) Information about committees
-        congresistas (str) Information about authors and proponents
-        steps (str) Information about bill steps
-    """
-
-    id: str
-    timestamp: datetime
-    general: Optional[str] = None
-    committees: Optional[str] = None
-    congresistas: Optional[str] = None
-    steps: Optional[str] = None
-
-
 class Bill(PrintableModel):
     """
     Represents a bill in the peruvian parliament.
 
     Attributes:
         id (str): Unique identifier for the bill.
-        org_id (int): The org_id or parliament where the bill was presented.
         leg_period (str): Legislative period of the bill.
         legislature (str): Legislature where the bill was presented.
         presentation_date (datetime): Date when the bill was presented.
@@ -216,32 +162,41 @@ class Bill(PrintableModel):
         complete_text (str): Complete text of the bill.
         status (str): Current status of the bill.
         proponent (str): Type of proponent of the bill
-        author_id (str): Unique identifier for the author of the bill.
-        bancada_id (str): Unique identifier for the political group associated with the bill.
+        author_name (str): Unique identifier for the author of the bill.
+        author_web (str): Unique identifier for the political group associated with the bill.
         bill_approved (bool): Boolean indicating if the bill has been published
     """
 
     # Attributes that fit in in Popolo structure
     id: str
-    org_id: int
     leg_period: LegPeriod
     legislature: Legislature
     presentation_date: datetime
     title: str
     summary: str
-    observations: str
-    complete_text: str
+    observations: str | None
+    complete_text: str | None
     status: str
     proponent: Proponents
-    author_id: int
-    bancada_id: int
+    author_name: str | None
+    author_web: str | None
     bill_approved: bool
 
     model_config = ConfigDict(use_enum_values=False)
 
-    def save_to_json(self, path: Path):
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(self.model_dump_json(indent=2))
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
+
+    @field_validator("legislature", mode="before")
+    @classmethod
+    def validate_legislature(cls, v):
+        if isinstance(v, Legislature):
+            return v
+        return parse_legislature(v)
 
 
 class BillCongresistas(PrintableModel):
@@ -251,13 +206,29 @@ class BillCongresistas(PrintableModel):
 
     Attributes:
         bill_id (str): A unique identifier for the bill.
-        person_id (str): A unique identifier for the person.
+        nombre (str): Name of the person.
+        leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the bill (e.g. author, coauthor, adherente, etc)
     """
 
     bill_id: str
-    person_id: str
+    nombre: str
+    leg_period: LegPeriod
     role_type: RoleTypeBill
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
+
+    @field_validator("role_type", mode="before")
+    @classmethod
+    def validate_role_type(cls, v):
+        if isinstance(v, RoleTypeBill):
+            return v
+        return parse_role_bill(v)
 
     model_config = ConfigDict(use_enum_values=False)
 
@@ -268,11 +239,188 @@ class BillCommittees(PrintableModel):
 
     Attributes:
         bill_id (str): The identifier of the bill.
-        committee_id (str): The identifier of the committee.
+        committee_name (str): The identifier of the committee.
     """
 
     bill_id: str
-    committee_id: int
+    committee_name: str
+
+
+class BillStep(PrintableModel):
+    """
+    Represents a bill step record with details about the actions taken on a bill.
+
+    Attributes:
+        id (int): A unique identifier for each step record.
+        bill_id (str): The identifier of the bill associated with this step.
+        vote_step (bool): Records if the step is a vote or not.
+        step_date (datetime): The date and time when the step occured.
+        step_detail (str): The details on the step
+    """
+
+    id: int
+    bill_id: str
+    vote_step: bool
+    vote_id: str | None
+    step_date: datetime
+    step_detail: str
+    step_files: list[int]
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class BillDocument(PrintableModel):
+    """
+    Represents a document object related to a Bill and to a specific BillStep
+
+    Attributes:
+        bill_id (str): The identifier of the bill associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+
+    bill_id: str
+    step_id: int
+    archivo_id: int
+    url: str
+    text: str
+    vote_doc: bool
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class Motion(PrintableModel):
+    """
+    Represents a motion in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the motion.
+        leg_period (str): Legislative period of the motion.
+        legislature (str): Legislature where the motion was presented.
+        presentation_date (datetime): Date when the motion was presented.
+        motion_type (str): Type of the motion.
+        summary (str): Summary of the motion.
+        observations (str): Observations on the motion.
+        complete_text (str): Complete text of the motion.
+        status (str): Current status of the motion.
+        author_name (str): Unique identifier for the author of the motion.
+        author_web (str): Unique identifier for the political group associated with the motion.
+        motion_approved (bool): Boolean indicating if the motion has been published
+    """
+
+    # Attributes that fit in in Popolo structure
+    id: str
+    leg_period: LegPeriod
+    legislature: Legislature
+    presentation_date: datetime
+    motion_type: MotionType
+    summary: str
+    observations: str | None
+    complete_text: str | None
+    status: str
+    author_name: str | None
+    author_web: str | None
+    motion_approved: bool
+
+    model_config = ConfigDict(use_enum_values=False)
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
+
+    @field_validator("legislature", mode="before")
+    @classmethod
+    def validate_legislature(cls, v):
+        if isinstance(v, Legislature):
+            return v
+        return parse_legislature(v)
+
+
+class MotionCongresistas(PrintableModel):
+    """
+    Represents a relation between a motion and parliament members based on their
+    role during the presentation of the motion.
+
+    Attributes:
+        motion_id (str): A unique identifier for the motion.
+        nombre (str): Name of the person.
+        leg_period (str): Legislative period.
+        role_type (str): The type of role that the person has in the motion (e.g. author, coauthor, adherente, etc)
+    """
+
+    motion_id: str
+    nombre: str
+    leg_period: LegPeriod
+    role_type: RoleTypeBill
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
+
+    @field_validator("role_type", mode="before")
+    @classmethod
+    def validate_role_type(cls, v):
+        if isinstance(v, RoleTypeBill):
+            return v
+        return parse_role_bill(v)
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class MotionStep(PrintableModel):
+    """
+    Represents a motion step record with details about the actions taken on a motion.
+
+    Attributes:
+        id (int): A unique identifier for each step record.
+        motion_id (str): The identifier of the motion associated with this step.
+        vote_step (bool): Records if the step is a vote or not.
+        step_date (datetime): The date and time when the step occured.
+        step_detail (str): The details on the step
+        step_url (str): The url associated to the step
+    """
+
+    id: int
+    motion_id: str
+    vote_step: bool
+    vote_id: str | None
+    step_date: datetime
+    step_detail: str
+    step_files: list[int]
+
+    model_config = ConfigDict(use_enum_values=False)
+
+
+class MotionDocument(PrintableModel):
+    """
+    Represents a document object related to a Motion and to a specific MotionStep
+
+    Attributes:
+        motion_id (str): The identifier of the motion associated with this step.
+        step_id (int): A unique identifier for each step record.
+        archivo_id (int): A unique identifier for each file record.
+        url (str): The url associated to the file
+        text (str): Extracted text from the file
+        vote_doc (bool): Records if the step is a vote or not.
+    """
+
+    motion_id: str
+    step_id: int
+    archivo_id: int
+    url: str
+    text: str
+    vote_doc: bool
+
+    model_config = ConfigDict(use_enum_values=False)
 
 
 class Congresista(PrintableModel):
@@ -280,45 +428,34 @@ class Congresista(PrintableModel):
     Represents a member of the peruvian parliament
 
     Attributes:
-        id (str): Unique identifier for the person.
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
-        party_id (str): Unique identifier for the party.
+        party_name (str): Name of the party from where the person was elected.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
         website (str): Official website of the congressperson.
+        photo_url (str): Official photo url of the congressperson.
     """
 
     # Attributes that fit in Popolo structure
-    id: int
-    leg_period: LegPeriod
     nombre: str
-    party_id: int
+    leg_period: LegPeriod
+    party_name: str
     votes_in_election: int
     dist_electoral: Optional[str]
     condicion: str
     website: str
+    photo_url: str
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
 
     model_config = ConfigDict(use_enum_values=False)
-
-    def __str__(self):
-        return "\n".join(f"{key}: {value}" for key, value in self.model_dump().items())
-
-
-class Party(PrintableModel):
-    """
-    Represent a Political Party in the peruvian government
-
-    Attributes:
-        leg_period (str): Legislative period.
-        party_id (int): Unique identifier for the party
-        party_name (str): Name of the party
-    """
-
-    leg_period: LegPeriod
-    party_id: int
-    party_name: str
 
 
 class Bancada(PrintableModel):
@@ -327,13 +464,13 @@ class Bancada(PrintableModel):
 
     Attributes:
         leg_year (str): Year period of the bancada
-        bancada_id (int): Unique identifier for the bancada
         bancada_name (str): Name of the bancada
     """
 
     leg_year: LegislativeYear
-    bancada_id: int
     bancada_name: str
+
+    model_config = ConfigDict(use_enum_values=False)
 
 
 class Organization(PrintableModel):
@@ -343,18 +480,27 @@ class Organization(PrintableModel):
     Attributes:
         leg_period (str): Legislative period.
         leg_year (str): Legislative year.
-        org_id (int): Unique identifier for the organization.
         org_name (str): Name of the organization.
-        org_type (str): Type of organization (e.g. committee, etc)
+        org_type (str): Type of organization (e.g. bancada, partido, committee, etc)
+        comm_type (str): Type of committee (e.g. ordinaria, especial, etc)
+        org_link (str): Url of the organization's website.
     """
 
     leg_period: LegPeriod
     leg_year: LegislativeYear
 
     # Attributes that fit in Popolo structure
-    org_id: int
     org_name: str
     org_type: TypeOrganization
+    comm_type: TypeCommittee | None
+    org_link: str
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
 
     model_config = ConfigDict(use_enum_values=False)
 
@@ -364,23 +510,34 @@ class Membership(PrintableModel):
     Represents a person's role in an organization during a specific time period.
 
     Attributes:
-        id (int): Unique identifier for the membership relationship.
         role (str): Role of the person in the organization (e.g. vocero, miembro, presidente, etc)
-        person_id (int): Identifier for the person
-        org_id (int): Identifier for the organization
+        nombre (str): Name of the person.
+        leg_period (str): Legislative period.
+        org_name (str): Name of the organization.
+        org_type (str): Type of organization (e.g. bancada, partido, committee, etc)
+        comm_type (str): Type of committee (e.g. ordinaria, especial, etc)
         start_date (datetime): Date of the beginning of the membership
         end_date (datetime): Date of the end of the membership
     """
 
     # Attributes that fit in Popolo structure
-    id: int
     role: RoleOrganization
-    person_id: int
-    org_id: int
+    nombre: str
+    leg_period: LegPeriod
+    org_name: str
+    org_type: TypeOrganization
+    comm_type: TypeCommittee | None
     start_date: datetime
-    end_date: datetime
+    end_date: datetime | None
 
     model_config = ConfigDict(use_enum_values=False)
+
+    @field_validator("leg_period", mode="before")
+    @classmethod
+    def validate_leg_period(cls, v):
+        if isinstance(v, LegPeriod):
+            return v
+        return parse_leg_period(v)
 
     @field_validator("end_date")
     def check_end_after_start(cls, end, info):
@@ -395,13 +552,13 @@ class BancadaMembership(PrintableModel):
     Represents a person's membership in a bancada during a specific time period.
 
     Attributes:
-        id (int): Unique identifier for the membership relationship.
         leg_year (str): Year period of the membership
-        person_id (int): Identifier for the person
-        bancada_id (int): Identifier for the bancada
+        cong_name (str): Name of the congresista
+        website (str): Congresista's website
+        bancada_name (str): Bancada's name
     """
 
-    id: int
     leg_year: LegislativeYear
-    person_id: int
-    bancada_id: int
+    cong_name: str
+    website: str
+    bancada_name: str

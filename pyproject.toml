@@ -42,3 +42,6 @@ dependencies = [
     "sqlalchemy-schemadisplay>=2.0",
     "typing>=3.10.0.0",
 ]
+
+[tool.uv.sources]
+backend = { path = "backend" }

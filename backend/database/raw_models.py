@@ -1,10 +1,36 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Index
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.sql import expression
+from sqlalchemy.inspection import inspect
 
 Base = declarative_base()
 
 
-class RawBill(Base):
+class RawBase(Base):
+    __abstract__ = True
+
+    # Columns to ignore in ALL raw models
+    _ignore_eq = ["timestamp", "last_update", "changed", "processed"]
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+
+        mapper = inspect(self).mapper
+
+        for col in mapper.columns:
+            name = col.key
+            if name in self._ignore_eq:
+                continue
+            if getattr(self, name) != getattr(other, name):
+                return False
+
+        return True
+
+    __hash__ = None
+
+
+class RawBill(RawBase):
     """
     Represents a raw scraped bill in the peruvian parliament.
 
@@ -15,6 +41,9 @@ class RawBill(Base):
         committees (str) Information about committees
         congresistas (str) Information about authors and proponents
         steps (str) Information about bill steps
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_bills"
@@ -24,9 +53,18 @@ class RawBill(Base):
     committees = Column(String, nullable=True)
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
 
-class RawBillDocument(Base):
+class RawBillDocument(RawBase):
     """
     Raw documents url and text content extracted by scrape_raw_bills_documents.py
 
@@ -39,9 +77,25 @@ class RawBillDocument(Base):
         archivo_id (str): id related to the document
         url (str): complete document's url.
         text (str): extracted text from the pdf
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_bill_documents"
+
+    __table_args__ = (
+        Index(
+            "idx_raw_bill_documents_bill_last",
+            "bill_id",
+            "last_update",
+        ),
+        Index(
+            "idx_raw_bill_documents_bill_processed",
+            "bill_id",
+            "processed",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(DateTime, nullable=False)
@@ -51,9 +105,18 @@ class RawBillDocument(Base):
     archivo_id = Column(String, nullable=False)
     url = Column(String, nullable=False)
     text = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
 
-class RawCommittee(Base):
+class RawCommittee(RawBase):
     """
     Represents a raw scraped committee in the peruvian parliament.
 
@@ -63,6 +126,9 @@ class RawCommittee(Base):
         legislative_year (int): Legislative year
         committee_type (str): Type of committee in the parliament
         raw_html (str): Html text
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_committees"
@@ -72,9 +138,18 @@ class RawCommittee(Base):
     legislative_year = Column(Integer, nullable=False)
     committee_type = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
 
-class RawCongresista(Base):
+class RawCongresista(RawBase):
     """
     Represents a raw scraped information of congresistas
 
@@ -85,7 +160,9 @@ class RawCongresista(Base):
         url (str): Congresista's website url
         profile_content (str): Html text from the website's profile tab
         memberships_content (str): API response to memberships of the congresista in json format
-
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_congresistas"
@@ -96,8 +173,18 @@ class RawCongresista(Base):
     url = Column(String, nullable=False)
     profile_content = Column(String, nullable=False)
     memberships_content = Column(String, nullable=True)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
-class RawMotion(Base):
+
+class RawMotion(RawBase):
     """
     Represents a raw scraped motion in the peruvian parliament.
 
@@ -107,17 +194,30 @@ class RawMotion(Base):
         general (str): Main motion info
         congresistas (str) Information about authors and proponents
         steps (str) Information about motion steps
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_motions"
-    
+
     id = Column(String, primary_key=True)
     timestamp = Column(DateTime, primary_key=True)
     general = Column(String, nullable=True)
     congresistas = Column(String, nullable=True)
     steps = Column(String, nullable=True)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
-class RawMotionDocument(Base):
+
+class RawMotionDocument(RawBase):
     """
     Raw documents url and text content extracted by scrape_raw_motions_documents.py
 
@@ -130,6 +230,9 @@ class RawMotionDocument(Base):
         archivo_id (str): id related to the document
         url (str): complete document's url.
         text (str): extracted text from the pdf
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_motion_documents"
@@ -142,8 +245,18 @@ class RawMotionDocument(Base):
     archivo_id = Column(String, nullable=False)
     url = Column(String, nullable=False)
     text = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
-class RawBancada(Base):
+
+class RawBancada(RawBase):
     """
     Represents a raw scraped bancada in the peruvian parliament.
 
@@ -152,6 +265,9 @@ class RawBancada(Base):
         timestamp (datetime): timestamp of the scraping task
         leg_period (str): Legislative period
         raw_html (str): Html text
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
 
     __tablename__ = "raw_bancadas"
@@ -160,23 +276,47 @@ class RawBancada(Base):
     timestamp = Column(DateTime, nullable=False)
     legislative_period = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
 
-class RawOrganization(Base):
+
+class RawOrganization(RawBase):
     """
-    Represents a raw scraped organization in the peruvian parliament such as 
+    Represents a raw scraped organization in the peruvian parliament such as
     Junta de Portavoces, Consejo Directivo, Mesa Directiva y Comisión Permanente.
 
     Attributes:
         id (str): Unique identifier for the organization.
         timestamp (datetime): timestamp of the scraping task
         legislative_year (str): Legislative year
+        org_link (str): Organization's website
         raw_html (str): Html text
+        last_update (bool): Column that indicates if this tuple is the last update for the bill_id
+        changed (bool): Column that indicates if the last update has any difference from the previous update
+        processed (bool): Column that indicates if the last update with changes have been updated
     """
-    
+
     __tablename__ = "raw_organizations"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(DateTime, nullable=False)
     legislative_year = Column(Integer, nullable=False)
     type_org = Column(String, nullable=False)
+    org_link = Column(String, nullable=False)
     raw_html = Column(String, nullable=False)
+    last_update = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    changed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
+    processed = Column(
+        Boolean, nullable=False, server_default=expression.false(), default=False
+    )
