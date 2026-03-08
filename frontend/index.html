@@ -1,51 +1,140 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Congress Votes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenPeru</title>
   <link rel="stylesheet" href="./styles.css" />
-  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark">OP</div>
+      <div class="brand-text">
+        <div class="brand-title">OpenPeru</div>
+        <div class="brand-subtitle">Congress data, made navigable</div>
+      </div>
+    </div>
+    <nav class="tabs" aria-label="Primary">
+      <button class="tab active" data-tab="splash" type="button">Presentation</button>
+      <button class="tab" data-tab="congressman" type="button">Congressman</button>
+      <button class="tab" data-tab="bills" type="button">Bills</button>
+      <button class="tab" data-tab="sessions" type="button">Sessions</button>
+    </nav>
+  </header>
+
   <main class="container">
-    <h1>Votación del Congreso</h1>
-    <h2> Asunto: <span id="titulo"></span></h2>
-    <h3>ESTADO: APROBADO</h3>
-    <h4> Fecha: <span id="fecha"></span></h4>
-    <h4> Evento: <span id="evento"></span></h4>
-  
-    <svg id="chart" width="800" height="250"></svg>
-  
-    <div id="legend"></div>
-     
-    <h3>Resumen por bancada</h3>
-    <table id="bancada-table">
-      <thead>
-        <tr>
-          <th>Bancada</th>
-          <th>SI</th>
-          <th>NO</th>
-          <th>Otros</th>
-          <th>% Aprobación</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <section id="tab-splash" class="tab-panel active" role="tabpanel">
+      <div class="splash">
+        <div class="splash-text">
+          <p class="eyebrow">OpenPeru / Beta</p>
+          <h1>Make the Congress legible.</h1>
+          <p class="lead">
+            A focused interface for exploring congress members, bills, and session activity.
+            This version is intentionally simple and modular so we can iterate fast.
+          </p>
+          <div class="splash-actions">
+            <button class="primary" data-tab-jump="congressman" type="button">Explore Congressmen</button>
+            <button class="ghost" data-tab-jump="bills" type="button">Browse Bills</button>
+          </div>
+        </div>
+        <div class="splash-card">
+          <div class="card-title">What’s inside</div>
+          <ul class="card-list">
+            <li>Profiles and party info</li>
+            <li>Authorship and co-authorship of bills</li>
+            <li>Session-level views (next)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-congressman" class="tab-panel" role="tabpanel">
+      <div class="panel-header">
+        <div>
+          <h2>Congressman</h2>
+          <p>Select a congressman to view profile and authored bills.</p>
+        </div>
+        <div class="api-pill">API: <span id="api-base">/api</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="field">
+          <label for="congressman-select">Select congressman</label>
+          <div class="input-row">
+            <select id="congressman-select"></select>
+            <button id="congressman-go" type="button">Load</button>
+          </div>
+          <div id="api-status" class="api-status"></div>
+        </div>
+
+        <div class="details-grid">
+          <div class="details-card" id="congressman-details">
+            <div class="empty-state">Select a congressman to see details.</div>
+          </div>
+          <div class="photo-card" id="congressman-photo">
+            <div class="photo-frame">
+              <img id="photo-img" alt="" />
+              <div class="photo-fallback">Photo</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bills-section">
+          <div class="section-title">Bills (author or co-author)</div>
+          <div id="bills-table" class="table-wrap">
+            <div class="empty-state">Select a congressman to list their bills.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-bills" class="tab-panel" role="tabpanel">
+      <div class="panel">
+        <h2>Bills</h2>
+        <p>Select a law to see its summary and legislative steps.</p>
+
+        <div class="field">
+          <label for="bill-search">Search law (ley)</label>
+          <div class="input-row autocomplete">
+            <input id="bill-search" type="text" placeholder="Type a law name or number" autocomplete="off" />
+            <button id="bill-go" type="button">Load</button>
+            <div id="bill-suggest" class="suggestions" role="listbox"></div>
+          </div>
+          <div id="bill-status" class="api-status"></div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-title">Summary</div>
+          <p id="bill-summary" class="summary-text">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+            ut labore et dolore magna aliqua.
+          </p>
+        </div>
+
+        <div class="steps-section">
+          <div class="section-title">Steps</div>
+          <div id="bill-steps" class="timeline">
+            <div class="empty-state">Select a law to see its steps.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-sessions" class="tab-panel" role="tabpanel">
+      <div class="panel">
+        <h2>Sessions</h2>
+        <p>This tab is ready for the next iteration.</p>
+      </div>
+    </section>
   </main>
 
+  <footer class="site-footer">
+    <span>OpenPeru</span>
+    <span class="dot">•</span>
+    <span>Data served by your API</span>
+  </footer>
 
-
-
-  <div class="actions">
-    <button id="download-csv">Descarga la informacion (CSV)</button>
-  </div>
-
-
-  <script src="./script_header.js?v=1"></script>
-  <script src="./script.js?v=2"></script>
-  <script src="./script_table.js"></script>
-  <script src="./script_download.js"></script>
-
+  <script src="./app.js"></script>
 </body>
 </html>
-
