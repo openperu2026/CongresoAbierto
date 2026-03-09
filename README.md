@@ -37,7 +37,7 @@ All information is stored in relational databases designed for analysis, reuse, 
 
 OpenPeru follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
 
-```
+```mermaid
 flowchart LR
 
 subgraph Sources["Data Sources"]
