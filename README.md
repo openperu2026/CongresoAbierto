@@ -1,6 +1,8 @@
 # OpenPeru
 
-OpenPeru is an open‑source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured, machine‑readable data. Its goal is to lower the cost of understanding how Congress works—who proposes laws, how representatives vote, how parties and committees behave—and to make political accountability feasible for citizens, journalists, researchers, and civil society organizations.
+OpenPeru is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured, machine readable data.
+
+Its goal is to lower the cost of understanding how Congress works: who proposes laws, how representatives vote, how parties behave, and how legislation evolves. By converting difficult-to-use documents into structured datasets, OpenPeru makes political accountability feasible for citizens, journalists, researchers, and civil society organizations.
 
 Rather than creating new political information, OpenPeru unlocks the value of data that already exists but is currently difficult to access, search, and analyze.
 
@@ -8,14 +10,13 @@ Rather than creating new political information, OpenPeru unlocks the value of da
 
 ## Why This Matters: Unlocking the Value of Legislative Data
 
-Peru has experienced more than a decade of political instability, characterized by weak political parties, high legislative turnover, and repeated executive–legislative conflicts. In this context, democratic accountability depends critically on transparency: the ability of citizens and organizations to monitor legislative behavior and evaluate representatives based on evidence.
+Peru has experienced years of political instability and weak political parties. In this context, it is especially important for citizens and organizations to be able to understand what Congress is doing and how representatives behave.
 
-Although the Peruvian Congress publishes large volumes of information—bills, motions, voting records, committee reports, and debate transcripts—this information is dispersed across multiple portals and frequently released as PDFs or inconsistently structured web pages. These formats impose high search, interpretation, and processing costs. As a result, most legislative data has high *intrinsic* value but very low *realized* value: few actors can actually use it.
+Although the Peruvian Congress publishes a large amount of information, it is often scattered across different websites and released in formats that are difficult to search, analyze, or reuse. This makes it hard for journalists, researchers, and citizens to follow legislative activity or hold representatives accountable.
 
-OpenPeru addresses this gap by reducing the friction between documents and data. By converting congressional documents into standardized datasets and exposing them through a unified data model, the project increases the *post value* of political information. Tasks that were previously infeasible—systematic vote analysis, party‑level accountability, longitudinal tracking of legislators—become accessible and scalable.
+OpenPeru helps solve this problem by turning complex and fragmented congressional information into structured data that is easier to explore, analyze, and understand. 
 
-In short, OpenPeru is about transforming formal transparency into effective accountability.
-
+By making legislative information more accessible, OpenPeru aims to support transparency, research, and public accountability.
 ---
 
 ## What OpenPeru Provides
@@ -32,53 +33,83 @@ All information is stored in relational databases designed for analysis, reuse, 
 
 ---
 
-## Technical Overview
+## Architecture Overview
 
-OpenPeru follows a layered data‑engineering architecture that separates data acquisition, storage, processing, and validation. This design keeps raw information reproducible while enabling clean analytical outputs.
+OpenPeru follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
+
+```
+flowchart LR
+
+subgraph Sources["Data Sources"]
+A1[Congress Websites]
+A2[PDF Documents]
+end
+
+subgraph Ingestion["Data Ingestion"]
+B1[HTML Scrapers]
+B2[PDF Parsers]
+B3[Archive Crawlers]
+end
+
+subgraph Raw["Raw Data Layer"]
+C1[(Raw Database)]
+end
+
+subgraph Processing["Processing"]
+D1[Cleaning]
+D2[Entity Resolution]
+D3[Validation Schemas]
+end
+
+subgraph Processed["Structured Data Layer"]
+E1[(Processed Database)]
+end
+
+subgraph Applications["Applications"]
+F1[Public API]
+F2[Dashboards]
+F3[Research & Analysis]
+end
+
+A1 --> B1
+A2 --> B2
+
+B1 --> C1
+B2 --> C1
+B3 --> C1
+
+C1 --> D1
+D1 --> D2
+D2 --> D3
+
+D3 --> E1
+
+E1 --> F1
+E1 --> F2
+E1 --> F3
+```
 
 ### 1. Data Acquisition (Scrapers)
 
-Legislative data is collected directly from official Congress websites using custom scrapers. These handle:
-
-- HTML pages with inconsistent structure
-- PDF documents containing votes, attendance, and official records
-- Pagination, historical archives, and idiosyncratic naming conventions
-
-Scrapers are designed to be idempotent and resilient to partial failures, producing *raw* records without interpretation.
+Custom scrapers collect legislative data directly from Congress websites.
+They handle HTML pages, PDFs, and historical archives while remaining resilient to format changes.
 
 ### 2. Raw Data Layer
 
-All scraped content is stored in a **raw database** that closely mirrors the source documents. This layer:
-
-- Preserves original values and timestamps
-- Allows re‑processing when parsing logic improves
-- Serves as a reproducible audit trail
-
-Raw models live in `backend/database/raw_models.py` and are tested independently.
+All scraped content is stored in a **raw database** that closely mirrors the source documents. This preserves the original data and allows re-processing when parsing improves.
 
 ### 3. Processing and Standardization
 
-The processing layer transforms raw records into clean, structured entities:
-
-- Normalizes names, dates, and identifiers
-- Maps legislative states into standardized enums
-- Resolves relationships between legislators, parties, committees, and votes
-
-This step converts documents into data with clear semantics. Validation schemas ensure internal consistency.
+Raw records are cleaned and standardized into structured entities.
+This includes normalization, entity resolution, and schema validation.
 
 ### 4. Processed Data Layer
 
-Cleaned outputs are stored in a **processed database**, optimized for querying and analysis. This layer is what downstream users, dashboards, or APIs would consume.
+Clean outputs are stored in a processed database optimized for querying and analysis.
 
 ### 5. Testing and Reliability
 
-The project includes extensive automated tests covering:
-
-- Scrapers (HTML/PDF parsing logic)
-- Raw and processed database models
-- Processing and transformation functions
-
-This ensures changes in Congress websites or data formats are detected early.
+Automated tests cover scrapers, database models, and processing logic to detect changes in Congress data sources.
 
 ---
 
@@ -108,18 +139,6 @@ Each major submodule includes its own README with more detailed documentation.
 
 ---
 
-## Developer Documentation
-
-Detailed instructions on how to set up, run, and test the OpenPeru pipeline are available in the backend documentation.
-
-Please refer to:
-
-- `backend/README.md` – How to run the pipeline locally, CLI options, database initialization, and testing
-
-This top-level README intentionally focuses on the project’s purpose, data model, and overall architecture.
-
----
-
 ## Project Status and Roadmap
 
 OpenPeru is under active development. Current priorities include:
@@ -136,10 +155,4 @@ Contributions and feedback are welcome.
 ## License
 
 This project is released under an open-source license. See the `LICENSE` file for details.
-
----
-
-## Acknowledgements
-
-OpenPeru builds on ideas from the civic‑tech and open‑data community and is inspired by projects such as OpenStates and other legislative transparency platforms.
 
