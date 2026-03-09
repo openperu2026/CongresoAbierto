@@ -129,10 +129,12 @@ class RawOrganizationScraper:
             select_year.select_by_value(period_value)
 
             wait.until(
-                lambda d: Select(
-                    d.find_element(By.NAME, "idRegistroPadre")
-                ).first_selected_option.get_attribute("value")
-                == period_value
+                lambda d: (
+                    Select(
+                        d.find_element(By.NAME, "idRegistroPadre")
+                    ).first_selected_option.get_attribute("value")
+                    == period_value
+                )
             )
 
             # Strategy 2 (better if you know what changes): wait for a specific container/table to appear/update
@@ -210,10 +212,12 @@ class RawOrganizationScraper:
             if last_org is None:
                 org.changed = True
                 org.last_update = True
+                org.processed = False
             else:
                 # Compare last vs new
                 org.changed = org != last_org
                 org.last_update = True
+                org.processed = not org.changed
 
                 # Update the old version AFTER comparison
                 last_org.last_update = False

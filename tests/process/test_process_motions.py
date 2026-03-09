@@ -138,13 +138,13 @@ def test_process_motion_steps_vote_detection_and_vote_id_increment():
             "seguimientoId": 123,
             "fecSeguimiento": "2026-01-01",
             "detalle": "Pasa a comisión",
-            "adjuntos": [{"proyectoArchivoId": 1}],
+            "adjuntos": [{"seguimientoAdjuntoId": 1}],
         },
         {
             "seguimientoId": 234,
             "fecSeguimiento": "2026-01-02",
             "detalle": "Se realiza VOTACIÓN en el pleno",
-            "adjuntos": [{"proyectoArchivoId": 2}, {"proyectoArchivoId": 3}],
+            "adjuntos": [{"seguimientoAdjuntoId": 2}, {"seguimientoAdjuntoId": 3}],
         },
         {
             "seguimientoId": 345,
@@ -176,6 +176,25 @@ def test_process_motion_steps_vote_detection_and_vote_id_increment():
     assert out[2].vote_step is True
     assert out[2].vote_id == "MO_777_2"
     assert out[2].step_files == []
+
+
+def test_process_motion_steps_carries_des_estado_mocion_as_step_status():
+    steps = [
+        {
+            "seguimientoId": 456,
+            "fecSeguimiento": "2026-02-10",
+            "desEstadoMocion": "En Comisión",
+            "detalle": "Texto libre sin clasificación directa",
+            "adjuntos": [],
+        }
+    ]
+    rm = _raw_motion(id="MO_888", steps=steps)
+
+    out = mod.process_motion_steps(rm)
+
+    assert out is not None
+    assert len(out) == 1
+    assert out[0].step_status == "En Comisión"
 
 
 def test_process_motion_document_vote_doc_true_for_si_no_pattern_si_first():

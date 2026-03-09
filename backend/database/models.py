@@ -286,6 +286,7 @@ class Congresista(Base):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         party_name (str): Name of the party.
+        current_bancada (str): Name of the bancada.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
@@ -299,6 +300,7 @@ class Congresista(Base):
     nombre = Column(String, nullable=False)
     leg_period = Column(Enum(LegPeriod, name="leg_period"), nullable=False)
     party_name = Column(String, nullable=False)
+    current_bancada = Column(String, nullable=False)
     votes_in_election = Column(Integer, nullable=False)
     dist_electoral = Column(String, nullable=True)
     condicion = Column(String, nullable=False)
@@ -322,8 +324,8 @@ class Bancada(Base):
 
     __tablename__ = "bancadas"
 
+    bancada_id = Column(Integer, primary_key=True, autoincrement=True)
     leg_year = Column(Enum(LegislativeYear, name="leg_period"), nullable=False)
-    bancada_id = Column(Integer, primary_key=True)
     bancada_name = Column(String, nullable=False)
 
 
@@ -397,7 +399,7 @@ class BancadaMembership(Base):
 
     __tablename__ = "bancada_memberships"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     leg_year = Column(Enum(LegislativeYear, name="leg_year"), nullable=False)
     person_id = Column(Integer, ForeignKey("congresistas.id"), nullable=False)
     bancada_id = Column(Integer, ForeignKey("bancadas.bancada_id"), nullable=False)
@@ -512,3 +514,20 @@ class MotionDocument(Base):
             "motion_id", "step_id", "archivo_id", name="motion_document_uniq"
         ),
     )
+
+
+class Ley(Base):
+    """
+    Represents a law (ley) in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the motion.
+        title (str): Law title.
+        bill_id (str): Bill id related to this law (Proyecto de Ley)
+    """
+
+    __tablename__ = "leyes"
+
+    id = Column(String, primary_key=True, nullable=False)
+    title = Column(String, nullable=False)
+    bill_id = Column(String, nullable=False)

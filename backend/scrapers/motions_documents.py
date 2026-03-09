@@ -142,9 +142,11 @@ class RawMotionDocumentScraper:
         with self.Session() as session:
             last_document = (
                 session.query(RawMotionDocument)
-                .filter(RawMotionDocument.motion_id == document.motion_id,
-                        RawMotionDocument.seguimiento_id == document.seguimiento_id,
-                        RawMotionDocument.archivo_id == document.archivo_id,)
+                .filter(
+                    RawMotionDocument.motion_id == document.motion_id,
+                    RawMotionDocument.seguimiento_id == document.seguimiento_id,
+                    RawMotionDocument.archivo_id == document.archivo_id,
+                )
                 .order_by(RawMotionDocument.timestamp.desc())
                 .first()
             )
@@ -153,10 +155,12 @@ class RawMotionDocumentScraper:
             if last_document is None:
                 document.changed = True
                 document.last_update = True
+                document.processed = False
             else:
                 # Compare last vs new
                 document.changed = document != last_document
                 document.last_update = True
+                document.processed = not document.changed
 
                 # Update the old version AFTER comparison
                 last_document.last_update = False

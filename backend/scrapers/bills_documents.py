@@ -176,8 +176,10 @@ class RawBillDocumentScraper:
 
             if prev is None:
                 new_doc.changed = True
+                new_doc.processed = False
             else:
                 new_doc.changed = is_changed(new_doc, prev)
+                new_doc.processed = not new_doc.changed
                 prev.last_update = False
                 session.add(prev)  # stage update of old latest
 

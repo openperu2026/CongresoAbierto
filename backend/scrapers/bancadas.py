@@ -187,10 +187,12 @@ class RawBancadaScraper:
             if last_bancada is None:
                 bancada.changed = True
                 bancada.last_update = True
+                bancada.processed = False
             else:
                 # Compare last vs new
                 bancada.changed = bancada != last_bancada
                 bancada.last_update = True
+                bancada.processed = not bancada.changed
 
                 # Update the old version AFTER comparison
                 last_bancada.last_update = False

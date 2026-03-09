@@ -16,6 +16,8 @@ from backend import (
     parse_leg_period,
     parse_legislature,
     parse_role_bill,
+    parse_proponent,
+    parse_motion_type,
 )
 from typing import Optional
 from datetime import datetime
@@ -198,6 +200,13 @@ class Bill(PrintableModel):
             return v
         return parse_legislature(v)
 
+    @field_validator("proponent", mode="before")
+    @classmethod
+    def validate_proponent(cls, v):
+        if isinstance(v, Proponents):
+            return v
+        return parse_proponent(v)
+
 
 class BillCongresistas(PrintableModel):
     """
@@ -209,12 +218,14 @@ class BillCongresistas(PrintableModel):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the bill (e.g. author, coauthor, adherente, etc)
+        web_page (str): Webpage.
     """
 
     bill_id: str
     nombre: str
     leg_period: LegPeriod
     role_type: RoleTypeBill
+    web_page: str | None = None
 
     @field_validator("leg_period", mode="before")
     @classmethod
@@ -263,6 +274,7 @@ class BillStep(PrintableModel):
     vote_step: bool
     vote_id: str | None
     step_date: datetime
+    step_status: str | None = None
     step_detail: str
     step_files: list[int]
 
@@ -341,6 +353,13 @@ class Motion(PrintableModel):
             return v
         return parse_legislature(v)
 
+    @field_validator("motion_type", mode="before")
+    @classmethod
+    def validate_motion_type(cls, v):
+        if isinstance(v, MotionType):
+            return v
+        return parse_motion_type(v)
+
 
 class MotionCongresistas(PrintableModel):
     """
@@ -352,12 +371,14 @@ class MotionCongresistas(PrintableModel):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         role_type (str): The type of role that the person has in the motion (e.g. author, coauthor, adherente, etc)
+        web_page (str): website.
     """
 
     motion_id: str
     nombre: str
     leg_period: LegPeriod
     role_type: RoleTypeBill
+    web_page: str | None = None
 
     @field_validator("leg_period", mode="before")
     @classmethod
@@ -394,6 +415,7 @@ class MotionStep(PrintableModel):
     vote_step: bool
     vote_id: str | None
     step_date: datetime
+    step_status: str | None = None
     step_detail: str
     step_files: list[int]
 
@@ -431,6 +453,7 @@ class Congresista(PrintableModel):
         nombre (str): Name of the person.
         leg_period (str): Legislative period.
         party_name (str): Name of the party from where the person was elected.
+        current_bancada (str): Name of the current bancada.
         votes_in_election (int): Number of votes obtain in elections
         dist_electoral (str): Electoral district.
         condicion (str): Condition of the congressperson, e.g., 'active', 'inactive'.
@@ -442,6 +465,7 @@ class Congresista(PrintableModel):
     nombre: str
     leg_period: LegPeriod
     party_name: str
+    current_bancada: str
     votes_in_election: int
     dist_electoral: Optional[str]
     condicion: str
@@ -523,6 +547,7 @@ class Membership(PrintableModel):
     # Attributes that fit in Popolo structure
     role: RoleOrganization
     nombre: str
+    web_page: str
     leg_period: LegPeriod
     org_name: str
     org_type: TypeOrganization
@@ -562,3 +587,18 @@ class BancadaMembership(PrintableModel):
     cong_name: str
     website: str
     bancada_name: str
+
+
+class Ley(PrintableModel):
+    """
+    Represents a law (ley) in the peruvian parliament.
+
+    Attributes:
+        id (str): Unique identifier for the motion.
+        title (str): Law title.
+        bill_id (str): Bill id related to this law (Proyecto de Ley)
+    """
+
+    id: str
+    title: str
+    bill_id: str

@@ -12,6 +12,7 @@ def profile_html():
     <html>
       <div class="nombres"><span>Label</span><span>Juan Pérez</span></div>
       <div class="grupo"><span>Label</span><span>Accion Popular</span></div>
+      <div class="bancada"><span>Label</span><span>Accion Popular</span></div>
       <div class="votacion"><span>Label</span><span>12,345</span></div>
       <div class="representa"><span>Label</span><span>Lima</span></div>
       <div class="condicion"><span>Label</span><span>Titular</span></div>
@@ -26,6 +27,7 @@ def _raw_cong(
     memberships_content=None,
     leg_period="2021-2026",
     url="https://www.congreso.gob.pe/congresista/juan",
+    website="https://www.congreso.gob.pe/congresista/juan",
 ):
     if memberships_content is None:
         memberships_content = {"data": []}
@@ -34,6 +36,7 @@ def _raw_cong(
         memberships_content=json.dumps(memberships_content),
         leg_period=leg_period,
         url=url,
+        website=website,
     )
 
 
@@ -59,6 +62,7 @@ def test_process_profile_content_parses_fields_and_votes_int(profile_html):
     assert cong.nombre == "Juan Pérez"
     assert cong.leg_period == "2021-2026"
     assert cong.party_name == "Accion Popular"
+    assert cong.current_bancada == "Accion Popular"
     assert cong.votes_in_election == 12345  # "12,345" -> 12345
     assert cong.dist_electoral == "Lima"
     assert cong.condicion == "Titular"
@@ -108,7 +112,9 @@ def test_process_memberships_all_branches(monkeypatch):
     }
 
     raw = _raw_cong(memberships_content=memberships_payload, leg_period="2021-2026")
-    cong = SimpleNamespace(nombre="Juan Pérez", leg_period="2021-2026")
+    cong = SimpleNamespace(
+        nombre="Juan Pérez", leg_period="2021-2026", website="www.congreso.gob.pe/juan"
+    )
 
     out = mod.process_memberships(raw, cong)
 
@@ -120,7 +126,7 @@ def test_process_memberships_all_branches(monkeypatch):
     assert m0.leg_period == "2021-2026"
     assert m0.role == "presidente"
     assert m0.org_name == "Subcomisión de Acusaciones Constitucionales"
-    assert m0.org_type == "Comisión"
+    assert m0.org_type == "Subcomisión de Acusaciones Constitucionales"
     assert m0.comm_type == "Subcomisión de Acusaciones Constitucionales"
     assert m0.start_date == datetime.fromisoformat("2025-08-01")
     assert m0.end_date is None
