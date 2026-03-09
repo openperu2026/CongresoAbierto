@@ -2,22 +2,11 @@
 
 OpenPeru is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured, machine readable data.
 
-Its goal is to lower the cost of understanding how Congress works: who proposes laws, how representatives vote, how parties behave, and how legislation evolves. By converting difficult-to-use documents into structured datasets, OpenPeru makes political accountability feasible for citizens, journalists, researchers, and civil society organizations.
+Its goal is to lower the cost of understanding how Congress works: who proposes laws, how representatives vote, how parties behave, and how legislation evolves. By converting difficult-to-use documents into structured datasets, OpenPeru makes political accountability more feasible for citizens, journalists, researchers, and civil society organizations.
 
-Rather than creating new political information, OpenPeru unlocks the value of data that already exists but is currently difficult to access, search, and analyze.
+Peru has experienced years of political instability and weak political parties, making transparency and accountability especially important. Although the Peruvian Congress publishes large amounts of information such as bills, voting records, and official documents, this data is often scattered across different websites and released in formats that are difficult to search, analyze, or reuse.
 
----
-
-## Why This Matters: Unlocking the Value of Legislative Data
-
-Peru has experienced years of political instability and weak political parties. In this context, it is especially important for citizens and organizations to be able to understand what Congress is doing and how representatives behave.
-
-Although the Peruvian Congress publishes a large amount of information, it is often scattered across different websites and released in formats that are difficult to search, analyze, or reuse. This makes it hard for journalists, researchers, and citizens to follow legislative activity or hold representatives accountable.
-
-OpenPeru helps solve this problem by turning complex and fragmented congressional information into structured data that is easier to explore, analyze, and understand. 
-
-By making legislative information more accessible, OpenPeru aims to support transparency, research, and public accountability.
----
+OpenPeru helps solve this problem by turning complex and fragmented congressional information into structured data that is easier to explore, analyze, and understand. Rather than creating new political information, the project unlocks the value of data that already exists but is currently difficult to access.
 
 ## What OpenPeru Provides
 
@@ -31,13 +20,11 @@ At its current stage, OpenPeru focuses on the legislative core of Congress and i
 
 All information is stored in relational databases designed for analysis, reuse, and future API access.
 
----
-
 ## Architecture Overview
 
 OpenPeru follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
 
-```
+```mermaid
 flowchart LR
 
 subgraph Sources["Data Sources"]
