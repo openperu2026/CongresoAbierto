@@ -129,11 +129,30 @@ The architecture is intentionally modular to support future extensions such as A
 
 ## Repository Structure (High Level)
 
-- `backend/scrapers/` – Data collection from Congress sources
-- `backend/database/` – Raw and processed database models, sessions, and orchestration
-- `backend/process/` – Data cleaning, normalization, and schema logic
-- `tests/` – Unit and integration tests
-- `data/` – Local raw and processed databases (development)
+The repository is organized into modular components for data collection, processing, and testing:
+
+```
+openperu/
+├── backend/
+│   ├── api/            # Future API layer
+│   ├── cli/            # Command line interface for pipelines
+│   ├── core/           # Shared configuration, utilities, logging
+│   ├── database/       # Raw and processed database models
+│   ├── documents/      # Downloaded congressional documents
+│   ├── process/        # Data cleaning and standardization
+│   └── scrapers/       # Data collection from Congress websites
+│
+├── data/
+│   ├── raw/            # Raw scraped data - Not available in GitHub
+│   └── processed/      # Clean structured datasets - Not available in GitHub
+│
+├── draft_notebooks/    # Exploration and experimentation
+├── logs/               # Pipeline and scraper logs
+└── tests/
+    ├── database/       # Tests for database models
+    ├── process/        # Data processing tests
+    └── scrapers/       # Scraper tests
+```
 
 Each major submodule includes its own README with more detailed documentation.
 
