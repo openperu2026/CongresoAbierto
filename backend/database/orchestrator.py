@@ -274,6 +274,11 @@ class OpenPeruOrchestrator:
         only_without_pages: bool = True,
         include_bills: bool = True,
         include_motions: bool = True,
+        s3_bucket: str | None = None,
+        s3_prefix: str | None = None,
+        prefer_s3: bool = True,
+        http_fallback: bool = True,
+        deepseek_json_backup_dir: str | None = None,
     ):
         provider_name = provider_name.lower()
         if provider_name != "deepseek":
@@ -292,6 +297,11 @@ class OpenPeruOrchestrator:
             include_bills=include_bills,
             include_motions=include_motions,
             only_without_pages=only_without_pages,
+            s3_bucket=s3_bucket,
+            s3_prefix=s3_prefix,
+            prefer_s3=prefer_s3,
+            http_fallback=http_fallback,
+            deepseek_json_backup_dir=deepseek_json_backup_dir,
         )
         return run_ocr_pipeline(
             repository=repository,
@@ -986,6 +996,31 @@ def build_parser() -> argparse.ArgumentParser:
         help="Reprocess documents even if page rows already exist",
     )
     parser.add_argument(
+        "--ocr-s3-bucket",
+        type=str,
+        help="S3 bucket used as OCR PDF source",
+    )
+    parser.add_argument(
+        "--ocr-s3-prefix",
+        type=str,
+        help="Optional S3 prefix where documents are stored",
+    )
+    parser.add_argument(
+        "--ocr-no-s3",
+        action="store_true",
+        help="Disable S3 lookup and use only source URLs",
+    )
+    parser.add_argument(
+        "--ocr-no-http-fallback",
+        action="store_true",
+        help="Disable HTTP fallback when S3 lookup fails",
+    )
+    parser.add_argument(
+        "--ocr-json-backup-dir",
+        type=str,
+        help="Write DeepSeek OCR JSON backups to this folder",
+    )
+    parser.add_argument(
         "--download-documents-limit",
         type=int,
         help="Limit the number of documents downloaded per type (bills/motions)",
@@ -1092,6 +1127,11 @@ def main(argv: list[str] | None = None) -> None:
             only_without_pages=not args.ocr_reprocess,
             include_bills=run_bills,
             include_motions=run_motions,
+            s3_bucket=args.ocr_s3_bucket,
+            s3_prefix=args.ocr_s3_prefix,
+            prefer_s3=not args.ocr_no_s3,
+            http_fallback=not args.ocr_no_http_fallback,
+            deepseek_json_backup_dir=args.ocr_json_backup_dir,
         )
         _print_ocr_summary(ocr_stats)
 

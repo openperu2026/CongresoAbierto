@@ -1,5 +1,5 @@
 import re
-import fitz
+import pymupdf as fitz
 from io import BytesIO
 from jellyfish import jaro_winkler_similarity as jws
 

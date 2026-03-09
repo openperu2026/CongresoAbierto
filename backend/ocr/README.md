@@ -25,7 +25,17 @@ from backend.ocr import (
 
 repo = OCRRepository(settings.RAW_DB_URL)
 provider = DeepSeekOCRProvider(model_name="deepseek-ai/DeepSeek-OCR")
-config = OCRPipelineConfig(documents_limit=100, workers=1)
+config = OCRPipelineConfig(
+    documents_limit=100,
+    workers=1,
+    # S3-first resolution (recommended for Colab to avoid source-site WAF blocks)
+    s3_bucket="your-bucket",
+    s3_prefix="openperu",
+    prefer_s3=True,
+    http_fallback=True,
+    # DeepSeek-only JSON backup
+    deepseek_json_backup_dir="data/raw/ocr_json_backup",
+)
 stats = run_ocr_pipeline(repository=repo, provider=provider, config=config)
 print(stats)
 ```
@@ -34,3 +44,4 @@ print(stats)
 
 - Colab is suitable for backfills and ad-hoc jobs.
 - For reliable always-on processing, use a persistent GPU worker runtime.
+- When running in Colab, prefer S3 input instead of source URLs to avoid 403/WAF issues.

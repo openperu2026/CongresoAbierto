@@ -251,6 +251,14 @@ OCR
 
 • `--ocr-reprocess` OCR documents even if page rows already exist
 
+• `--ocr-s3-bucket`, `--ocr-s3-prefix` use S3 as OCR PDF source
+
+• `--ocr-no-s3` disable S3 lookup
+
+• `--ocr-no-http-fallback` disable HTTP fallback if S3 fails
+
+• `--ocr-json-backup-dir` write DeepSeek OCR JSON backups to a folder
+
 • `--no-documents` skip loading documents in processing stage
 
 Processing limits

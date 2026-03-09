@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from io import BytesIO
+import json
+from pathlib import Path
 
 from loguru import logger
 from PIL import Image
@@ -13,8 +14,8 @@ from backend.ocr.classifier import classify_page
 from backend.ocr.pdf_pages import iter_pdf_pages_as_png_bytes
 from backend.ocr.providers.base import OCRProvider
 from backend.ocr.repository import OCRRepository
+from backend.ocr.storage import PDFSourceResolver, PDFStorageConfig
 from backend.ocr.types import OCRPageResult, OCRPageTask, OCRSourceDocument
-from backend.scrapers.utils import get_url
 
 
 @dataclass(slots=True)
@@ -27,6 +28,12 @@ class OCRPipelineConfig:
     include_bills: bool = True
     include_motions: bool = True
     only_without_pages: bool = True
+    s3_bucket: str | None = None
+    s3_prefix: str | None = None
+    prefer_s3: bool = True
+    http_fallback: bool = True
+    deepseek_json_backup_dir: str | None = None
+    deepseek_json_pretty: bool = True
 
 
 @dataclass(slots=True)
@@ -38,31 +45,22 @@ class OCRPipelineStats:
     pages_failed: int = 0
 
 
-async def _download_pdf(url: str) -> bytes | None:
-    response = await asyncio.to_thread(get_url, url)
-    if response is None:
-        return None
-
-    try:
-        response.raise_for_status()
-    except Exception:
-        return None
-
-    return response.content
-
-
 async def _producer(
     documents: list[OCRSourceDocument],
     task_queue: asyncio.Queue,
     config: OCRPipelineConfig,
     stats: OCRPipelineStats,
     doc_status: dict[int, bool],
+    resolver: PDFSourceResolver,
 ) -> None:
     for source in documents:
         stats.documents_scanned += 1
-        pdf_bytes = await _download_pdf(source.url)
+        pdf_bytes = await asyncio.to_thread(resolver.resolve_pdf_bytes, source)
         if not pdf_bytes:
-            logger.warning(f"Failed to download PDF: {source.url}")
+            logger.warning(
+                "Failed to load PDF bytes "
+                f"parent_type={source.parent_type} parent_doc_id={source.parent_doc_id}"
+            )
             doc_status[source.parent_doc_id] = False
             continue
 
@@ -167,6 +165,50 @@ async def _writer(
         result_queue.task_done()
 
 
+def _write_deepseek_json_backups(
+    backup_dir: Path,
+    *,
+    by_doc: dict[int, list[OCRPageResult]],
+    pretty: bool,
+) -> None:
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    for parent_doc_id, results in by_doc.items():
+        if not results:
+            continue
+        source = results[0].source
+        ordered = sorted(results, key=lambda r: r.page_number)
+        payload = {
+            "parent_type": source.parent_type,
+            "parent_doc_id": source.parent_doc_id,
+            "parent_natural_id": source.parent_natural_id,
+            "seguimiento_id": source.seguimiento_id,
+            "archivo_id": source.archivo_id,
+            "source_url": source.url,
+            "ocr_provider": ordered[0].ocr_provider,
+            "ocr_model": ordered[0].ocr_model,
+            "created_at": datetime.now().isoformat(),
+            "pages": [
+                {
+                    "page_number": item.page_number,
+                    "page_type": item.page_type,
+                    "processed": item.processed,
+                    "error": item.error,
+                    "text": item.text,
+                }
+                for item in ordered
+            ],
+        }
+        filename = (
+            f"{source.parent_type}_{source.parent_natural_id}_"
+            f"{source.seguimiento_id}_{source.archivo_id}.json"
+        )
+        out_path = backup_dir / filename
+        out_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2 if pretty else None),
+            encoding="utf-8",
+        )
+
+
 async def run_ocr_pipeline_async(
     *,
     repository: OCRRepository,
@@ -188,9 +230,17 @@ async def run_ocr_pipeline_async(
     result_queue: asyncio.Queue = asyncio.Queue(maxsize=config.queue_maxsize)
 
     doc_status: dict[int, bool] = {}
+    storage = PDFSourceResolver(
+        PDFStorageConfig(
+            s3_bucket=config.s3_bucket,
+            s3_prefix=config.s3_prefix,
+            prefer_s3=config.prefer_s3,
+            http_fallback=config.http_fallback,
+        )
+    )
 
     producer_task = asyncio.create_task(
-        _producer(docs, task_queue, config, stats, doc_status)
+        _producer(docs, task_queue, config, stats, doc_status, storage)
     )
     worker_tasks = [
         asyncio.create_task(_worker(provider, config.prompt, task_queue, result_queue))
@@ -205,6 +255,22 @@ async def run_ocr_pipeline_async(
     await asyncio.gather(*worker_tasks)
     await result_queue.join()
     await writer_task
+
+    if provider.name == "deepseek" and config.deepseek_json_backup_dir:
+        by_doc: dict[int, list[OCRPageResult]] = {}
+        for source in docs:
+            rows = await asyncio.to_thread(
+                repository.fetch_page_results_for_document,
+                source,
+                provider.model_name,
+            )
+            by_doc[source.parent_doc_id] = rows
+        await asyncio.to_thread(
+            _write_deepseek_json_backups,
+            Path(config.deepseek_json_backup_dir),
+            by_doc=by_doc,
+            pretty=config.deepseek_json_pretty,
+        )
 
     grouped_sources: dict[int, OCRSourceDocument] = {
         source.parent_doc_id: source for source in docs

@@ -5,7 +5,7 @@ from loguru import logger
 from pathlib import Path
 import re
 import pytesseract
-import fitz
+import pymupdf as fitz
 from io import BytesIO
 from PIL import Image
 import numpy as np

@@ -159,3 +159,34 @@ class OCRRepository:
                 )
 
             session.commit()
+
+    def fetch_page_results_for_document(
+        self, source: OCRSourceDocument, ocr_model: str
+    ) -> list[OCRPageResult]:
+        with self.Session() as session:
+            rows = (
+                session.query(RawDocumentPage)
+                .filter(
+                    RawDocumentPage.parent_type == source.parent_type,
+                    RawDocumentPage.parent_doc_id == source.parent_doc_id,
+                    RawDocumentPage.ocr_model == ocr_model,
+                )
+                .order_by(RawDocumentPage.page_number.asc())
+                .all()
+            )
+
+            return [
+                OCRPageResult(
+                    source=source,
+                    page_number=row.page_number,
+                    text=row.text,
+                    page_type=row.page_type,
+                    ocr_provider=row.ocr_provider,
+                    ocr_model=row.ocr_model,
+                    prompt=row.prompt or "",
+                    processed=row.processed,
+                    timestamp=row.timestamp,
+                    error=row.error,
+                )
+                for row in rows
+            ]
