@@ -69,19 +69,33 @@
         </div>
 
         <div class="details-grid">
-          <div class="details-card" id="congressman-details">
-            <div class="empty-state">Select a congressman to see details.</div>
-          </div>
           <div class="photo-card" id="congressman-photo">
             <div class="photo-frame">
               <img id="photo-img" alt="" />
               <div class="photo-fallback">Photo</div>
             </div>
           </div>
+          <div class="details-card" id="congressman-details">
+            <div class="empty-state">Select a congressman to see details.</div>
+          </div>
         </div>
 
         <div class="bills-section">
           <div class="section-title">Bills (author or co-author)</div>
+          <div class="filters">
+            <div class="filter">
+              <label for="bill-role-filter">Role</label>
+              <select id="bill-role-filter">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="filter">
+              <label for="bill-status-filter">Status</label>
+              <select id="bill-status-filter">
+                <option value="">All</option>
+              </select>
+            </div>
+          </div>
           <div id="bills-table" class="table-wrap">
             <div class="empty-state">Select a congressman to list their bills.</div>
           </div>
@@ -95,21 +109,22 @@
         <p>Select a law to see its summary and legislative steps.</p>
 
         <div class="field">
-          <label for="bill-search">Search law (ley)</label>
+          <label>Search law (ley)</label>
           <div class="input-row autocomplete">
-            <input id="bill-search" type="text" placeholder="Type a law name or number" autocomplete="off" />
+            <input id="bill-search-id" type="text" placeholder="Search by law number (id)" autocomplete="off" />
+            <div id="bill-suggest-id" class="suggestions" role="listbox"></div>
+          </div>
+          <div class="input-row autocomplete" style="margin-top: 0.75rem;">
+            <input id="bill-search-title" type="text" placeholder="Search by law title" autocomplete="off" />
             <button id="bill-go" type="button">Load</button>
-            <div id="bill-suggest" class="suggestions" role="listbox"></div>
+            <div id="bill-suggest-title" class="suggestions" role="listbox"></div>
           </div>
           <div id="bill-status" class="api-status"></div>
         </div>
 
         <div class="summary-card">
           <div class="summary-title">Summary</div>
-          <p id="bill-summary" class="summary-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-            ut labore et dolore magna aliqua.
-          </p>
+          <p id="bill-summary" class="summary-text">Upcoming feature</p>
         </div>
 
         <div class="steps-section">

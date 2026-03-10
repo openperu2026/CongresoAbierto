@@ -8,6 +8,7 @@ const state = {
   congressmen: [],
   congressmanByName: new Map(),
   leyes: [],
+  currentBills: [],
 };
 
 const els = {
@@ -20,8 +21,12 @@ const els = {
   photoImg: document.getElementById("photo-img"),
   photoFallback: document.querySelector(".photo-fallback"),
   billsTable: document.getElementById("bills-table"),
-  billSearch: document.getElementById("bill-search"),
-  billSuggest: document.getElementById("bill-suggest"),
+  billRoleFilter: document.getElementById("bill-role-filter"),
+  billStatusFilter: document.getElementById("bill-status-filter"),
+  billSearchId: document.getElementById("bill-search-id"),
+  billSearchTitle: document.getElementById("bill-search-title"),
+  billSuggestId: document.getElementById("bill-suggest-id"),
+  billSuggestTitle: document.getElementById("bill-suggest-title"),
   billButton: document.getElementById("bill-go"),
   billStatus: document.getElementById("bill-status"),
   billSummary: document.getElementById("bill-summary"),
@@ -45,6 +50,13 @@ async function fetchJson(url) {
     throw new Error(`Request failed: ${res.status}`);
   }
   return res.json();
+}
+
+function formatDate(value, fallback) {
+  if (!value) return fallback;
+  const text = String(value);
+  const datePart = text.split("T")[0].split(" ")[0];
+  return datePart ? datePart.replace(/-/g, "/") : fallback;
 }
 
 function renderDetails(data) {
@@ -105,7 +117,7 @@ function renderBills(bills) {
         <tr>
           <td>${bill.title || bill.bill_id}</td>
           <td>${bill.role_type}</td>
-          <td>${bill.presentation_date || "—"}</td>
+          <td>${formatDate(bill.presentation_date, "—")}</td>
           <td>${bill.status || "—"}</td>
         </tr>
       `
@@ -129,6 +141,36 @@ function renderBills(bills) {
   `;
 }
 
+function populateBillFilters(bills) {
+  if (!els.billRoleFilter || !els.billStatusFilter) {
+    return;
+  }
+
+  const roles = Array.from(new Set(bills.map((b) => b.role_type).filter(Boolean))).sort();
+  const statuses = Array.from(new Set(bills.map((b) => b.status).filter(Boolean))).sort();
+
+  els.billRoleFilter.innerHTML = [
+    '<option value="">All</option>',
+    ...roles.map((role) => `<option value="${role}">${role}</option>`),
+  ].join("");
+
+  els.billStatusFilter.innerHTML = [
+    '<option value="">All</option>',
+    ...statuses.map((status) => `<option value="${status}">${status}</option>`),
+  ].join("");
+}
+
+function applyBillFilters() {
+  const role = els.billRoleFilter?.value || "";
+  const status = els.billStatusFilter?.value || "";
+  const filtered = state.currentBills.filter((bill) => {
+    if (role && bill.role_type !== role) return false;
+    if (status && bill.status !== status) return false;
+    return true;
+  });
+  renderBills(filtered);
+}
+
 function renderBillSteps(steps) {
   if (!steps || steps.length === 0) {
     els.billSteps.innerHTML = '<div class="empty-state">No steps found for this law.</div>';
@@ -140,7 +182,7 @@ function renderBillSteps(steps) {
       (step) => `
         <div class="timeline-item">
           <div class="timeline-title">${step.step_type || "Step"}</div>
-          <div class="timeline-meta">${step.step_date || "Date not available"}</div>
+          <div class="timeline-meta">${formatDate(step.step_date, "Date not available")}</div>
           <div>${step.step_detail || ""}</div>
         </div>
       `
@@ -149,14 +191,19 @@ function renderBillSteps(steps) {
 }
 
 function closeBillSuggest() {
-  if (els.billSuggest) {
-    els.billSuggest.classList.remove("open");
-    els.billSuggest.innerHTML = "";
+  if (els.billSuggestId) {
+    els.billSuggestId.classList.remove("open");
+    els.billSuggestId.innerHTML = "";
+  }
+  if (els.billSuggestTitle) {
+    els.billSuggestTitle.classList.remove("open");
+    els.billSuggestTitle.innerHTML = "";
   }
 }
 
-function renderBillSuggestions(query) {
-  if (!els.billSuggest) {
+function renderBillSuggestions(query, type) {
+  const target = type === "id" ? els.billSuggestId : els.billSuggestTitle;
+  if (!target) {
     return;
   }
   const q = query.trim().toLowerCase();
@@ -165,11 +212,12 @@ function renderBillSuggestions(query) {
     return;
   }
   const matches = (state.leyes || [])
-    .filter(
-      (item) =>
-        item.id.toLowerCase().includes(q) ||
-        item.title.toLowerCase().includes(q)
-    )
+    .filter((item) => {
+      if (type === "id") {
+        return item.id.toLowerCase().includes(q);
+      }
+      return item.title.toLowerCase().includes(q);
+    })
     .slice(0, 8);
 
   if (matches.length === 0) {
@@ -177,35 +225,45 @@ function renderBillSuggestions(query) {
     return;
   }
 
-  els.billSuggest.innerHTML = matches
+  target.innerHTML = matches
     .map(
       (item, idx) =>
         `<div class="suggestion-item${idx === 0 ? " active" : ""}" data-bill="${item.bill_id}">${item.id} — ${item.title}</div>`
     )
     .join("");
-  els.billSuggest.classList.add("open");
+  target.classList.add("open");
 }
 
 function selectBillSuggestion(el) {
   const billId = el.dataset.bill;
   const label = el.textContent || "";
-  if (els.billSearch) {
-    els.billSearch.value = label;
+  if (els.billSearchId) {
+    const split = label.split(" — ");
+    els.billSearchId.value = split[0] || label;
+  }
+  if (els.billSearchTitle) {
+    const split = label.split(" — ");
+    els.billSearchTitle.value = split.slice(1).join(" — ") || label;
   }
   closeBillSuggest();
   loadBillSteps(billId);
 }
 
-function resolveBillFromInput() {
-  const value = (els.billSearch?.value || "").trim().toLowerCase();
-  if (!value) {
+function resolveBillFromInputs() {
+  const idValue = (els.billSearchId?.value || "").trim().toLowerCase();
+  const titleValue = (els.billSearchTitle?.value || "").trim().toLowerCase();
+  if (!idValue && !titleValue) {
     return null;
   }
-  const match = (state.leyes || []).find(
-    (item) =>
-      `${item.id} — ${item.title}`.toLowerCase() === value ||
-      item.id.toLowerCase() === value
-  );
+  const match = (state.leyes || []).find((item) => {
+    if (idValue && item.id.toLowerCase() === idValue) {
+      return true;
+    }
+    if (titleValue && item.title.toLowerCase() === titleValue) {
+      return true;
+    }
+    return false;
+  });
   return match ? match.bill_id : null;
 }
 
@@ -217,7 +275,9 @@ async function loadCongressman(id, name) {
     ]);
     renderDetails(details);
     renderPhoto(details.photo_url, name || details.nombre || "");
-    renderBills(bills);
+    state.currentBills = bills || [];
+    populateBillFilters(state.currentBills);
+    applyBillFilters();
   } catch (err) {
     console.error(err);
     els.details.innerHTML = '<div class="empty-state">Failed to load congressman details.</div>';
@@ -323,17 +383,35 @@ function bindEvents() {
     }
   });
 
-  if (els.billSearch) {
-    els.billSearch.addEventListener("input", (e) => {
-      renderBillSuggestions(e.target.value);
+  if (els.billSearchId) {
+    els.billSearchId.addEventListener("input", (e) => {
+      renderBillSuggestions(e.target.value, "id");
     });
-    els.billSearch.addEventListener("focus", (e) => {
-      renderBillSuggestions(e.target.value);
+    els.billSearchId.addEventListener("focus", (e) => {
+      renderBillSuggestions(e.target.value, "id");
     });
   }
 
-  if (els.billSuggest) {
-    els.billSuggest.addEventListener("click", (e) => {
+  if (els.billSearchTitle) {
+    els.billSearchTitle.addEventListener("input", (e) => {
+      renderBillSuggestions(e.target.value, "title");
+    });
+    els.billSearchTitle.addEventListener("focus", (e) => {
+      renderBillSuggestions(e.target.value, "title");
+    });
+  }
+
+  if (els.billSuggestId) {
+    els.billSuggestId.addEventListener("click", (e) => {
+      const item = e.target.closest(".suggestion-item");
+      if (item) {
+        selectBillSuggestion(item);
+      }
+    });
+  }
+
+  if (els.billSuggestTitle) {
+    els.billSuggestTitle.addEventListener("click", (e) => {
       const item = e.target.closest(".suggestion-item");
       if (item) {
         selectBillSuggestion(item);
@@ -343,7 +421,7 @@ function bindEvents() {
 
   if (els.billButton) {
     els.billButton.addEventListener("click", () => {
-      const billId = resolveBillFromInput();
+      const billId = resolveBillFromInputs();
       if (billId) {
         loadBillSteps(billId);
       }
@@ -351,10 +429,26 @@ function bindEvents() {
   }
 
   document.addEventListener("click", (e) => {
-    if (els.billSuggest && !els.billSuggest.contains(e.target) && e.target !== els.billSearch) {
+    const isSearch = e.target === els.billSearchId || e.target === els.billSearchTitle;
+    const inSuggest =
+      (els.billSuggestId && els.billSuggestId.contains(e.target)) ||
+      (els.billSuggestTitle && els.billSuggestTitle.contains(e.target));
+    if (!isSearch && !inSuggest) {
       closeBillSuggest();
     }
   });
+
+  if (els.billRoleFilter) {
+    els.billRoleFilter.addEventListener("change", () => {
+      applyBillFilters();
+    });
+  }
+
+  if (els.billStatusFilter) {
+    els.billStatusFilter.addEventListener("change", () => {
+      applyBillFilters();
+    });
+  }
 }
 
 function init() {
