@@ -46,6 +46,21 @@ def test_fetch_pending_documents(tmp_path):
     assert docs[0].parent_type == "bill"
 
 
+def test_fetch_pending_documents_skips_processed_documents(tmp_path):
+    repo = _make_repo(tmp_path)
+
+    engine = create_engine(repo.engine.url)
+    Session = sessionmaker(bind=engine)
+    with Session() as session:
+        row = session.query(RawBillDocument).first()
+        row.processed = True
+        session.add(row)
+        session.commit()
+
+    docs = repo.fetch_pending_documents(include_motions=False)
+    assert docs == []
+
+
 def test_upsert_page_result_and_mark_parent_processed(tmp_path):
     repo = _make_repo(tmp_path)
     source = repo.fetch_pending_documents(include_motions=False)[0]

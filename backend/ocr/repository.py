@@ -26,6 +26,7 @@ class OCRRepository:
         limit: int | None = None,
         include_bills: bool = True,
         include_motions: bool = True,
+        skip_processed_documents: bool = True,
         only_without_pages: bool = True,
     ) -> list[OCRSourceDocument]:
         docs: list[OCRSourceDocument] = []
@@ -33,6 +34,8 @@ class OCRRepository:
         with self.Session() as session:
             if include_bills:
                 stmt = select(RawBillDocument).where(RawBillDocument.last_update.is_(True))
+                if skip_processed_documents:
+                    stmt = stmt.where(RawBillDocument.processed.is_(False))
                 if only_without_pages:
                     stmt = stmt.where(
                         ~exists(
@@ -67,6 +70,8 @@ class OCRRepository:
                 stmt = select(RawMotionDocument).where(
                     RawMotionDocument.last_update.is_(True)
                 )
+                if skip_processed_documents:
+                    stmt = stmt.where(RawMotionDocument.processed.is_(False))
                 if only_without_pages:
                     stmt = stmt.where(
                         ~exists(

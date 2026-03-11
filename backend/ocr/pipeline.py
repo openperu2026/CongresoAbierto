@@ -27,6 +27,7 @@ class OCRPipelineConfig:
     documents_limit: int | None = None
     include_bills: bool = True
     include_motions: bool = True
+    skip_processed_documents: bool = True
     only_without_pages: bool = True
     s3_bucket: str | None = None
     s3_prefix: str | None = None
@@ -219,6 +220,7 @@ async def run_ocr_pipeline_async(
         limit=config.documents_limit,
         include_bills=config.include_bills,
         include_motions=config.include_motions,
+        skip_processed_documents=config.skip_processed_documents,
         only_without_pages=config.only_without_pages,
     )
 
