@@ -17,8 +17,7 @@ function unpackSeatsPayload(data) {
   return { seats: [], fecha: null };
 }
 
-fetch("/data/seats.json")
-  .then(r => r.json())
+window.fetchSeatsData()
   .then(data => {
     const { seats } = unpackSeatsPayload(data);
     const tableData = buildTableData(seats);

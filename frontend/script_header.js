@@ -32,8 +32,7 @@ function unpackHeaderPayload(data) {
   };
 }
 
-fetch("/data/seats.json")
-  .then(r => r.json())
+window.fetchSeatsData()
   .then(data => {
     const { fecha, titulo, evento } = unpackHeaderPayload(data);
     const asuntoTitulo = extractAsuntoTitle(titulo);

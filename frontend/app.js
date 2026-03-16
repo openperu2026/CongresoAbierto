@@ -9,6 +9,7 @@ const state = {
   congressmanByName: new Map(),
   leyes: [],
   currentBills: [],
+  currentLeyId: null,
 };
 
 const els = {
@@ -177,11 +178,19 @@ function renderBillSteps(steps) {
     return;
   }
 
+  const showVoteButton = state.currentLeyId === "31751";
   els.billSteps.innerHTML = steps
     .map(
-      (step) => `
+      (step, index) => `
         <div class="timeline-item">
-          <div class="timeline-title">${step.step_type || "Step"}</div>
+          <div class="timeline-head">
+            <div class="timeline-title">${step.step_type || "Step"}</div>
+            ${
+              showVoteButton && step.step_type === "VOTE"
+                ? `<button type="button" class="timeline-action" data-action="view-vote" data-step-index="${index}">ver votacion</button>`
+                : ""
+            }
+          </div>
           <div class="timeline-meta">${formatDate(step.step_date, "Date not available")}</div>
           <div>${step.step_detail || ""}</div>
         </div>
@@ -289,6 +298,9 @@ async function loadBillSteps(billId) {
   if (!billId) {
     return;
   }
+
+  const selectedLey = (state.leyes || []).find((item) => item.bill_id === billId);
+  state.currentLeyId = selectedLey?.id || null;
 
   try {
     const steps = await fetchJson(`${API_BASE}/bills/${billId}/steps`);
@@ -447,6 +459,25 @@ function bindEvents() {
   if (els.billStatusFilter) {
     els.billStatusFilter.addEventListener("change", () => {
       applyBillFilters();
+    });
+  }
+
+  if (els.billSteps) {
+    els.billSteps.addEventListener("click", (e) => {
+      const button = e.target.closest('[data-action="view-vote"]');
+      if (!button) {
+        return;
+      }
+
+      const params = new URLSearchParams();
+      if (state.currentLeyId) {
+        params.set("ley", state.currentLeyId);
+      }
+      if (button.dataset.stepIndex) {
+        params.set("step", button.dataset.stepIndex);
+      }
+
+      window.location.href = `./graphic.html?${params.toString()}`;
     });
   }
 }

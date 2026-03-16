@@ -44,15 +44,10 @@ function downloadTextFile(text, filename, mime = "text/csv;charset=utf-8") {
 }
 
 async function downloadSeatsAsCSV(
-  jsonUrl = "/data/seats.json",
+  jsonUrl = window.SEATS_DATA_URL || "/data/seats.json",
   filename = "seats.csv"
 ) {
-  const res = await fetch(jsonUrl);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${jsonUrl}`);
-  }
-
-  const data = await res.json();
+  const data = await fetchSeatsData();
   const seats = Array.isArray(data) ? data : (data?.resultados ?? []);
   const csv = objectsToCSV(seats);
   downloadTextFile(csv, filename);
@@ -69,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btn.addEventListener("click", async () => {
     try {
-      await downloadSeatsAsCSV("/data/seats.json", "seats.csv");
+      await downloadSeatsAsCSV(window.SEATS_DATA_URL || "/data/seats.json", "seats.csv");
     } catch (err) {
       console.error("CSV download failed ❌", err);
       alert("No se pudo descargar el archivo CSV");

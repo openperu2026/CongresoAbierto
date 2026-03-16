@@ -1,0 +1,122 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+.container {
+  max-width: 960px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.topbar {
+  margin-bottom: 16px;
+}
+
+.back-link {
+  color: #0f4c5c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+#chart {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.seat {
+  stroke: #333;
+  stroke-width: 0.7;
+}
+
+#legend {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px 12px;
+  font-size: 13px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  display: inline-block;
+  flex: 0 0 12px;
+}
+
+#bancada-table {
+  margin-top: 16px;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+#bancada-table th,
+#bancada-table td {
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+#bancada-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+#bancada-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.25;
+  max-width: 260px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px 24px;
+}
+
+#download-csv {
+  margin: 12px 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #177a407c;
+  cursor: pointer;
+}
+
+#download-csv:hover {
+  background: #f5f5f5;
+}

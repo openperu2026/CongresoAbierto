@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List
@@ -8,6 +9,7 @@ from aiohttp import web
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = BASE_DIR / "data" / "OpenPeru.db"
+SEATS_PATH = BASE_DIR / "data" / "seats.json"
 
 
 def dict_factory(cursor: sqlite3.Cursor, row: sqlite3.Row) -> Dict[str, Any]:
@@ -114,6 +116,10 @@ async def bill_steps(request: web.Request) -> web.Response:
     return web.json_response(rows)
 
 
+async def seats_data(_: web.Request) -> web.Response:
+    return web.json_response(json.loads(SEATS_PATH.read_text(encoding="utf-8")))
+
+
 def create_app() -> web.Application:
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_get("/api/health", health)
@@ -122,6 +128,7 @@ def create_app() -> web.Application:
     app.router.add_get("/api/congresistas/{person_id}/bills", congresista_bills)
     app.router.add_get("/api/leyes", list_leyes)
     app.router.add_get("/api/bills/{bill_id}/steps", bill_steps)
+    app.router.add_get("/api/seats", seats_data)
     app.router.add_options("/api/{tail:.*}", health)
     return app
 

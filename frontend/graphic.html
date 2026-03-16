@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenPeru Vote Graphic</title>
+  <link rel="stylesheet" href="./graphic.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div class="topbar">
+      <a class="back-link" href="./index.html">Back to home</a>
+    </div>
+
+    <h1>Votacion del Congreso</h1>
+    <h2>Asunto: <span id="titulo"></span></h2>
+    <h3>Estado: APROBADO</h3>
+    <h4>Fecha: <span id="fecha"></span></h4>
+    <h4>Evento: <span id="evento"></span></h4>
+
+    <svg id="chart" width="800" height="250"></svg>
+
+    <div id="legend"></div>
+
+    <h3>Resumen por bancada</h3>
+    <table id="bancada-table">
+      <thead>
+        <tr>
+          <th>Bancada</th>
+          <th>SI</th>
+          <th>NO</th>
+          <th>Otros</th>
+          <th>% Aprobacion</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <div class="actions">
+    <button id="download-csv" type="button">Descarga la informacion (CSV)</button>
+  </div>
+
+  <script>
+    window.SEATS_DATA_URL =
+      window.location.hostname === "localhost" && window.location.port === "5500"
+        ? "http://localhost:8000/api/seats"
+        : "/api/seats";
+  </script>
+  <script src="./seats_data.js"></script>
+  <script src="./script_header.js?v=1"></script>
+  <script src="./script.js?v=2"></script>
+  <script src="./script_table.js"></script>
+  <script src="./script_download.js"></script>
+</body>
+</html>

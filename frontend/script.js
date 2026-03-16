@@ -69,11 +69,7 @@ function unpackSeatsForChart(data) {
 }
 
 
-fetch("/data/seats.json")
-  .then(res => {
-    console.log("fetch status:", res.status);
-    return res.json();
-  })
+window.fetchSeatsData()
   .then(data => {
     const seats = unpackSeatsForChart(data);
     console.log("seats loaded:", seats.length);
