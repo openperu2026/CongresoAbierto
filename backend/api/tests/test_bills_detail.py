@@ -1,14 +1,14 @@
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
-from api.main import app
-from estecon.backend.scrapers.schema import Congresista
+from backend.api.main import app
+from backend.process.schema import Bill
 import pytest
 
 client = TestClient(app)
 
 VERSION = "v1"
-ENDPOINT_NAME = "congresistas"
-TEST_OBS = "1109"
+ENDPOINT_NAME = "bills"
+TEST_OBS = "2021_10300"
 
 
 def test_active_endpoint():
@@ -31,19 +31,16 @@ def test_response_matches_model():
     data = response.json()
     assert data["data"]  # Check it's not an empty response object
     try:
-        Congresista(**data["data"])
+        Bill(**data["data"])
     except ValidationError:
         pytest.fail("Response does not match expected data model")
 
 
-@pytest.mark.parametrize("congresista_id, response_code", [(1110, 404), ("abc", 422)])
-def test_invalid_path(congresista_id, response_code):
+@pytest.mark.parametrize("bill_id, response_code", [("9999_99999", 404), ("abc", 422)])
+def test_invalid_path(bill_id, response_code):
     """
     Check API returns appropriate response codes for path parameteres.
-
-    Note: FastAPI default behavior is to redirect /v1/congresistas/ to
-        /v1/congresista, so not test is needed for an empty response.
     """
-    response = client.get(f"/{VERSION}/{ENDPOINT_NAME}/{congresista_id}")
+    response = client.get(f"/{VERSION}/{ENDPOINT_NAME}/{bill_id}")
     assert response.status_code == response_code, "Unexpected response code"
     assert response.json()["detail"], "Missing error detail"

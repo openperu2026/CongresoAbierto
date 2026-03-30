@@ -102,10 +102,6 @@ def parse_motion_type(value: str) -> MotionType:
         if isinstance(item.value, str) and item.value == v:
             return item
 
-    # Handle the multi-value case for COMISION_INVESTIGADORA.
-    if v in MotionType.COMISION_INVESTIGADORA.value:
-        return MotionType.COMISION_INVESTIGADORA
-
     raise ValueError(f"Unknown motion_type: {value!r}")
 
 
@@ -132,150 +128,178 @@ def parse_proponent(value: str) -> Proponents:
 
 
 DES_ESTADO_TO_MOTION_STEP_TYPE: dict[str, MotionStepType] = {
+
     # Presented
-    "Presentado": MotionStepType.PRESENTED,
+    "Presentado": MotionStepType.PRESENTADO,
+    
     # Admitted / not admitted
-    "Admitida la Moción": MotionStepType.ADMITTED,
-    "NO ADMITIDA A DEBATE": MotionStepType.REJECTED,
-    "RECHAZADA LA ADMISIÓN A DEBATE": MotionStepType.REJECTED,
+    "Admitida la Moción": MotionStepType.PENDIENTE_DEBATE,
+    "NO ADMITIDA A DEBATE": MotionStepType.NO_ADMITIDA,
+    "RECHAZADA LA ADMISIÓN A DEBATE": MotionStepType.NO_ADMITIDA,
+    
     # Assigned / in committee
-    "En Comisión": MotionStepType.ASSIGNED,
-    "Integrantes de Comisión": MotionStepType.ASSIGNED,
-    "Aprobado integrantes de Comisión": MotionStepType.ASSIGNED,
+    "En Comisión": MotionStepType.EN_COMISION,
+    "Integrantes de Comisión": MotionStepType.EN_COMISION,
+    "Aprobado integrantes de Comisión": MotionStepType.EN_COMISION,
+    
     # Agenda / internal routing (CD = Consejo Directivo)
-    "En Agenda C.D": MotionStepType.AGENDA,
-    "PARA SER VISTA POR EL CONSEJO DIRECTIVO": MotionStepType.INTERNAL_ROUTE,
-    "Tramitada con conocimiento del CD": MotionStepType.INTERNAL_ROUTE,
-    "TRAMITADA CON ACUERDO DE CD": MotionStepType.INTERNAL_ROUTE,
-    "Por Acuerdo de CD.": MotionStepType.INTERNAL_ROUTE,
-    "Acuerdo Junta de Portavoces": MotionStepType.INTERNAL_ROUTE,
+    "En Agenda C.D": MotionStepType.AGENDA_CONSEJO_DIRECTIVO,
+    "PARA SER VISTA POR EL CONSEJO DIRECTIVO": MotionStepType.AGENDA_CONSEJO_DIRECTIVO,
+    "Tramitada con conocimiento del CD": MotionStepType.TRAMITADO_POR_CONSEJO_DIRECTIVO,
+    "TRAMITADA CON ACUERDO DE CD": MotionStepType.TRAMITADO_POR_CONSEJO_DIRECTIVO,
+    "Por Acuerdo de CD.": MotionStepType.TRAMITADO_POR_CONSEJO_DIRECTIVO,
+
+    "Acuerdo Junta de Portavoces": MotionStepType.ACUERDO_JUNTA_PORTAVOCES,
+    
     # Pleno routing / agenda
-    "Para ser vista por el Pleno": MotionStepType.AGENDA,
-    "En Agenda del Pleno": MotionStepType.AGENDA,
-    "Orden del Día": MotionStepType.AGENDA,
-    "Dado cuenta en el Pleno": MotionStepType.INTERNAL_ROUTE,
-    "Por Acuerdo de Pleno": MotionStepType.INTERNAL_ROUTE,
+    "Para ser vista por el Pleno": MotionStepType.EN_AGENDA,
+    "En Agenda del Pleno": MotionStepType.EN_AGENDA,
+    "Orden del Día": MotionStepType.EN_AGENDA,
+    "Dado cuenta en el Pleno": MotionStepType.EN_AGENDA,
+    "Por Acuerdo de Pleno": MotionStepType.EN_AGENDA,
+    
     # Debate
-    "En Debate": MotionStepType.DEBATE,
-    "Leída en sesión": MotionStepType.DEBATE,
+    "En Debate": MotionStepType.PENDIENTE_DEBATE,
+    
     # Vote-ish / outcomes
-    "Aprobada": MotionStepType.APPROVED,
-    "Aprobada la Moción": MotionStepType.APPROVED,
-    "Rechazada": MotionStepType.REJECTED,
+    "Leída en sesión": MotionStepType.LEIDA_PLENO,
+    "Aprobada": MotionStepType.APROBADO_PLENO,
+    "Aprobada la Moción": MotionStepType.APROBADO_PLENO,
+    "Rechazada": MotionStepType.RECHAZADO_PLENO,
+    
     # Reconsideration
-    "Reconsideración": MotionStepType.RECONSIDERATION,
-    "Rechazada Reconsideración": MotionStepType.RECONSIDERATION,  # still a reconsideration event
+    "Reconsideración": MotionStepType.RECONSIDERACION,
+    "Rechazada Reconsideración": MotionStepType.RECONSIDERACION,
+    
     # Text updates
-    "Texto consensuado": MotionStepType.TEXT_UPDATE,
-    "Texto Sustitutorio": MotionStepType.TEXT_UPDATE,
-    "Retiro de Firma": MotionStepType.WITHDRAWN,
-    "Adhesión": MotionStepType.TEXT_UPDATE,  # signature/support update
+    "Texto consensuado": MotionStepType.TEXTO_SUSTITUTORIO,
+    "Texto Sustitutorio": MotionStepType.TEXTO_SUSTITUTORIO,
+    "Retiro de Firma": MotionStepType.RETIRO_FIRMA,
+    "Adhesión": MotionStepType.TEXTO_SUSTITUTORIO,
+    
     # Official comms / documents
-    "Oficio": MotionStepType.OFFICIAL_COMMUNICATION,
+    "Oficio": MotionStepType.OFICIO,
+    
     # Publication
-    "Publicado Diario Oficial  El Peruano": MotionStepType.PUBLISHED,
+    "Publicado Diario Oficial  El Peruano": MotionStepType.PUBLICADA,
+    
     # Appearances (minister, etc.)
-    "Concurre Ministro": MotionStepType.APPEARANCE,
-    "Asiste": MotionStepType.APPEARANCE,
-    "Asistió el Ministro  para contestar el pliego.": MotionStepType.APPEARANCE,
+    "Concurre Ministro": MotionStepType.MINISTRO,
+    "Asiste": MotionStepType.MINISTRO,
+    "Asistió el Ministro  para contestar el pliego.": MotionStepType.MINISTRO,
+    
     # Order / procedural
-    "Cuestión de Orden": MotionStepType.DISCIPLINE_OR_ORDER,
+    "Cuestión de Orden": MotionStepType.CUESTION_ORDEN,
+    
     # Requirements / blocking status
-    "INCUMPLE REQUISITOS PARA CONTINUAR SU TRÁMITE": MotionStepType.REQUIREMENTS_BLOCK,
+    "INCUMPLE REQUISITOS PARA CONTINUAR SU TRÁMITE": MotionStepType.INCUMPLE_REQUISITOS,
+    
     # Withdrawal
-    "Solicita retiro de moción": MotionStepType.WITHDRAWN,
-    "RETIRADA POR SU AUTOR": MotionStepType.WITHDRAWN,
+    "Solicita retiro de moción": MotionStepType.RETIRO_FIRMA,
+    "RETIRADA POR SU AUTOR": MotionStepType.RETIRADO,
+    
     # Archive
-    "Al archivo": MotionStepType.ARCHIVED,
-    "En Archivo General": MotionStepType.ARCHIVED,
+    "Al archivo": MotionStepType.ARCHIVO,
+    "En Archivo General": MotionStepType.ARCHIVO,
+    
     # Resignation (if applicable in your domain)
-    "Renuncia": MotionStepType.RESIGNATION,
+    "Renuncia": MotionStepType.RENUNCIA,
+    
     # External routing / referrals
-    "En Fiscalía de la Nación": MotionStepType.INTERNAL_ROUTE,
+    "En Fiscalía de la Nación": MotionStepType.FISCALIA,
 }
 
 
 def classify_motion_des_estado(des_estado: str | None) -> MotionStepType:
     if not des_estado:
-        return MotionStepType.UNKNOWN
+        return MotionStepType.DESCONOCIDO
 
     key = " ".join(des_estado.strip().split())  # trim + collapse whitespace
     return (
         DES_ESTADO_TO_MOTION_STEP_TYPE.get(key)
         or DES_ESTADO_TO_MOTION_STEP_TYPE.get(key.upper())
         or DES_ESTADO_TO_MOTION_STEP_TYPE.get(key.title())
-        or MotionStepType.UNKNOWN
+        or MotionStepType.DESCONOCIDO
     )
 
-
 DES_ESTADO_TO_STEP_TYPE: dict[str, BillStepType] = {
-    "------": BillStepType.UNKNOWN,
+    "------": BillStepType.DESCONOCIDO,
     # Presented
-    "PRESENTADO": BillStepType.PRESENTED,
+    "PRESENTADO": BillStepType.PRESENTADO,
+
     # Assigned / committee routing
-    "EN COMISIÓN": BillStepType.ASSIGNED,
-    "PASA A COMISIÓN": BillStepType.ASSIGNED,
-    "RETORNA A COMISIÓN": BillStepType.ASSIGNED,
-    "Acumulado en Sala": BillStepType.INTERNAL_ROUTE,
+    "EN COMISIÓN": BillStepType.EN_COMISION,
+    "PASA A COMISIÓN": BillStepType.EN_COMISION,
+    "RETORNA A COMISIÓN": BillStepType.EN_COMISION,
+    "Acumulado en Sala": BillStepType.EN_COMISION,
+
     # Committee stage artifacts / decisions
-    "DICTAMEN": BillStepType.COMMITTEE_STAGE,
-    "ACUERDO DE COMISIÓN": BillStepType.COMMITTEE_STAGE,
+    "DICTAMEN": BillStepType.DICTAMEN,
+    "ACUERDO DE COMISIÓN": BillStepType.DICTAMEN,
+
     # Exemptions / procedural shortcuts
-    "Dispensado de Dictamen": BillStepType.EXEMPTION,
-    "EXONERADO DE DICTAMEN": BillStepType.EXEMPTION,
-    "EXONERADO DE PLAZO DE PUBLICACIÓN": BillStepType.EXEMPTION,
-    "Dispensado de Publicación en el Portal": BillStepType.EXEMPTION,
+    "Dispensado de Dictamen": BillStepType.EXCEPCION,
+    "EXONERADO DE DICTAMEN": BillStepType.EXCEPCION,
+    "EXONERADO DE PLAZO DE PUBLICACIÓN": BillStepType.EXCEPCION,
+    "Dispensado de Publicación en el Portal": BillStepType.EXCEPCION,
+
     # Agenda
-    "Orden del Día": BillStepType.AGENDA,
-    "EN AGENDA DEL PLENO": BillStepType.AGENDA,
-    "EN AGENDA DE LA COMISIÓN PERMANENTE": BillStepType.AGENDA,
+    "Orden del Día": BillStepType.EN_AGENDA,
+    "EN AGENDA DEL PLENO": BillStepType.EN_AGENDA,
+    "EN AGENDA DE LA COMISIÓN PERMANENTE": BillStepType.EN_AGENDA,
+
     # Debate
-    "EN DEBATE - PLENO": BillStepType.DEBATE,
-    "EN DEBATE - COMISIÓN PERMANENTE": BillStepType.DEBATE,
-    "EN DEBATE DE LA COMISIÓN PERMANENTE": BillStepType.DEBATE,
+    "EN DEBATE - PLENO": BillStepType.PENDIENTE_DEBATE,
+    "EN DEBATE - COMISIÓN PERMANENTE": BillStepType.PENDIENTE_DEBATE,
+    "EN DEBATE DE LA COMISIÓN PERMANENTE": BillStepType.PENDIENTE_DEBATE,
+    "EN CUARTO INTERMEDIO": BillStepType.PENDIENTE_DEBATE,
+    "PARA CONSEJO DIRECTIVO": BillStepType.PENDIENTE_DEBATE,
+
     # Vote events
-    "APROBADO 1ERA. VOTACIÓN": BillStepType.VOTE,
-    "Pendiente 2da. votación": BillStepType.VOTE,
-    "No alcanzó Nº de votos": BillStepType.VOTE,
-    "NO APROBADO": BillStepType.VOTE,
-    # Approval outcomes
-    "APROBADO": BillStepType.APPROVED,
-    "Aprobado Com.Permanente ": BillStepType.APPROVED,
-    "ACUERDO DEL PLENO": BillStepType.APPROVED,
+    "APROBADO 1ERA. VOTACIÓN": BillStepType.APROB_1_VOTACION,
+    "Pendiente 2da. votación": BillStepType.PENDIENTE_2_VOTACION,
+    "No alcanzó Nº de votos": BillStepType.NO_APROBADO,
+    "NO APROBADO": BillStepType.NO_APROBADO,
+    "APROBADO": BillStepType.APROB_2_VOTACION,
+    "Aprobado Com.Permanente ": BillStepType.APROB_COM_PERMANENTE,
+    "ACUERDO DEL PLENO": BillStepType.ACUERDO_PLENO,
+
     # Text / autographs (post-approval drafting)
-    "TEXTO SUSTITUTORIO": BillStepType.TEXT_UPDATE,
-    "AUTÓGRAFA": BillStepType.TEXT_UPDATE,
-    "AUTÓGRAFA OBSERVADA": BillStepType.TEXT_UPDATE,
-    "Retiro de Firma": BillStepType.TEXT_UPDATE,  # could also be WITHDRAWN depending on how you interpret it
-    # Reconsideration
-    "EN RECONSIDERACIÓN": BillStepType.RECONSIDERATION,
-    # Rejection
-    "RECHAZADO": BillStepType.REJECTED,
+    "TEXTO SUSTITUTORIO": BillStepType.TEXTO_SUSTITUTORIO,
+    "AUTÓGRAFA": BillStepType.AUTÓGRAFA,
+    "AUTÓGRAFA OBSERVADA": BillStepType.AUTÓGRAFA,
+    "Retiro de Firma": BillStepType.RETIRO_FIRMA,  
+    "ACLARACIÓN": BillStepType.ACLARACION,
+
     # Withdrawal
-    "Retirado por su Autor": BillStepType.WITHDRAWN,
-    "Solicita Retiro": BillStepType.WITHDRAWN,
+    "Retirado por su Autor": BillStepType.RETIRADO,
+    "Solicita Retiro": BillStepType.RETIRADO,
+
+    # Reconsideration
+    "EN RECONSIDERACIÓN": BillStepType.RECONSIDERACION,
+
+    # Rejection
+    "RECHAZADO": BillStepType.NO_APROBADO,
+
     # Archive
-    "Al Archivo": BillStepType.ARCHIVED,
-    "DECRETO DE ARCHIVO": BillStepType.ARCHIVED,
+    "Al Archivo": BillStepType.ARCHIVO,
+    "DECRETO DE ARCHIVO": BillStepType.ARCHIVO,
+
     # Promulgation / publication
-    "Promulgado/Presidente de la República": BillStepType.PROMULGATED,
-    "Promulgado/Presidente del Congreso": BillStepType.PROMULGATED,
-    "Publicada en el Diario Oficial El Peruano": BillStepType.PUBLISHED,
-    # Clarification / internal routing
-    "ACLARACIÓN": BillStepType.CLARIFICATION,
-    "EN CUARTO INTERMEDIO": BillStepType.INTERNAL_ROUTE,
-    "PARA CONSEJO DIRECTIVO": BillStepType.INTERNAL_ROUTE,
+    "Promulgado/Presidente de la República": BillStepType.PUBLICADA,
+    "Promulgado/Presidente del Congreso": BillStepType.PUBLICADA,
+    "Publicada en el Diario Oficial El Peruano": BillStepType.PUBLICADA,
 }
 
 
 def classify_des_estado(des_estado: str | None) -> BillStepType:
     if not des_estado:
-        return BillStepType.UNKNOWN
+        return BillStepType.DESCONOCIDO
 
     key = " ".join(des_estado.strip().split())  # trim + collapse whitespace
     # keep original casing keys in mapping, but also try upper
     return DES_ESTADO_TO_STEP_TYPE.get(key) or DES_ESTADO_TO_STEP_TYPE.get(
-        key.upper(), BillStepType.UNKNOWN
+        key.upper(), BillStepType.DESCONOCIDO
     )
 
 

@@ -1,13 +1,13 @@
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
-from api.main import app
-from estecon.backend.scrapers.schema import Congresista
+from backend.api.main import app
+from backend.process.schema import Bill
 import pytest
 
 client = TestClient(app)
 
 VERSION = "v1"
-ENDPOINT_NAME = "congresistas"
+ENDPOINT_NAME = "bills"
 
 
 def test_active_endpoint():
@@ -30,8 +30,8 @@ def test_response_matches_model():
     data = response.json()
     assert len(data) > 0
     try:
-        for congresista in data["data"]:
-            Congresista(**congresista)  # Unpacks the dict to validate using keys
+        for bill in data["data"]:
+            Bill(**bill)  # Unpacks the dict to validate using keys
     except ValidationError:
         pytest.fail("Response does not match expected data model")
 
@@ -39,8 +39,12 @@ def test_response_matches_model():
 @pytest.mark.parametrize(
     "query_str",
     [
+        ("status=failed"),
+        ("proposed_by=1000"),
+        ("last_action_date=2025-01-01"),
+        ("step_type=advanced"),
         ("leg_period=2021-2026"),
-        ("leg_period=2016-2021"),
+        ("leg_period=2021-2026&proposed_by=1000"),
     ],
 )
 def test_query_params(query_str):

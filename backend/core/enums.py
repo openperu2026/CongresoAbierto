@@ -40,77 +40,81 @@ class MotionType(str, Enum):
     INTERPELACION = "Interpelación"
     INFORME_MINISTROS = "Invitación a Ministros para Informar"
     VACANCIA = "Vacancia"
-    COMISION_INVESTIGADORA = [
-        "Otorgar Facultades de Comisión Investigadora",
-        "Comisiones Investigadoras",
-    ]
+    COMISION_INVESTIGADORA = "Otorgar Facultades de Comisión Investigadora"
+    COMISION_INVESTIGADORA_2 = "Comisiones Investigadoras"
     COMISION_ESPECIAL = "Comisiones Especiales"
     PESAR = "Pesar"
     OTRAS = "Otras"
 
 
 class MotionStepType(str, Enum):
-    UNKNOWN = "unknown"
+    DESCONOCIDO = "Desconocido"
 
     # Intake / start
-    PRESENTED = "presented"
-    ADMITTED = "admitted to debate"
+    PRESENTADO = "Presentado"
+    NO_ADMITIDA = "No admitida a debate"
+    PENDIENTE_DEBATE = "Por debatir en el pleno o comisión permanente"
 
     # Routing / admin handling
-    ASSIGNED = "assigned"
-    INTERNAL_ROUTE = "internal routing"
-    AGENDA = "agenda"
+    EN_COMISION = "En comisión"
+    AGENDA_CONSEJO_DIRECTIVO = "En agenda del Consejo Directivo"
+    TRAMITADO_POR_CONSEJO_DIRECTIVO = "En trámite del Consejo Directivo"
+    ACUERDO_JUNTA_PORTAVOCES = "Acuerdo por Junta de Portavoces"
+    EN_AGENDA = "En agenda del pleno"
 
     # Deliberation
-    DEBATE = "debate"
-    VOTE = "vote"
-    APPROVED = "approved"
-    REJECTED = "rejected"
+    PENDIENTE_DEBATE = "Por debatir en el pleno o comisión permanente"
+    LEIDA_PLENO = "Leída en sesión del pleno"
+    APROBADO_PLENO = "Aprobado en el pleno"
+    RECHAZADO_PLENO = "Rechazada en el pleno"
 
     # Reconsideration
-    RECONSIDERATION = "reconsideration"
+    RECONSIDERACION = "Reconsideración"
 
     # Text / documents
-    TEXT_UPDATE = "text update"
-    OFFICIAL_COMMUNICATION = "official communication"
+    TEXTO_SUSTITUTORIO = "Texto sustitutorio"
+    OFICIO = "Oficio"
 
     # Attendance / appearances (minister, etc.)
-    APPEARANCE = "appearance"
+    MINISTRO = "Asistencia de ministros"
 
     # Other outcomes
-    WITHDRAWN = "withdrawn"
-    ARCHIVED = "archived"
-    PUBLISHED = "published"
-    RESIGNATION = "resignation"
-    DISCIPLINE_OR_ORDER = "question of order"
-    REQUIREMENTS_BLOCK = "requirements not met"
-
+    RETIRO_FIRMA = "Retiro de firma"
+    RETIRADO = "Retirado por su autor"
+    ARCHIVO = "Archivado"
+    PUBLICADA = "Publicada en El Peruano"
+    RENUNCIA = "Renuncia"
+    CUESTION_ORDEN = "Cuestión de orden"
+    INCUMPLE_REQUISITOS = "Incumple requisitos"
+    FISCALIA = "En Fiscalía de la Nación"
 
 class BillStepType(str, Enum):
-    UNKNOWN = "unknown"
-    PRESENTED = "presented"
-    ASSIGNED = "assigned to committee"
-    COMMITTEE_STAGE = "committee stage"
-    AGENDA = "agenda"
-    DEBATE = "debate"
-    VOTE = "vote"
-    RECONSIDERATION = "reconsideration"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-    TEXT_UPDATE = "text update"
-    WITHDRAWN = "withdrawn"
-    ARCHIVED = "archived"
-    PROMULGATED = "promulgated"
-    PUBLISHED = "published"
-    CLARIFICATION = "clarification"
-    INTERNAL_ROUTE = "internal routing"
-    EXEMPTION = "exemption"
-
+    DICTAMEN = "Con dictamen"
+    PUBLICADA = "Publicada en El Peruano"
+    PENDIENTE_DEBATE = "Por debatir en el pleno o comisión permanente"
+    ARCHIVO = "Archivado"
+    PRESENTADO = "Presentado"
+    EN_COMISION = "En comisión"
+    RETIRADO = "Retirado por su autor"
+    EN_AGENDA = "En agenda del pleno"
+    RECONSIDERACION = "En reconsideración del pleno"
+    APROB_1_VOTACION = "Aprobado 1ra votación"
+    PENDIENTE_2_VOTACION = "Pendiente 2da votación"
+    AUTÓGRAFA = "Con autógrafa"
+    APROB_2_VOTACION = "Aprobado 2da votación"
+    EXCEPCION = "Excepcion de dictamen o publicación"
+    NO_APROBADO = "No aprobado en votación"
+    APROB_COM_PERMANENTE = "Aprobado por comisión permanente"
+    RETIRO_FIRMA = "Retiro de firma"
+    ACUERDO_PLENO = "Acuerdo del pleno"
+    TEXTO_SUSTITUTORIO = "Texto sustitutorio"
+    ACLARACION = "Aclaración"
+    DESCONOCIDO = "Desconocido"
 
 class RoleTypeBill(str, Enum):
-    AUTHOR = "author"
-    COAUTHOR = "coauthor"
-    ADHERENTE = "adherente"
+    Autor = "Autor"
+    Coautor = "Coautor"
+    Adherente = "Adherente"
 
 
 class Proponents(str, Enum):
