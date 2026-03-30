@@ -9,7 +9,7 @@ from backend.database.raw_models import (
     RawDocumentPage,
 )
 from backend.ocr.repository import OCRRepository
-from backend.ocr.types import OCRPageResult, OCRSourceDocument
+from backend.ocr.types import OCRPageResult
 
 
 def _make_repo(tmp_path):
