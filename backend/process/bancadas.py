@@ -48,7 +48,9 @@ def process_bancada(
             # Congresista
             name = row.xpath('.//*[@class="conginfo"]')[0].text
             web_profile = row.xpath('.//*[@class="conginfo"]/@href')[0]
-            parsed_website = get_url_text("https://www.congreso.gob.pe" + web_profile)
+            
+            query = web_profile.split('?', 1)[1]
+            parsed_website = get_url_text("https://www3.congreso.gob.pe/pagina/?" + query)
             website = get_cong_website(parsed_website)
 
             membership_list.append(

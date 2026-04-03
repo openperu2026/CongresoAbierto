@@ -2,6 +2,7 @@ import json
 import time
 from datetime import datetime, timedelta
 from loguru import logger
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -11,7 +12,7 @@ from backend.config import settings
 from backend.scrapers.utils import get_url_text
 from backend.database.raw_models import RawBill
 
-BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal-service/"
+BASE_URL = "https://wb2server.congreso.gob.pe/spley-portal/#"
 RAW_DB_PATH = settings.RAW_DB_URL
 
 
@@ -42,6 +43,32 @@ class RawBillScraper:
         # List of raw bills objects
         self.raw_bills = []
 
+    def __search_api_url(self, bill_url: str) -> str:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+
+            try:
+                page.goto("https://wb2server.congreso.gob.pe/spley-portal/", wait_until="domcontentloaded")
+
+                with page.expect_response(
+                    lambda r: (
+                        "spley-portal-service/expediente/" in r.url
+                        and r.request.method == "GET"
+                        and r.status == 200
+                    ),
+                    timeout=10000,
+                ) as response_info:
+                    page.evaluate("url => { window.location.href = url; }", bill_url)
+
+                return response_info.value.url
+
+            except PlaywrightTimeoutError:
+                return None
+
+            finally:
+                browser.close()
+
     def scrape_bill(self, year: str, bill_number: str) -> None:
         """
         Scrape key sections: general, congresistas, committees, steps
@@ -50,7 +77,8 @@ class RawBillScraper:
         """
 
         bill_url = f"{BASE_URL}/expediente/{year}/{bill_number}"
-        response = get_url_text(bill_url)
+        api_url = self.__search_api_url(bill_url)
+        response = get_url_text(api_url)
 
         if response:
             resp = json.loads(response)

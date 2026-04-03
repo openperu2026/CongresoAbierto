@@ -31,10 +31,10 @@ from backend.scrapers.utils import parse_url
 
 
 BASE_URLS = {
-    "Junta de Portavoces": "https://www.congreso.gob.pe/integrantesjuntadeportavoces",
-    "Consejo Directivo": "https://www.congreso.gob.pe/integrantesconsejodirectivo/",
-    "Mesa Directiva": "https://www.congreso.gob.pe/integrantesmesadirectiva",
-    "Comisión Permanente": "https://www.congreso.gob.pe/integrantescomisionespermanentes",
+    "Junta de Portavoces": "https://www3.congreso.gob.pe/pagina/junta-de-portavoces",
+    "Consejo Directivo": "https://www3.congreso.gob.pe/pagina/consejodirectivo",
+    "Mesa Directiva": "https://www3.congreso.gob.pe/pagina/mesa-directiva",
+    "Comisión Permanente": "https://www3.congreso.gob.pe/pagina/comision-permanente",
 }
 
 RAW_DB_PATH = settings.RAW_DB_URL

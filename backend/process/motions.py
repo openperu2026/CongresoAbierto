@@ -47,6 +47,7 @@ def process_motion(raw_motion: RawMotion) -> tuple[Motion, list[MotionCongresist
 
     # Extracting information from firmantes dictionary
     cong_list = []
+
     if firmantes:
         author_info = firmantes[0]
         author_name = author_info.get("nombre")
