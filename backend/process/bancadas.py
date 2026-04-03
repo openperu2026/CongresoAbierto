@@ -1,11 +1,44 @@
 from lxml.html import fromstring
+from urllib.parse import urljoin
 
 from backend import LegislativeYear, find_leg_period
 from backend.database.raw_models import RawBancada
 from backend.process.schema import Bancada, BancadaMembership
 
 from backend.process.utils import get_current_leg_year
-from backend.scrapers.utils import get_url_text, get_cong_website
+
+CONGRESO_BASE_URL = "https://www.congreso.gob.pe"
+LEGACY_CONGRESO_BASE_URL = "https://www3.congreso.gob.pe"
+
+
+def get_url_text(url: str, data: str | None = None) -> str | None:
+    from backend.scrapers.utils import get_url_text as _get_url_text
+
+    return _get_url_text(url, data)
+
+
+def get_cong_website(profile_content: str) -> str | None:
+    from backend.scrapers.utils import get_cong_website as _get_cong_website
+
+    return _get_cong_website(profile_content)
+
+
+def _build_profile_url(web_profile: str) -> str:
+    """
+    Normalize congresista profile links from both current path-style and legacy
+    query-string style hrefs.
+    """
+    if web_profile.startswith(("http://", "https://")):
+        return web_profile
+
+    if web_profile.startswith(("/pagina/?", "pagina/?")):
+        return urljoin(f"{LEGACY_CONGRESO_BASE_URL}/", web_profile.lstrip("/"))
+
+    if "?" in web_profile:
+        query = web_profile.split("?", 1)[1]
+        return f"{LEGACY_CONGRESO_BASE_URL}/pagina/?{query}"
+
+    return urljoin(CONGRESO_BASE_URL, web_profile)
 
 
 def process_bancada(
@@ -48,7 +81,8 @@ def process_bancada(
             # Congresista
             name = row.xpath('.//*[@class="conginfo"]')[0].text
             web_profile = row.xpath('.//*[@class="conginfo"]/@href')[0]
-            parsed_website = get_url_text("https://www.congreso.gob.pe" + web_profile)
+
+            parsed_website = get_url_text(_build_profile_url(web_profile))
             website = get_cong_website(parsed_website)
 
             membership_list.append(

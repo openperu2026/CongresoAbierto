@@ -24,7 +24,7 @@ from backend.config import settings
 from backend.database.raw_models import RawCommittee
 from backend.scrapers.utils import parse_url
 
-BASE_URL = "https://www.congreso.gob.pe/CuadrodeComisiones"
+BASE_URL = "https://www3.congreso.gob.pe/pagina/comisiones-ordinarias"
 RAW_DB_PATH = settings.RAW_DB_URL
 
 

@@ -128,6 +128,7 @@ class Proponents(str, Enum):
     PODER_JUDICIAL = "Poder Judicial"
     GORES = "Gobiernos Regionales"
     GOLOS = "Gobiernos Locales"
+    JNJ = "Junta Nacional de Justicia"
 
 
 class LegPeriod(str, Enum):
