@@ -18,7 +18,7 @@ from backend.scrapers.utils import (
     get_cong_website,
 )
 
-BASE_URL = "https://www.congreso.gob.pe/pleno/congresistas/"
+BASE_URL = "https://www3.congreso.gob.pe/pagina/congresistas"
 API_MEMBERSHIP = "https://wb2server.congreso.gob.pe/vll/cargos/api/"
 RAW_DB_PATH = settings.RAW_DB_URL
 
@@ -175,7 +175,7 @@ class RawCongresistasScraper:
             profile_content=profile_content,
             memberships_content=memberships_content,
         )
-        logger.info(f"Congresista successfully extracted from {website}")
+        logger.success(f"Congresista successfully extracted from {website}")
         return raw_congresista
 
     def extract_cong_from_period(

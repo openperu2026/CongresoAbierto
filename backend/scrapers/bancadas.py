@@ -22,7 +22,7 @@ from backend.database.raw_models import RawBancada
 from backend.scrapers.utils import parse_url
 
 
-BASE_URL = "https://www.congreso.gob.pe/integrantes-grupos-parlamentarios"
+BASE_URL = "https://www3.congreso.gob.pe/pagina/grupos-parlamentarios"
 RAW_DB_PATH = settings.RAW_DB_URL
 
 
@@ -135,7 +135,7 @@ class RawBancadaScraper:
 
         if only_current:
             dict_condicion = {"en Ejercicio": "eej"}
-
+            
             # Only scrape current period
             key, val = list(dict_periods.items())[0]
             dict_periods = {key: val}
