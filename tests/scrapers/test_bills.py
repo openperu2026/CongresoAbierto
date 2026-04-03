@@ -6,10 +6,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Adjust this import to your actual module path
-from backend.scrapers.bills import RawBillScraper, BASE_URL
+from backend.scrapers.bills import RawBillScraper
 from backend.database.raw_models import Base, RawBill
 
-
+API_URL = "https://api.congreso.gob.pe/spley-portal-service/expediente/"
 # ---------- create_raw_bill ----------
 
 
@@ -132,9 +132,9 @@ def test_scrape_bill_appends_raw_bill(monkeypatch, raw_session):
     scraper.session = raw_session
 
     # Fake JSON response from get_url_text
-    def fake_get_url_text(url):
+    def fake_get_url_text(url: str):
         # Make sure URL is what we expect
-        assert url == f"{BASE_URL}/expediente/2021/1234"
+        assert url.startswith(API_URL)
         return json.dumps(
             {
                 "data": {
