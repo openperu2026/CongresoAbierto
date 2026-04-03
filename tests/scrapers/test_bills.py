@@ -131,6 +131,12 @@ def test_scrape_bill_appends_raw_bill(monkeypatch, raw_session):
     scraper = RawBillScraper()
     scraper.session = raw_session
 
+    monkeypatch.setattr(
+        scraper,
+        "_RawBillScraper__search_api_url",
+        lambda bill_url: f"{API_URL}2021/1234",
+    )
+
     # Fake JSON response from get_url_text
     def fake_get_url_text(url: str):
         # Make sure URL is what we expect
