@@ -1,6 +1,6 @@
 # OpenPeru
 
-OpenPeru is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured, machine readable data.
+OpenPeru is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured data that can be easily analyzed, consumed and understood.
 
 Its goal is to lower the cost of understanding how Congress works: who proposes laws, how representatives vote, how parties behave, and how legislation evolves. By converting difficult-to-use documents into structured datasets, OpenPeru makes political accountability more feasible for citizens, journalists, researchers, and civil society organizations.
 
