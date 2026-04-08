@@ -1,14 +1,14 @@
-# OpenCongress
+# OpenPeru
 
-OpenCongress is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured, machine readable data.
+OpenPeru is an open source civic technology project that transforms fragmented and unstructured legislative information from the Peruvian Congress into structured data that can be easily analyzed, consumed and understood.
 
 Its goal is to lower the cost of understanding how Congress works: who proposes laws, how representatives vote, how parties behave, and how legislation evolves. By converting difficult-to-use documents into structured datasets, OpenPeru makes political accountability more feasible for citizens, journalists, researchers, and civil society organizations.
 
 Peru has experienced years of political instability and weak political parties, making transparency and accountability especially important. Although the Peruvian Congress publishes large amounts of information such as bills, voting records, and official documents, this data is often scattered across different websites and released in formats that are difficult to search, analyze, or reuse.
 
-OpenCongress helps solve this problem by turning complex and fragmented congressional information into structured data that is easier to explore, analyze, and understand. Rather than creating new political information, the project unlocks the value of data that already exists but is currently difficult to access.
+OpenPeru helps solve this problem by turning complex and fragmented congressional information into structured data that is easier to explore, analyze, and understand. Rather than creating new political information, the project unlocks the value of data that already exists but is currently difficult to access.
 
-## What OpenCongress Provides
+## What OpenPeru Provides
 
 At its current stage, OpenPeru focuses on the legislative core of Congress and integrates data across multiple dimensions:
 
@@ -22,7 +22,7 @@ All information is stored in relational databases designed for analysis, reuse, 
 
 ## Architecture Overview
 
-OpenCongress follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
+OpenPeru follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
 
 ```mermaid
 flowchart LR
@@ -147,7 +147,7 @@ Each major submodule includes its own README with more detailed documentation.
 
 ## Project Status and Roadmap
 
-OpenCongress is under active development. Current priorities include:
+OpenPeru is under active development. Current priorities include:
 
 - Expanding coverage of voting and attendance records
 - Improving historical consistency across legislative periods
