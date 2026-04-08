@@ -4,7 +4,7 @@ This directory contains the OpenPeru data pipeline. It scrapes official Peruvian
 
 ## What lives here
 
-• `backend/__main__.py` and `backend/orchestrator.py` (orchestrator entrypoint and pipeline control)
+• `backend/__main__.py` and `backend/cli.py` (cli entrypoint and pipeline control)
 
 • `backend/scrapers/` raw extraction layer (HTML and PDF sources)
 
@@ -14,11 +14,11 @@ This directory contains the OpenPeru data pipeline. It scrapes official Peruvian
 
 Supporting docs
 
-• `backend/scrapers/README.md`
+• [`backend/scrapers/README.md`](./scrapers/README.md)
 
-• `backend/process/README.md`
+• [`backend/process/README.md`](./process/README.md)
 
-• `backend/database/README.md`
+• [`backend/database/README.md`](./database/README.md)
 
 ## Requirements
 
@@ -42,13 +42,13 @@ uv run pre-commit install
 
 ## Create databases
 
-Initialize or update the SQLite databases:
+The project is currently working with a local SQLite database. Either download it or create them from scratch. Initialize or update the SQLite databases:
 
 ```bash
 uv run python -m backend.database.build_db
 ```
 
-By default this creates
+By default this creates or updates
 
 • Raw database: `data/raw/OpenPeruRaw.db`
 
@@ -66,7 +66,7 @@ uv run python -m backend --help
 
 ### Common commands
 
-Process only pending raw records (default behavior)
+Process only pending raw records, without scraping (default behavior)
 
 ```bash
 uv run python -m backend
@@ -84,13 +84,7 @@ Scrape only, skip processing
 uv run python -m backend --scrape --skip-processing
 ```
 
-Process only, without scraping
-
-```bash
-uv run python -m backend
-```
-
-### Run a specific target group
+### Run a specific target group to scrape
 
 Bills only
 
@@ -112,7 +106,7 @@ uv run python -m backend --scrape --only-others
 
 ### Current period only
 
-Where supported, scrape only the current legislative period
+Where supported, scrape only the current legislative period (only supported for congresistas, bancadas, committees and organizations)
 
 ```bash
 uv run python -m backend --scrape --only-current
@@ -126,7 +120,7 @@ Refresh stale non approved bills and motions older than N days
 uv run python -m backend --scrape --weekly-days 7
 ```
 
-Skip scraping others if their latest raw scrape is within N days
+Skip scraping others (congresistas, bancadas, committees and organizations) if their latest raw scrape is within N days
 
 ```bash
 uv run python -m backend --scrape --others-days 14
@@ -144,6 +138,12 @@ Motions
 
 ```bash
 uv run python -m backend --scrape --motion-year 2021 --motion-start 1 --motion-end 200
+```
+
+Leyes
+
+```bash
+uv run python -m backend --scrape --ley-start 31222 --ley-end 31250
 ```
 
 ### Documents
@@ -215,6 +215,9 @@ Optional range filters
 
 • `--motion-year YEAR`, `--motion-start A`, `--motion-end B`
 
+• `--ley-start A`, `--ley-end B`
+
+
 Documents
 
 • `--scrape-documents` scrape pending bill and motion documents
@@ -241,13 +244,13 @@ Raw tables track whether a scraped record is new, changed, or already processed.
 
 For the latest raw snapshot per record key
 
-• First version of a record: `changed = True`, `processed = False`
+• First version of a record: `last_update = True`, `changed = True`, `processed = False`
 
-• Unchanged re scrape: `changed = False`, `processed = True`
+• Unchanged re scrape: `last_update = True`, `changed = False`, `processed = True`
 
-• Changed re scrape: `changed = True`, `processed = False`
+• Changed re scrape: `last_update = True`, `changed = True`, `processed = False`
 
-Processing should focus on raw rows where `changed = True` and `processed = False`.
+Processing should focus on raw rows where `last_update = True`, `changed = True` and `processed = False`.
 
 ## Tests
 
