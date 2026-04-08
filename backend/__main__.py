@@ -1,4 +1,4 @@
-from backend.database.orchestrator import main
+from backend.cli import main
 
 
 if __name__ == "__main__":

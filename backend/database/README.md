@@ -4,9 +4,9 @@ This module defines raw/clean DB schemas and orchestrates persistence.
 
 ## Files
 
-- `raw_models.py`: raw ingestion tables (`Raw*`), including tracking fields.
-- `models.py`: clean SQLAlchemy models for normalized entities.
-- `build_db.py`: create/update SQLite DBs and ensure tracking columns exist.
+- `raw_models.py`: raw ingestion tables (`Raw*`), including tracking fields (`last_update`, `processed` and `changed`).
+- `models.py`: clean SQLAlchemy models for normalized entities and relations.
+- `build_db.py`: create/update SQLite DBs and ensure all columns exist.
 - `orchestrator.py`: end-to-end ETL runner (scrape + process + load).
 - `crud/`: DB helper functions for upserts and lookups used by the orchestrator.
   - `pipeline_core.py`
@@ -49,8 +49,8 @@ uv run python -m backend --scrape --weekly-days 10
 
 For each latest raw record:
 
-- first version: `changed=True`, `processed=False`
-- unchanged new version: `changed=False`, `processed=True`
-- changed new version: `changed=True`, `processed=False`
+- first version: `last_update = True`, `changed=True`, `processed=False`
+- unchanged new version: `last_update = True`, `changed=False`, `processed=True`
+- changed new version: `last_update = True`, `changed=True`, `processed=False`
 
 This allows process stages to focus on records that still need clean-table updates.
