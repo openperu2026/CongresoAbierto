@@ -4,12 +4,20 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
+      - id: mixed-line-ending
       - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
       - id: check-merge-conflict
+      - id: debug-statements
+      - id: forbid-submodules
       - id: no-commit-to-branch
-        stages: [pre-commit, pre-push]
-        args: [--branch, main, --branch, develop]
+        args: [--branch, main, --branch, dev]
+        stages: [pre-commit, pre-push]    
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.0
@@ -63,4 +71,4 @@ repos:
           '
         language: system
         pass_filenames: false
-        stages: [pre-commit, pre-push]
+        stages: [pre-commit, pre-push]    
