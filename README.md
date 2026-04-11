@@ -20,6 +20,75 @@ At its current stage, OpenPeru focuses on the legislative core of Congress and i
 
 All information is stored in relational databases designed for analysis, reuse, and future API access.
 
+## Development Setup
+
+1. **Install UV**  
+   Follow instructions from the official docs:  
+   https://docs.astral.sh/uv/getting-started/installation/
+
+2. **Clone the repository**  
+   ```bash
+   git clone https://github.com/openperu2026/dev-opencongress.git
+    cd dev-opencongress
+    ```
+
+3. **Synchronize the virtual environment.**
+    ```bash
+    uv sync
+    ```
+4. **Activate the environment**
+    ```bash
+    source .venv/bin/activate
+    ```
+
+5. **Install Git hooks (IMPORTANT)**
+    We use pre-commit to enforce code quality and workflow rules.
+    ```bash
+    pre-commit install
+    pre-commit install --hook-type pre-push
+    ```
+
+## GitFlow Workflow
+We follow a GitFlow branching model. For detailed rules, go [here](https://github.com/openperu2026/dev-opencongress/blob/feature/repo-config/docs/git-flow.md).
+
+*Our branches*
+- `main`: Production-ready code only. This branch always reflects the current stable release.
+- `dev`: Integration branch for ongoing development. All completed features are merged here before a `release`.
+- `feature/*`: New feature development. Branch from `dev` and merge back into `dev` when complete.
+- `release/*`: Release preparation and stabilization (e.g., bug fixes, final testing). Branch from `dev`, then merge into both `main` and `dev`.
+- `hotfix/*`: Emergency fixes for production issues. Branch from `main`, then merge into both `main` and `dev`.
+
+## Repository Structure (High Level)
+
+The repository is organized into modular components for data collection, processing, and testing:
+
+```
+openperu/
+├── backend/
+│   ├── api/            # Future API layer
+│   ├── cli/            # Command line interface for pipelines
+│   ├── core/           # Shared configuration, utilities, logging
+│   ├── database/       # Raw and processed database models
+│   ├── documents/      # Downloaded congressional documents
+│   ├── process/        # Data cleaning and standardization
+│   └── scrapers/       # Data collection from Congress websites
+│
+├── data/
+│   ├── raw/            # Raw scraped data - Not available in GitHub
+│   └── processed/      # Clean structured datasets - Not available in GitHub
+│
+├── draft_notebooks/    # Exploration and experimentation
+├── logs/               # Pipeline and scraper logs
+└── tests/
+    ├── database/       # Tests for database models
+    ├── process/        # Data processing tests
+    └── scrapers/       # Scraper tests
+```
+
+Each major submodule includes its own README with more detailed documentation.
+
+---
+
 ## Architecture Overview
 
 OpenPeru follows a layered architecture that separates data collection, storage, processing, and analysis. This keeps raw data reproducible while producing clean datasets for research and applications.
@@ -112,38 +181,6 @@ Automated tests cover scrapers, database models, and processing logic to detect 
 
 The architecture is intentionally modular to support future extensions such as APIs, dashboards, and machine‑learning pipelines.
 
----
-
-## Repository Structure (High Level)
-
-The repository is organized into modular components for data collection, processing, and testing:
-
-```
-openperu/
-├── backend/
-│   ├── api/            # Future API layer
-│   ├── cli/            # Command line interface for pipelines
-│   ├── core/           # Shared configuration, utilities, logging
-│   ├── database/       # Raw and processed database models
-│   ├── documents/      # Downloaded congressional documents
-│   ├── process/        # Data cleaning and standardization
-│   └── scrapers/       # Data collection from Congress websites
-│
-├── data/
-│   ├── raw/            # Raw scraped data - Not available in GitHub
-│   └── processed/      # Clean structured datasets - Not available in GitHub
-│
-├── draft_notebooks/    # Exploration and experimentation
-├── logs/               # Pipeline and scraper logs
-└── tests/
-    ├── database/       # Tests for database models
-    ├── process/        # Data processing tests
-    └── scrapers/       # Scraper tests
-```
-
-Each major submodule includes its own README with more detailed documentation.
-
----
 
 ## Project Status and Roadmap
 
