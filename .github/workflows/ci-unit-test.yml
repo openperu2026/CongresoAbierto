@@ -1,7 +1,8 @@
 name: CI Unit Tests
 
-on: pull_request
-
+on:
+  pull_request:
+  
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -10,22 +11,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python  # Faster than uv python install
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: ".python-version" # From uv set-up
+          python-version-file: ".python-version"
 
-      - name: Install uv and activate a virtual environment
+      - name: Set up uv
         uses: astral-sh/setup-uv@v6
         with:
-          # uv docs says to manually specify version: https://docs.astral.sh/uv/guides/integration/github/
           version: "0.7.19"
           enable-cache: true
 
       - name: Install pytesseract
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-spa
 
-      - name: Install the project
+      - name: Install project
         run: uv sync --locked --all-extras --dev
 
       - name: Run tests
