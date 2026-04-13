@@ -198,4 +198,3 @@ Contributions and feedback are welcome.
 ## License
 
 This project is released under an open-source license. See the `LICENSE` file for details.
-
