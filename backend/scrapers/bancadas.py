@@ -135,7 +135,7 @@ class RawBancadaScraper:
 
         if only_current:
             dict_condicion = {"en Ejercicio": "eej"}
-            
+
             # Only scrape current period
             key, val = list(dict_periods.items())[0]
             dict_periods = {key: val}
