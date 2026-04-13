@@ -108,7 +108,6 @@ def test_can_create_raw_bill(session):
 
 def test_can_create_raw_bill_document(session):
     now = datetime.now(UTC)
-    step_date = now.date()
     doc = RawBillDocument(
         timestamp=now,
         bill_id="PL-1234",

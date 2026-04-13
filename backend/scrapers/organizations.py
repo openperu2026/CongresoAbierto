@@ -202,7 +202,7 @@ class RawOrganizationScraper:
                 .filter(
                     RawOrganization.type_org == org.type_org,
                     RawOrganization.legislative_year == org.legislative_year,
-                    RawOrganization.last_update == True,
+                    RawOrganization.last_update,
                 )
                 .order_by(RawOrganization.timestamp.desc())
                 .first()
