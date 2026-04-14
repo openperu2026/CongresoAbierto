@@ -1,3 +1,4 @@
+# For running this test you should run:
 # uv run pytest -W ignore::UserWarning  .\tests\database\test_transformation_final.py -vv
 
 import re
