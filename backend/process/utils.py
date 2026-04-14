@@ -1,10 +1,11 @@
 import re
 import json
 import polars as pl
-
-from backend import PARTY_ALIASES
-from backend.config import directories
+from datetime import datetime
 from sqlalchemy.orm import Session
+
+from backend import PARTY_ALIASES, LegislativeYear
+from backend.config import directories
 from backend.database.raw_models import RawBill, RawMotion
 
 
@@ -64,10 +65,6 @@ def gen_congresistas_df(session: Session) -> None:
     df.write_json(directories.PROCESSED_DATA / "cong_info_2021_2026.json")
 
     return None
-
-
-from datetime import datetime
-from backend import LegislativeYear
 
 
 def get_current_leg_year(timestamp: str) -> LegislativeYear:
