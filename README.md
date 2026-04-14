@@ -147,8 +147,7 @@ E1 --> F3
 
 ### 1. Data Acquisition (Scrapers)
 
-Custom scrapers collect legislative data directly from Congress websites.
-They handle HTML pages, PDFs, and historical archives while remaining resilient to format changes.
+Custom scrapers collect legislative data directly from Congress websites. They handle HTML pages, PDFs, and historical archives while remaining resilient to format changes.
 
 ### 2. Raw Data Layer
 
