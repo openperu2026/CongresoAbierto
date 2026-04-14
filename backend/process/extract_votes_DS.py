@@ -606,6 +606,4 @@ def transformation_final(texto, congresistas_raw):
     # When the bellow block include a brother, it includes the full name
     final_match = matching_lists(third_match, list_below)
 
-
-    
     return {"title": titulo, "date": fecha, "results": final_match}
