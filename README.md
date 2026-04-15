@@ -180,7 +180,6 @@ Automated tests cover scrapers, database models, and processing logic to detect 
 
 The architecture is intentionally modular to support future extensions such as APIs, dashboards, and machine‑learning pipelines.
 
-
 ## Project Status and Roadmap
 
 OpenPeru is under active development. Current priorities include:
