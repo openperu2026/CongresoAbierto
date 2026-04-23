@@ -103,7 +103,6 @@ def normalize_text(
 
 
 def get_type(text: str) -> str | None:
-
     # Detect VOTACION
     if re.search(r"\bVOTACI[OÓ]N\s*:", text):
         return "VOTACION"
@@ -177,7 +176,6 @@ def _parse_fecha(fecha: str):
 
 
 def get_fecha(text):
-
     fecha_match = re.search(r"[Ff]echa[:\s]*([\d/]+)", text, re.IGNORECASE)
     if not fecha_match:
         fecha_match = re.search(r"[Ee]ccha[:\s]*([\d/]+)", text, re.IGNORECASE)
@@ -568,7 +566,6 @@ def matching_last_name(lst_congres, lst_attendance, text_below=False):
 
 
 def transformation_final(texto, congresistas_raw):
-
     texto_normalized = normalize_text(texto)
     type_text = get_type(texto_normalized)
     blocks = locate_blocks(texto_normalized, type_text)

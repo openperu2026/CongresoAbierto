@@ -246,7 +246,6 @@ def test_transformation_final_L31751():
 
 
 def test_transformation_final_L31989():
-
     try:
         from backend.process import extract_votes_DS as ev
     except Exception as exc:
