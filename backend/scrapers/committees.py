@@ -260,7 +260,7 @@ class RawCommitteeScraper:
                 .filter(
                     RawCommittee.legislative_year == committee.legislative_year,
                     RawCommittee.committee_type == committee.committee_type,
-                    RawCommittee.last_update == True,
+                    RawCommittee.last_update,
                 )
                 .order_by(RawCommittee.timestamp.desc())
                 .first()

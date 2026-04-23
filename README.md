@@ -147,8 +147,7 @@ E1 --> F3
 
 ### 1. Data Acquisition (Scrapers)
 
-Custom scrapers collect legislative data directly from Congress websites.
-They handle HTML pages, PDFs, and historical archives while remaining resilient to format changes.
+Custom scrapers collect legislative data directly from Congress websites. They handle HTML pages, PDFs, and historical archives while remaining resilient to format changes.
 
 ### 2. Raw Data Layer
 
@@ -181,7 +180,6 @@ Automated tests cover scrapers, database models, and processing logic to detect 
 
 The architecture is intentionally modular to support future extensions such as APIs, dashboards, and machine‑learning pipelines.
 
-
 ## Project Status and Roadmap
 
 OpenPeru is under active development. Current priorities include:
@@ -198,4 +196,3 @@ Contributions and feedback are welcome.
 ## License
 
 This project is released under an open-source license. See the `LICENSE` file for details.
-
