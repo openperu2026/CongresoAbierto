@@ -36,3 +36,8 @@ dependencies = [
 
 [tool.uv.sources]
 backend = { path = "backend" }
+
+[dependency-groups]
+dev = [
+    "zensical>=0.0.34",
+]
