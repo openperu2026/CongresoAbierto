@@ -43,25 +43,13 @@ jobs:
           fi
 
           if [[ "$is_feature" == true ]]; then
-            if [[ "$BASE_REF" != "dev" ]]; then
-              echo "feature/* branches must target dev."
-              exit 1
-            fi
-            exit 0
+            [[ "$BASE_REF" == "dev" ]] || { echo "feature/* branches must target dev."; exit 1; }
           fi
 
           if [[ "$is_release" == true ]]; then
-            if [[ "$BASE_REF" != "main" && "$BASE_REF" != "dev" ]]; then
-              echo "release/* branches may only target main or dev."
-              exit 1
-            fi
-            exit 0
+            [[ "$BASE_REF" == "main" || "$BASE_REF" == "dev" ]] || { echo "release/* branches may only target main or dev."; exit 1; }
           fi
 
           if [[ "$is_hotfix" == true ]]; then
-            if [[ "$BASE_REF" != "main" && "$BASE_REF" != "dev" ]]; then
-              echo "hotfix/* branches may only target main or dev."
-              exit 1
-            fi
-            exit 0
+            [[ "$BASE_REF" == "main" || "$BASE_REF" == "dev" ]] || { echo "hotfix/* branches may only target main or dev."; exit 1; }
           fi
