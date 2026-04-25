@@ -1,6 +1,6 @@
 # Collaboration Principles
 
-## Coordination
+## Coordination and Issue Tracker
 Tasks are tracked through GitHub issues. Each GitHub issue is tracked on GitHub Projects, moving through the stages of "Backlog," "To Do," "In Progress," "On Hold," and "Done." Once issues are in the "In Progress" stage there will be a single issue owner who is responsible for updating each project, assigned on GitHub.
 
 Beyond GitHub issues, minor project communication will also go through CAPP Slack for coordination and quick updates quick updates. Project information will be shared on GitHub in formal documentation
