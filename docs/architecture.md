@@ -190,16 +190,13 @@ The processing module uses the raw data layer to process each core entity based 
 
     ---
 
-    Regarding OCR extraction for votes and attendance, currently assumes a fixed tabular structure, converts them to an `Image` object and runs `Tesseract OCR` on them to recover word text plus positional references at the column and row level. It iterates over lines to remove introductory text and classify pages into either ASISTENCIA (attendance) or VOTACIÓN (vote tally) based on headers. Each page contains three columns blocks record columns, which the OCR  uses as reference to parse each entry according to the following logic: the first token is interpreted as the ‘bancada’ abbreviator, the last token is interpreted as attendance status or vote (depending on the page class), and everything is interpreted as the the congressperson’s name.
+    Regarding OCR extraction for votes and attendance, currently assumes a fixed tabular structure, converts them to an `Image` object and runs `Tesseract OCR` on them to recover word text plus positional references at the column and row level. It iterates over lines to remove introductory text and classify pages into either `ASISTENCIA` (attendance) or `VOTACIÓN` (vote tally) based on headers. Each page contains three columns blocks record columns, which the OCR uses as reference to parse each entry according to the following logic: the first token is interpreted as the `bancada` abbreviator, the last token is interpreted as attendance status or vote (depending on the page class), and everything is interpreted as the congressmember's name.
 
-    In the future, the pipeline will ideally also account for out of date votes placed via letters to the president of congress that require a standalone parsing logic.
-    ---
+    *Note: In the future, the pipeline will ideally also account for out of date votes placed via letters to the president of congress that require a standalone parsing logic.*
 
 
 </div>
 
-
-In the future, the pipeline will ideally also account for out of date votes placed via letters to the president of congress that require a standalone parsing logic
 
 All the processing scripts are then routed into the **processed database** to its correspondent tables by using SQLAlchemy ORM and a `Pydantic` schema validation layer.
 
@@ -272,8 +269,18 @@ flowchart LR
 After the processing data layer, we already have the core entities for our system. However, there are a few features that require to add new processing layers on top of these entities. For instance, we are currently implementing two features:
 
 - **Bill Process Summarization**: this feature converts each bill’s legislative timeline into a human-readable Spanish narrative by reading bill and step records, cleaning text, ranking key events, and generating a concise status summary. We are also adding this generated summary directly to the bills table, and it will be updated every time a new step is recorded for that bill, so the stored summary always reflects the latest legislative state.
-- **Bill Difference Tracker**: this feature identifies how the text of a bill changes over the course of its lifetime. Using the date of each step of the bill and its details, we can identify when each bill was revised and changed. The raw extracted text from each document often contains unnecessary text, which requires pre-processing. For that, the bill text is scanned for key start and stop phrases (i.e. "EL CONGRESO DE LA REPÚBLICA; Ha dado la Ley siguiente:" and "COMUNIQUESE AL SEÑOR PRESIDENTE DE LA REPUBLICA PARA SU PROMULGACIÓN"). Everything between these markers are considered to be the actual bill text.
+- **Bill Difference Tracker**: this feature identifies how the text of a bill changes over the course of its lifetime. Using the date of each step of the bill and its details, we can identify when each bill was revised and changed. The raw extracted text from each document often contains unnecessary text, which requires pre-processing. For that, the bill text is scanned for key start and stop phrases (i.e. *"EL CONGRESO DE LA REPÚBLICA; Ha dado la Ley siguiente:"* and *"COMUNIQUESE AL SEÑOR PRESIDENTE DE LA REPUBLICA PARA SU PROMULGACIÓN"*). Everything between these markers are considered to be the actual bill text.
 
 
 ### Frontend
 
+The frontend of OpenCongress is a lightweight Server-Side Rendering (SSR) web application built with Flask and Jinja templates, complemented by selective use of JavaScript (e.g., D3.js) for interactivity and data visualization.
+
+#### Design Principles
+- Flask (Backend): routing, API logic, and data retrieval
+- Jinja (Templates): server-side HTML rendering
+- APIs: structured JSON for dynamic components
+- Progressive enhancement: pages render server-side, with JavaScript added for interactivity
+- Modular Visualization
+
+For more details, see [Endpoints](./endpoints.md)

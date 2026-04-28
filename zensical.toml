@@ -24,13 +24,7 @@ nav = [
   { "Overview" = ["index.md", "contribute.md"] },
   { "Architecture" = "architecture.md" },
   { "Data Model" = "data_model.md" },
-  { "Endpoints" = [
-                  "endpoints/endpoint1.md",
-                  "endpoints/endpoint2.md",
-                  "endpoints/endpoint3.md",
-                  "endpoints/endpoint4.md",
-                  "endpoints/endpoint5.md"
-                  ] },
+  { "Endpoints" = "endpoints.md" },
   { "Tech Decisions" = "tech_decisions.md" },
 ]
 

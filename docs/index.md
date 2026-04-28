@@ -72,6 +72,7 @@ Each major submodule includes its own README with more detailed documentation.
 We follow a GitFlow branching model. For detailed rules, go [here](./branch_model.md).
 
 *Our branches*
+
 - `main`: Production-ready code only. This branch always reflects the current stable release.
 - `dev`: Integration branch for ongoing development. All completed features are merged here before a `release`.
 - `feature/*`: New feature development. Branch from `dev` and merge back into `dev` when complete.
