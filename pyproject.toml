@@ -7,16 +7,19 @@ requires-python = ">=3.13"
 dependencies = [
     "asyncio>=3.4.3",
     "boto3>=1.35.0",
-    "fitz>=0.0.1.dev2",
+    "coverage>=7.13.5",
     "httpx[http2]>=0.28.1",
     "ipykernel>=6.29.5",
     "ipython>=9.0.2",
     "jellyfish>=1.2.0",
     "loguru>=0.7.3",
     "lxml>=5.3.1",
+    "matplotlib>=3.10.8",
     "numpy>=2.4.4",
     "opencv-python>=4.11.0.86",
+    "pandas>=3.0.2",
     "pathlib>=1.0.1",
+    "pdf2image>=1.17.0",
     "pillow>=12.2.0",
     "playwright>=1.58.0",
     "polars>=1.30.0",
@@ -28,6 +31,7 @@ dependencies = [
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
     "ruff>=0.12.0",
+    "scikit-learn>=1.8.0",
     "selenium>=4.33.0",
     "sqlalchemy>=2.0.41",
     "tqdm>=4.67.3",
@@ -36,3 +40,9 @@ dependencies = [
 
 [tool.uv.sources]
 backend = { path = "backend" }
+
+[dependency-groups]
+dev = [
+    "zensical>=0.0.34",
+    "openpyxl>=3.1.5",
+]

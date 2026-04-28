@@ -109,7 +109,7 @@ def test_attendance_summary(sample_vote_event):
 
 def test_bill_creation(sample_bill):
     bill = sample_bill
-    assert bill.author_name == None
+    assert bill.author_name is None
     assert bill.proponent == Proponents.PODER_EJECUTIVO
 
 

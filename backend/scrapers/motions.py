@@ -173,9 +173,7 @@ class RawMotionScraper:
         session = self.session or self.Session()
 
         try:
-            latest_rows = (
-                session.query(RawMotion).filter(RawMotion.last_update == True).all()
-            )
+            latest_rows = session.query(RawMotion).filter(RawMotion.last_update).all()
             pending_ids: list[str] = []
 
             for row in latest_rows:
